@@ -30,7 +30,6 @@ app.get('/', async (req, res) => {
 			height: parseInt(req.query.h)
 		})
 
-		console.log(req.query.cookie.length)
 		if (req.query.cookie.length > 2)
 			await page.setCookie({
 				url: decodeURIComponent(req.query.url),
@@ -55,7 +54,7 @@ app.get('/', async (req, res) => {
 		console.error(err)
 	}
 
-	await browser.close()
+	return await browser.close()
 })
 
 app.listen(process.env.PORT)
