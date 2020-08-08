@@ -13,73 +13,45 @@ app.use((req, res, next) => {
 });
 
 app.get('/', async (req, res) => {
-	console.log(req.query)
-	try {
-		const browser = await puppeteer.launch({ defaultViewport: null })
-		const page = await browser.newPage()
-		await page.setViewport({
-			width: parseInt(req.query.w),
-			height: parseInt(req.query.h)
-		})
-		await page.goto(decodeURIComponent(req.query.url)) // URL is given by the "user" (your client-side application)
-		const screenshotBuffer = await page.screenshot()
-		const screenshot = screenshotBuffer.toString('base64')
-
-		// Respond with the image
-		res.writeHead(200, {
-			'Content-Type': 'text/plain',
-			'Content-Length': screenshot.length
-		})
-		res.end(screenshot)
-		//res.json([screenshotBuffer.toString()])
-
-		await browser.close()
-	}
-	catch (err) {
-		throw new Error(err)
-	}
-})
-
-app.post('/', async (req, res) => {
-	const w = parseInt(req.body.w)
-	const h = parseInt(req.body.h)
-	if (!w || !h) return res.end()
+	if (!req.query.url || !req.query.w || !req.query.h)
+		res.status(402).end({ error: 'Required param(s) missing.' })
 
 	const browser = await puppeteer.launch({ defaultViewport: null })
 	const page = await browser.newPage()
 
-	await page.setViewport({
-		width: parseInt(req.body.w),
-		height: parseInt(req.body.h)
-	})
+	if (req.query.darkMode)
+		await page.emulateMediaFeatures([{
+			name: 'prefers-color-scheme', value: 'dark'
+		}]);
 
-
-	const screenshots = []
 	try {
-		for await (const profile of req.body.urls) {
-			if (profile.url !== '') {
-				await page.goto(decodeURIComponent(profile.url))
-				//await page.evaluate()
-				const screenshotBuffer = await page.screenshot()
+		await page.setViewport({
+			width: parseInt(req.query.w),
+			height: parseInt(req.query.h)
+		})
 
-				screenshots.push({
-					link: profile.link,
-					img: getBase64Image(screenshotBuffer).toString()
-				})
-			}
-		}
+		if (req.query.cookie)
+			await page.setCookie({
+				url: decodeURIComponent(req.query.url),
+				name: JSON.parse(req.query.cookie).key,
+				value: JSON.parse(req.query.cookie).val
+			})
 
-		console.log(screenshots)
-		res.status(200).send(JSON.stringify(screenshots))
-	}
-	catch (err) {
+		await page.goto(decodeURIComponent(req.query.url))
+		const screenshotBuffer = await page.screenshot()
+		const screenshot = screenshotBuffer.toString('base64')
+
+		/* res.writeHead(200, {
+			'Content-Type': 'text/plain',
+			'Content-Length': screenshot.length
+		}) */
+		res.send(screenshot)
+
+	} catch (err) {
 		console.error(err)
-		res.status(500).send({ error: err })
 	}
-
-
 
 	await browser.close()
 })
 
-app.listen(4848)
+app.listen(process.env.PORT)
