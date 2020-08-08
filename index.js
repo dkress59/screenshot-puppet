@@ -13,7 +13,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/', async (req, res) => {
-	if (!req.query.length || !req.query.url || !req.query.w || !req.query.h)
+	if (!req.query.url || !req.query.w || !req.query.h)
 		return res.status(402).send({ error: 'Required param(s) missing.' })
 
 	const browser = await puppeteer.launch({ defaultViewport: null })
