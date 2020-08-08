@@ -30,14 +30,18 @@ app.get('/', async (req, res) => {
 			height: parseInt(req.query.h)
 		})
 
-		if (req.query.cookie)
+		console.log(req.query.cookie.length)
+		if (req.query.cookie.length > 2)
 			await page.setCookie({
 				url: decodeURIComponent(req.query.url),
 				name: JSON.parse(req.query.cookie).key,
 				value: JSON.parse(req.query.cookie).val
 			})
 
-		await page.goto(decodeURIComponent(req.query.url))
+		await page.goto(
+			decodeURIComponent(req.query.url)/* ,
+			{ waitUntil: 'domcontentloaded' } */
+		)
 		const screenshotBuffer = await page.screenshot()
 		const screenshot = screenshotBuffer.toString('base64')
 
