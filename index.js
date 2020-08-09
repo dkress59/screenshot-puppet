@@ -16,7 +16,13 @@ app.get('/', async (req, res) => {
 	if (!req.query.url || !req.query.w || !req.query.h)
 		return res.status(402).send({ error: 'Required param(s) missing.' })
 
-	const browser = await puppeteer.launch({ defaultViewport: null })
+	const browser = await puppeteer.launch({
+		defaultViewport: null,
+		args: [
+			'--no-sandbox',
+			'--disable-setuid-sandbox'
+		]
+	})
 	const page = await browser.newPage()
 
 	if (req.query.darkMode)
