@@ -28,10 +28,12 @@ app.get('/', (req, res) => {
 				'--no-sandbox',
 				'--disable-setuid-sandbox'
 			]
-		})/* .catch(err => {
+		})
+
+		setTimeout(() => {
 			browser.close()
-			res.status(500).send({ error: err })
-		}) */
+			return res.status(500).send({ error: 'Process cancelled manually (timeout).' })
+		}, 6000)
 
 		try {
 
