@@ -22,49 +22,52 @@ app.get('/', async (req, res) => {
 			'--no-sandbox',
 			'--disable-setuid-sandbox'
 		]
-	}).catch((e) => res.send({ error: 'timeout abort' }))
+	})
+		.then(p => {
 
-	try {
+			try {
 
-		if (!req.query.url || !req.query.w || !req.query.h)
-			throw 'Required param(s) missing.'
+				if (!req.query.url || !req.query.w || !req.query.h)
+					throw 'Required param(s) missing.'
 
-		const page = await browser.newPage()
+				const page = await browser.newPage()
 
-		page.setViewport({
-			width: parseInt(req.query.w),
-			height: parseInt(req.query.h)
+				page.setViewport({
+					width: parseInt(req.query.w),
+					height: parseInt(req.query.h)
+				})
+
+				if (req.query.darkMode)
+					await page.emulateMediaFeatures([{
+						name: 'prefers-color-scheme', value: 'dark'
+					}])
+
+				if (req.query.cookie.length > 2)
+					await page.setCookie({
+						url: decodeURIComponent(req.query.url),
+						name: JSON.parse(req.query.cookie).key,
+						value: JSON.parse(req.query.cookie).val
+					})
+
+				await page.goto(
+					decodeURIComponent(req.query.url)/* ,
+				{ waitUntil: 'domcontentloaded' } */
+				)
+				const screenshotBuffer = await page.screenshot()
+				const screenshot = screenshotBuffer.toString('base64')
+
+				await browser.close()
+				return res.send({ img: screenshot })
+
+			} catch (err) {
+				res.status(500).send({ error: err })
+				console.log(err)
+				await browser.close()
+				return //res.status(500).send({ error: err })
+				//return new Error(err)
+			}
 		})
-
-		if (req.query.darkMode)
-			await page.emulateMediaFeatures([{
-				name: 'prefers-color-scheme', value: 'dark'
-			}])
-
-		if (req.query.cookie.length > 2)
-			await page.setCookie({
-				url: decodeURIComponent(req.query.url),
-				name: JSON.parse(req.query.cookie).key,
-				value: JSON.parse(req.query.cookie).val
-			})
-
-		await page.goto(
-			decodeURIComponent(req.query.url)/* ,
-			{ waitUntil: 'domcontentloaded' } */
-		)
-		const screenshotBuffer = await page.screenshot()
-		const screenshot = screenshotBuffer.toString('base64')
-
-		await browser.close()
-		return res.send({ img: screenshot })
-
-	} catch (err) {
-		res.status(500).send({ error: err })
-		console.log(err)
-		await browser.close()
-		return //res.status(500).send({ error: err })
-		//return new Error(err)
-	}
+		.catch((e) => void e)
 
 })
 
