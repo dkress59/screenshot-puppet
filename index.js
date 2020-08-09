@@ -28,10 +28,10 @@ app.get('/', async (req, res) => {
 
 	const browser = await puppeteer.launch({
 		defaultViewport: null,
-		args: [
+		/* args: [
 			'--no-sandbox',
 			'--disable-setuid-sandbox'
-		]
+		] */
 	})
 	const page = await browser.newPage()
 
