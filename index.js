@@ -59,7 +59,8 @@ app.get('/', (req, res) => {
 
 		} catch (err) {
 			res.status(500).send({ error: err })
-			return new Error(err)
+			console.error(err)
+			return //new Error(err)
 		}
 
 	})()
