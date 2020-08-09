@@ -17,6 +17,7 @@ app.get('/', (req, res) => {
 	process.on("unhandledRejection", (reason, p) => {
 		console.error("Unhandled Rejection at: Promise", p, "reason:", reason)
 		browser.close()
+		return res.send({ error: reason })
 	})
 
 		(async () => {
