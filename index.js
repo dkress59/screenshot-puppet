@@ -1,8 +1,10 @@
 const puppeteer = require('puppeteer')
 const express = require('express')
 const bodyParser = require('body-parser')
+//const morgan = require('morgan')
 
 const app = express()
+//app.use(morgan("combined"))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
@@ -57,13 +59,12 @@ app.get('/', (req, res) => {
 			const screenshotBuffer = await page.screenshot()
 			const screenshot = screenshotBuffer.toString('base64')
 
-			await browser.close()
-			return res.send({ img: screenshot })
+			res.end(JSON.stringify({ img: screenshot }))
 
 		}
 
 		catch (err) {
-			res.status(500).send({ error: err })
+			res.status(500).end(JSON.stringify({ error: err }))
 			console.log(err)
 		}
 
