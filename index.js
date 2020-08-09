@@ -59,7 +59,7 @@ app.get('/', async (req, res) => {
 
 	} catch (err) {
 		console.error(err)
-		await browser.close()
+		browser.close()
 		return res.status(500).send({ error: err })
 		//return new Error(err)
 	}
