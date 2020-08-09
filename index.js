@@ -22,7 +22,7 @@ app.get('/', async (req, res) => {
 			'--no-sandbox',
 			'--disable-setuid-sandbox'
 		]
-	}).catch((e) => void e)
+	}).catch((e) => res.send({ error: 'timeout abort' }))
 
 	try {
 
