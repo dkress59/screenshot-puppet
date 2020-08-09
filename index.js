@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 		try {
 
 			if (!req.query.url || !req.query.w || !req.query.h)
-				throw new Error('Required param(s) missing.')
+				throw 'Required param(s) missing.'
 
 			const browser = await puppeteer.launch({
 				defaultViewport: null,
@@ -59,8 +59,7 @@ app.get('/', (req, res) => {
 
 		} catch (err) {
 			res.status(500).send({ error: err })
-			console.error(err)
-			return
+			throw new Error(err)
 		}
 
 	})()
