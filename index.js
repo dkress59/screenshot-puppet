@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 	(async () => {
 
 		const browser = await puppeteer.launch({
-			timeout: 0,
+			timeout: 6666,
 			defaultViewport: null,
 			args: [
 				'--no-sandbox',
