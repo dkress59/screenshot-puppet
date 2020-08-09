@@ -59,7 +59,7 @@ app.get('/', (req, res) => {
 
 		} catch (err) {
 			res.status(500).send({ error: err })
-			throw new Error(err)
+			return new Error(err)
 		}
 
 	})()
