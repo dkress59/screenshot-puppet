@@ -33,10 +33,10 @@ app.get('/', (req, res) => {
 					'--no-sandbox',
 					'--disable-setuid-sandbox'
 				]
-			}).catch(err => {
+			})/* .catch(err => {
 				browser.close()
 				res.status(500).send({ error: err })
-			})
+			}) */
 			const page = await browser.newPage()
 
 			page.setViewport({
@@ -63,13 +63,13 @@ app.get('/', (req, res) => {
 			const screenshotBuffer = await page.screenshot()
 			const screenshot = screenshotBuffer.toString('base64')
 
-			browser.close()
+			await browser.close()
 			//return screenshot
 			return res.send({ img: screenshot })
 
 		} catch (err) {
 			console.error(err)
-			browser.close()
+			await browser.close()
 			return res.status(500).send({ error: err })
 			//return new Error(err)
 		}
