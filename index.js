@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
 				'--no-sandbox',
 				'--disable-setuid-sandbox'
 			]
-		})
+		}).catch(e => void e)
 
 		try {
 
