@@ -16,12 +16,6 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => {
 
-	/* process.on("unhandledRejection", (reason, p) => {
-		console.error("Unhandled Rejection at: Promise", p, "reason:", reason)
-		browser.close()
-		return res.send({ error: reason })
-	}) */
-
 	(async () => {
 
 		const browser = await puppeteer.launch({
@@ -69,7 +63,6 @@ app.get('/', (req, res) => {
 			const screenshot = screenshotBuffer.toString('base64')
 
 			await browser.close()
-			//return screenshot
 			return res.send({ img: screenshot })
 
 		} catch (err) {
