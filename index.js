@@ -55,12 +55,13 @@ app.get('/', async (req, res) => {
 
 		await browser.close()
 		//return screenshot
-		return res.send(screenshot)
+		return res.send({ img: screenshot })
 
 	} catch (err) {
-		res.status(500).send({ error: err })
 		console.error(err)
-		return //new Error(err)
+		await browser.close()
+		return res.status(500).send({ error: err })
+		//return new Error(err)
 	}
 
 	//})()
