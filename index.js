@@ -22,21 +22,22 @@ app.get('/', (req, res) => {
 
 	(async () => {
 
+		const browser = await puppeteer.launch({
+			defaultViewport: null,
+			args: [
+				'--no-sandbox',
+				'--disable-setuid-sandbox'
+			]
+		})/* .catch(err => {
+			browser.close()
+			res.status(500).send({ error: err })
+		}) */
+
 		try {
 
 			if (!req.query.url || !req.query.w || !req.query.h)
 				throw 'Required param(s) missing.'
 
-			const browser = await puppeteer.launch({
-				defaultViewport: null,
-				args: [
-					'--no-sandbox',
-					'--disable-setuid-sandbox'
-				]
-			})/* .catch(err => {
-				browser.close()
-				res.status(500).send({ error: err })
-			}) */
 			const page = await browser.newPage()
 
 			page.setViewport({
