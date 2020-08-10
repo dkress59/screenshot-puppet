@@ -22,6 +22,7 @@ app.get('/', (req, res) => {
 
 		const browser = await puppeteer.launch({
 			timeout: 6666,
+			handleSIGINT: false,
 			defaultViewport: null,
 			args: [
 				'--no-sandbox',
@@ -36,7 +37,7 @@ app.get('/', (req, res) => {
 
 			const page = await browser.newPage()
 
-			page.setViewport({
+			await page.setViewport({
 				width: parseInt(req.query.w),
 				height: parseInt(req.query.h)
 			})
@@ -57,6 +58,9 @@ app.get('/', (req, res) => {
 				decodeURIComponent(req.query.url)/* ,
 				{ waitUntil: 'domcontentloaded' } */
 			)
+
+			await browser.close()
+
 			const screenshotBuffer = await page.screenshot()
 			const screenshot = screenshotBuffer.toString('base64')
 
@@ -70,7 +74,7 @@ app.get('/', (req, res) => {
 		}
 
 		finally {
-			await browser.close()
+			//await browser.close()
 		}
 
 	})()

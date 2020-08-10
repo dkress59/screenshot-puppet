@@ -1,1 +1,1 @@
-web: node index.js --unhandled-rejections=strict
+web: node index.js --trace-warnings
