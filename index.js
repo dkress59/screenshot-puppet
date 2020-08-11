@@ -17,7 +17,7 @@ app.use((req, res, next) => {
 })
 
 app.get('/', (req, res) => {
-	return res.status(500).send({ error: 'GET forbidden temporarily.' }
+	return res.status(500).send({ error: 'GET forbidden temporarily.' })
 
 	/*	(async () => {
 
