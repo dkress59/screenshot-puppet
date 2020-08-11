@@ -86,11 +86,11 @@ app.post('/', async (req, res) => {
 	//(async () => {
 
 	if (!req.body || req.body == {})
-		throw new Error('Nothing passed in the request body.')
+		return res.status(500).send({ error: 'Nothing passed in the request body.' })
 
 	const browser = await puppeteer.launch({
 		timeout: 6666,
-		//handleSIGINT: false,
+		handleSIGINT: false,
 		defaultViewport: null,
 		args: [
 			'--no-sandbox',
