@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer')
 const express = require('express')
 const bodyParser = require('body-parser')
-const { restart } = require('nodemon')
 //const morgan = require('morgan')
 
 const app = express()
