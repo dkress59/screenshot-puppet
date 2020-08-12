@@ -1,14 +1,54 @@
 #!/usr/bin/env node
-//require('dotenv').config()
 const puppeteer = require('puppeteer')
 const express = require('express')
 const bodyParser = require('body-parser')
 //const morgan = require('morgan')
+const redis = require('redis')
+const util = require('util')
 
 const app = express()
-//app.use(morgan("combined"))
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+const client = redis.createClient(process.env.REDIS_PORT)
+client.get = util.promisify(client.get)
+client.setex = util.promisify(client.setex)
+
+const cache = async (req, res, next) => {
+
+	if (req.method !== 'POST')
+		return next()
+	if (!req.body || req.body == {})
+		return res.status(402).send({ error: 'Nothing passed in the request body.' })
+
+	const needed = []
+	const cached = []
+	for await (const image of req.body) {
+		const cacheId =
+			new Date().getFullYear().toString()
+			+ '-' + new Date().getMonth().toString()
+			+ `-${image.link}-${req.body.w}x${req.body.h}`
+
+		try {
+			const isCached = await client.get(cacheId)
+			if (isCached && isCached.length) {
+				console.log('cached')
+				cached.push({ src: isCached, link: image.link })
+			}
+			else {
+				console.log('needed', isCached)
+				needed.push(image)
+			}
+		} catch (err) { console.error(err) }
+	}
+
+	console.log(needed.length, cached.length)
+
+	if (cached.length === req.body.length) {
+		return res.send(JSON.stringify(cached))
+	}
+
+	req.body = { cached, needed }
+	next()
+
+}
 
 app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
@@ -17,9 +57,12 @@ app.use((req, res, next) => {
 	res.type('application/json')
 	next()
 })
+app.use(bodyParser.json())
+//app.use(morgan('tiny'))
+app.use(cache)
 
 app.get('/', (req, res) => {
-	return res.status(500).send({ error: 'GET forbidden temporarily.' })
+	return res.status(402).send({ error: 'GET forbidden temporarily.' })
 
 		(async () => {
 
@@ -71,7 +114,7 @@ app.get('/', (req, res) => {
 				}
 		
 				catch (err) {
-					res.status(500).end(JSON.stringify({ error: err }))
+					res.status(402).send(JSON.stringify({ error: err }))
 					console.log(err)
 				}
 		
@@ -85,10 +128,7 @@ app.get('/', (req, res) => {
 
 
 app.post('/', async (req, res) => {
-	//(async () => {
-
-	if (!req.body || req.body == {})
-		return res.status(500).send({ error: 'Nothing passed in the request body.' })
+	const { cached, needed } = req.body
 
 	const browser = await puppeteer.launch({
 		timeout: 6666,
@@ -101,7 +141,7 @@ app.post('/', async (req, res) => {
 	}).catch(e => void e)
 
 	const returns = []
-	for (const image of req.body)
+	for (const image of needed)
 		returns.push((async () => {
 
 			try {
@@ -131,13 +171,17 @@ app.post('/', async (req, res) => {
 
 				const screenshotBuffer = await page.screenshot()
 				const screenshot = screenshotBuffer.toString('base64')
+				const cacheId =
+					new Date().getFullYear().toString()
+					+ '-' + new Date().getMonth().toString()
+					+ `-${image.link}-${needed.w}x${needed.h}`
 
+				await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
 				return { src: screenshot, link: image.link }
 
 			}
 
 			catch (err) {
-				//res.status(500).end(JSON.stringify({ error: err }))
 				console.log(err)
 				return { error: err, url: image.url, link: image.link }
 			}
@@ -146,11 +190,11 @@ app.post('/', async (req, res) => {
 
 	Promise.all(returns)
 		.then(images => {
-			res.status(200).send(JSON.stringify(images))
+			res.send(JSON.stringify([...cached, ...images]))
 			//browser.close()
 		})
 		.catch(err => {
-			res.status(500).send(JSON.stringify({ error: err }))
+			res.status(402).send(JSON.stringify({ error: err }))
 			//browser.close()
 		})
 		.finally(() => {
@@ -160,7 +204,6 @@ app.post('/', async (req, res) => {
 
 	//browser.close()
 
-	//)()
 })
 
 app.listen(process.env.PORT)
