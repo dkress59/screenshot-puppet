@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+//require('dotenv').config()
 const puppeteer = require('puppeteer')
 const express = require('express')
 const bodyParser = require('body-parser')
