@@ -19,66 +19,66 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
 	return res.status(500).send({ error: 'GET forbidden temporarily.' })
 
-	/*	(async () => {
+		(async () => {
 
-			const browser = await puppeteer.launch({
-				timeout: 6666,
-				handleSIGINT: false,
-				defaultViewport: null,
-				args: [
-					'--no-sandbox',
-					'--disable-setuid-sandbox'
-				]
-			}).catch(e => void e)
-
-			try {
-
-				if (!req.query.url || !req.query.w || !req.query.h)
-					throw 'Required param(s) missing.'
-
-				const page = await browser.newPage()
-
-				await page.setViewport({
-					width: parseInt(req.query.w),
-					height: parseInt(req.query.h)
-				})
-
-				if (req.query.darkMode)
-					await page.emulateMediaFeatures([{
-						name: 'prefers-color-scheme', value: 'dark'
-					}])
-
-				if (req.query.cookie.length > 2)
-					await page.setCookie({
-						url: decodeURIComponent(req.query.url),
-						name: JSON.parse(req.query.cookie).key,
-						value: JSON.parse(req.query.cookie).val
+			/*	const browser = await puppeteer.launch({
+					timeout: 6666,
+					handleSIGINT: false,
+					defaultViewport: null,
+					args: [
+						'--no-sandbox',
+						'--disable-setuid-sandbox'
+					]
+				}).catch(e => void e)
+		
+				try {
+		
+					if (!req.query.url || !req.query.w || !req.query.h)
+						throw 'Required param(s) missing.'
+		
+					const page = await browser.newPage()
+		
+					await page.setViewport({
+						width: parseInt(req.query.w),
+						height: parseInt(req.query.h)
 					})
-
-				await page.goto(
-					decodeURIComponent(req.query.url)
-				)
-
-				await browser.close()
-
-				const screenshotBuffer = await page.screenshot()
-				const screenshot = screenshotBuffer.toString('base64')
-
-				res.end(JSON.stringify({ img: screenshot }))
-
-			}
-
-			catch (err) {
-				res.status(500).end(JSON.stringify({ error: err }))
-				console.log(err)
-			}
-
-			finally {
-				//await browser.close()
-			}
+		
+					if (req.query.darkMode)
+						await page.emulateMediaFeatures([{
+							name: 'prefers-color-scheme', value: 'dark'
+						}])
+		
+					if (req.query.cookie.length > 2)
+						await page.setCookie({
+							url: decodeURIComponent(req.query.url),
+							name: JSON.parse(req.query.cookie).key,
+							value: JSON.parse(req.query.cookie).val
+						})
+		
+					await page.goto(
+						decodeURIComponent(req.query.url)
+					)
+		
+					await browser.close()
+		
+					const screenshotBuffer = await page.screenshot()
+					const screenshot = screenshotBuffer.toString('base64')
+		
+					res.end(JSON.stringify({ img: screenshot }))
+		
+				}
+		
+				catch (err) {
+					res.status(500).end(JSON.stringify({ error: err }))
+					console.log(err)
+				}
+		
+				finally {
+					//await browser.close()
+				}*/
 
 		})()
-		*/
+
 })
 
 
@@ -102,49 +102,49 @@ app.post('/', async (req, res) => {
 	for (const image of req.body)
 		returns.push((async () => {
 
-			//	try {
+			try {
 
-			const page = await browser.newPage()
+				const page = await browser.newPage()
 
-			await page.setViewport({
-				width: parseInt(image.w),
-				height: parseInt(image.h)
-			})
-
-			if (image.darkMode)
-				await page.emulateMediaFeatures([{
-					name: 'prefers-color-scheme', value: 'dark'
-				}])
-
-			if (image.cookie.length > 2)
-				await page.setCookie({
-					url: decodeURIComponent(image.url),
-					name: JSON.parse(image.cookie).key,
-					value: JSON.parse(image.cookie).val
+				await page.setViewport({
+					width: parseInt(image.w),
+					height: parseInt(image.h)
 				})
 
-			await page.goto(
-				decodeURIComponent(image.url)
-			)
+				if (image.darkMode)
+					await page.emulateMediaFeatures([{
+						name: 'prefers-color-scheme', value: 'dark'
+					}])
 
-			const screenshotBuffer = await page.screenshot()
-			const screenshot = screenshotBuffer.toString('base64')
+				if (image.cookie.length > 2)
+					await page.setCookie({
+						url: decodeURIComponent(image.url),
+						name: JSON.parse(image.cookie).key,
+						value: JSON.parse(image.cookie).val
+					})
 
-			return { src: screenshot, link: image.link }
+				await page.goto(
+					decodeURIComponent(image.url)
+				)
 
-			//	}
+				const screenshotBuffer = await page.screenshot()
+				const screenshot = screenshotBuffer.toString('base64')
 
-			/* catch (err) {
-				res.status(500).end(JSON.stringify({ error: err }))
+				return { src: screenshot, link: image.link }
+
+			}
+
+			catch (err) {
+				//res.status(500).end(JSON.stringify({ error: err }))
 				console.log(err)
-			} */
+				return { error: err, url: image.url, link: image.link }
+			}
 
 		})())
 
 	Promise.all(returns)
 		.then(images => {
 			res.status(200).send(JSON.stringify(images))
-			console.log('closing browser...', JSON.stringify(images).length)
 			//browser.close()
 		})
 		.catch(err => {
@@ -152,6 +152,7 @@ app.post('/', async (req, res) => {
 			//browser.close()
 		})
 		.finally(() => {
+			console.log('closing browser...')
 			browser.close().catch(e => void e)
 		})
 
