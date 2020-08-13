@@ -5,7 +5,6 @@ const bodyParser = require('body-parser')
 //const morgan = require('morgan')
 const redis = require('redis')
 const util = require('util')
-const cors = require('cors')
 
 const app = express()
 const client = redis.createClient(process.env.REDIS_URL || 'redis://127.0.0.1:6379')
@@ -48,7 +47,6 @@ const cache = async (req, res, next) => {
 
 }
 
-app.use(cors())
 app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 	res.header("Access-Control-Allow-Origin", process.env.ALLOW_ACCESS)
@@ -61,7 +59,7 @@ app.use(bodyParser.json())
 app.use(cache)
 
 app.get('/', (req, res) => {
-	return res.status(403).send({ error: 'GET is forbidden.', pipeline: 'good as is' })
+	return res.status(403).send({ error: 'GET is forbidden.' })
 
 		(async () => {
 
