@@ -59,7 +59,7 @@ app.use(bodyParser.json())
 app.use(cache)
 
 app.get('/', (req, res) => {
-	return res.status(403).send({ error: 'GET forbidden temporarily.', test: 'test', port: process.env.PORT, allow: process.env.ALLOW_ACCESS, redis: process.env.REDIS_PORT })
+	return res.status(403).send({ error: 'GET forbidden temporarily.', redis: process.env.REDIS_URL })
 
 		(async () => {
 
