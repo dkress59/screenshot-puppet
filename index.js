@@ -7,7 +7,7 @@ const redis = require('redis')
 const util = require('util')
 
 const app = express()
-const client = redis.createClient(process.env.REDIS_PORT)
+const client = redis.createClient(process.env.REDIS_URL)
 client.get = util.promisify(client.get)
 client.setex = util.promisify(client.setex)
 
