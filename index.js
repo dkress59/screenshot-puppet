@@ -7,7 +7,7 @@ const redis = require('redis')
 const util = require('util')
 
 const app = express()
-const client = redis.createClient(process.env.REDIS_URL)
+const client = redis.createClient(process.env.REDIS_URL || 'redis://127.0.0.1:6379')
 client.get = util.promisify(client.get)
 client.setex = util.promisify(client.setex)
 
@@ -15,16 +15,13 @@ const cache = async (req, res, next) => {
 
 	if (req.method !== 'POST')
 		next()
-	if (!req.body || req.body == {})
+	if (!req.body || req.body == [])
 		return res.status(402).send({ error: 'Nothing passed in the request body.' })
 
 	const needed = []
 	const cached = []
 	for await (const image of req.body) {
-		const cacheId =
-			new Date().getFullYear().toString()
-			+ '-' + new Date().getMonth().toString()
-			+ `-${image.link}-${req.body.w}x${req.body.h}`
+		const cacheId = `${image.link}-${parseInt(image.w)}x${parseInt(image.h)}`
 
 		try {
 			const isCached = await client.get(cacheId)
@@ -171,10 +168,7 @@ app.post('/', async (req, res) => {
 
 				const screenshotBuffer = await page.screenshot()
 				const screenshot = screenshotBuffer.toString('base64')
-				const cacheId =
-					new Date().getFullYear().toString()
-					+ '-' + new Date().getMonth().toString()
-					+ `-${image.link}-${needed.w}x${needed.h}`
+				const cacheId = `${image.link}-${needed.w}x${needed.h}`
 
 				await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
 				return { src: screenshot, link: image.link }
