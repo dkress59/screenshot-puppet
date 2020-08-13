@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 //const morgan = require('morgan')
 const redis = require('redis')
 const util = require('util')
+const cors = require('cors')
 
 const app = express()
 const client = redis.createClient(process.env.REDIS_URL || 'redis://127.0.0.1:6379')
@@ -47,13 +48,14 @@ const cache = async (req, res, next) => {
 
 }
 
-app.use((req, res, next) => {
+app.use(cors())
+/* app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 	res.header("Access-Control-Allow-Origin", process.env.ALLOW_ACCESS)
 	//res.header("Cache-Control", "private, max-age=2592000")
 	res.type('application/json')
 	next()
-})
+}) */
 app.use(bodyParser.json())
 //app.use(morgan('tiny'))
 app.use(cache)
