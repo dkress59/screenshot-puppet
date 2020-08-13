@@ -47,19 +47,19 @@ const cache = async (req, res, next) => {
 
 }
 
-app.use((req, res, next) => {
+/* app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 	res.header("Access-Control-Allow-Origin", process.env.ALLOW_ACCESS)
 	//res.header("Cache-Control", "private, max-age=2592000")
 	res.type('application/json')
 	next()
-})
+}) */
 app.use(bodyParser.json())
 //app.use(morgan('tiny'))
 app.use(cache)
 
 app.get('/', (req, res) => {
-	return res.status(403).send({ error: 'GET is forbidden.', redis: process.env.REDIS_URL })
+	return res.status(403).send({ error: 'GET is forbidden.', pipeline: 'good as is' })
 
 		(async () => {
 
