@@ -14,7 +14,7 @@ client.setex = util.promisify(client.setex)
 const cache = async (req, res, next) => {
 
 	if (req.method !== 'POST')
-		return next()
+		next()
 	if (!req.body || req.body == {})
 		return res.status(402).send({ error: 'Nothing passed in the request body.' })
 
