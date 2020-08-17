@@ -2,7 +2,7 @@
 const puppeteer = require('puppeteer')
 const express = require('express')
 const bodyParser = require('body-parser')
-//const morgan = require('morgan')
+const morgan = require('morgan')
 const redis = require('redis')
 const util = require('util')
 
@@ -62,7 +62,7 @@ app.use((req, res, next) => {
 	next()
 })
 app.use(bodyParser.json())
-//app.use(morgan('tiny'))
+app.use(morgan('tiny'))
 app.use(cache)
 
 app.get('/', (req, res) => {
@@ -96,9 +96,6 @@ app.post('/', async (req, res) => {
 						width: parseInt(image.w),
 						height: parseInt(image.h)
 					})
-				} catch (err) {
-					return res.send(1, err)
-				} try {
 
 					if (image.darkMode)
 						await page.emulateMediaFeatures([{
@@ -111,16 +108,10 @@ app.post('/', async (req, res) => {
 							name: JSON.parse(image.cookie).key,
 							value: JSON.parse(image.cookie).val
 						})
-				} catch (err) {
-					return res.send(2, err)
-				} try {
 
 					await page.goto(
 						decodeURIComponent(image.url)
 					)
-				} catch (err) {
-					return res.send(3, err)
-				} try {
 
 					const screenshotBuffer = await page.screenshot()
 					const screenshot = screenshotBuffer.toString('base64')
@@ -132,7 +123,7 @@ app.post('/', async (req, res) => {
 				}
 
 				catch (err) {
-					console.log(4, err)
+					console.log(err)
 					return { error: err, url: image.url, link: image.link }
 				}
 
