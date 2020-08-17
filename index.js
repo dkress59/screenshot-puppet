@@ -2,13 +2,13 @@
 const puppeteer = require('puppeteer')
 const express = require('express')
 const bodyParser = require('body-parser')
-const morgan = require('morgan')
+//const morgan = require('morgan')
 const redis = require('redis')
 const util = require('util')
 
 const PORT = process.env.PORT || 8080
 const REDIS = process.env.REDIS_URL || 'redis://127.0.0.1:6379'
-const ACCESS = process.env.ALLOW_ACCESS || '*'
+const ALLOW_ACCESS = process.env.ALLOW_ACCESS || '*'
 
 const app = express()
 const client = redis.createClient(REDIS)
@@ -18,14 +18,17 @@ client.setex = util.promisify(client.setex)
 const cache = async (req, res, next) => {
 
 	if (req.method !== 'POST')
-		next()
-	if (!req.body || req.body == [])
+		return next()
+	if (!req.body || req.body == {})
 		return res.status(402).send({ error: 'Nothing passed in the request body.' })
 
 	const needed = []
 	const cached = []
 	for await (const image of req.body) {
-		const cacheId = `${image.link}-${parseInt(image.w)}x${parseInt(image.h)}`
+		const cacheId =
+			new Date().getFullYear().toString()
+			+ '-' + new Date().getMonth().toString()
+			+ `-${image.link}-${req.body.w}x${req.body.h}`
 
 		try {
 			const isCached = await client.get(cacheId)
@@ -37,10 +40,7 @@ const cache = async (req, res, next) => {
 				console.log('needed', isCached)
 				needed.push(image)
 			}
-		} catch (err) {
-			console.error(err)
-			throw new Error(err)
-		}
+		} catch (err) { console.error(err) }
 	}
 
 	console.log(needed.length, cached.length)
@@ -56,17 +56,17 @@ const cache = async (req, res, next) => {
 
 app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-	res.header("Access-Control-Allow-Origin", ACCESS)
+	res.header("Access-Control-Allow-Origin", ALLOW_ACCESS)
 	//res.header("Cache-Control", "private, max-age=2592000")
 	res.type('application/json')
 	next()
 })
 app.use(bodyParser.json())
-app.use(morgan('tiny'))
-//app.use(cache)
+//app.use(morgan('tiny'))
+app.use(cache)
 
 app.get('/', (req, res) => {
-	return res.status(403).send({ error: 'GET is forbidden.', redis: REDIS })
+	return res.status(402).send({ error: 'GET forbidden temporarily.' })
 })
 
 
@@ -84,50 +84,52 @@ app.post('/', async (req, res) => {
 	}).catch(e => void e)
 
 	const returns = []
-	if (needed.length)
-		for (const image of needed)
-			returns.push((async () => {
+	for (const image of needed)
+		returns.push((async () => {
 
-				try {
+			try {
 
-					const page = await browser.newPage()
+				const page = await browser.newPage()
 
-					await page.setViewport({
-						width: parseInt(image.w),
-						height: parseInt(image.h)
+				await page.setViewport({
+					width: parseInt(image.w),
+					height: parseInt(image.h)
+				})
+
+				if (image.darkMode)
+					await page.emulateMediaFeatures([{
+						name: 'prefers-color-scheme', value: 'dark'
+					}])
+
+				if (image.cookie.length > 2)
+					await page.setCookie({
+						url: decodeURIComponent(image.url),
+						name: JSON.parse(image.cookie).key,
+						value: JSON.parse(image.cookie).val
 					})
 
-					if (image.darkMode)
-						await page.emulateMediaFeatures([{
-							name: 'prefers-color-scheme', value: 'dark'
-						}])
+				await page.goto(
+					decodeURIComponent(image.url)
+				)
 
-					if (image.cookie.length > 2)
-						await page.setCookie({
-							url: decodeURIComponent(image.url),
-							name: JSON.parse(image.cookie).key,
-							value: JSON.parse(image.cookie).val
-						})
+				const screenshotBuffer = await page.screenshot()
+				const screenshot = screenshotBuffer.toString('base64')
+				const cacheId =
+					new Date().getFullYear().toString()
+					+ '-' + new Date().getMonth().toString()
+					+ `-${image.link}-${needed.w}x${needed.h}`
 
-					await page.goto(
-						decodeURIComponent(image.url)
-					)
+				await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
+				return { src: screenshot, link: image.link }
 
-					const screenshotBuffer = await page.screenshot()
-					const screenshot = screenshotBuffer.toString('base64')
-					const cacheId = `${image.link}-${needed.w}x${needed.h}`
+			}
 
-					await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
-					return { src: screenshot, link: image.link }
+			catch (err) {
+				console.log(err)
+				return { error: err, url: image.url, link: image.link }
+			}
 
-				}
-
-				catch (err) {
-					console.log(err)
-					return { error: err, url: image.url, link: image.link }
-				}
-
-			})())
+		})())
 
 	Promise.all(returns)
 		.then(images => {
