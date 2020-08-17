@@ -6,8 +6,12 @@ const bodyParser = require('body-parser')
 const redis = require('redis')
 const util = require('util')
 
+const PORT = process.env.PORT || 8080
+const REDIS = process.env.REDIS_URL || 'redis://127.0.0.1:6379'
+const ACCESS = process.env.ALLOW_ACCESS || '*'
+
 const app = express()
-const client = redis.createClient(process.env.REDIS_URL || 'redis://127.0.0.1:6379')
+const client = redis.createClient(REDIS)
 client.get = util.promisify(client.get)
 client.setex = util.promisify(client.setex)
 
@@ -33,7 +37,10 @@ const cache = async (req, res, next) => {
 				console.log('needed', isCached)
 				needed.push(image)
 			}
-		} catch (err) { console.error(err) }
+		} catch (err) {
+			console.error(err)
+			throw new Error(err)
+		}
 	}
 
 	console.log(needed.length, cached.length)
@@ -49,7 +56,7 @@ const cache = async (req, res, next) => {
 
 app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-	res.header("Access-Control-Allow-Origin", process.env.ALLOW_ACCESS)
+	res.header("Access-Control-Allow-Origin", ACCESS)
 	//res.header("Cache-Control", "private, max-age=2592000")
 	res.type('application/json')
 	next()
@@ -59,7 +66,7 @@ app.use(bodyParser.json())
 app.use(cache)
 
 app.get('/', (req, res) => {
-	return res.status(403).send({ error: 'GET is forbidden.' })
+	return res.status(403).send({ error: 'GET is forbidden.', redis: REDIS })
 
 		(async () => {
 
@@ -138,49 +145,50 @@ app.post('/', async (req, res) => {
 	}).catch(e => void e)
 
 	const returns = []
-	for (const image of needed)
-		returns.push((async () => {
+	if (needed.length)
+		for (const image of needed)
+			returns.push((async () => {
 
-			try {
+				try {
 
-				const page = await browser.newPage()
+					const page = await browser.newPage()
 
-				await page.setViewport({
-					width: parseInt(image.w),
-					height: parseInt(image.h)
-				})
-
-				if (image.darkMode)
-					await page.emulateMediaFeatures([{
-						name: 'prefers-color-scheme', value: 'dark'
-					}])
-
-				if (image.cookie.length > 2)
-					await page.setCookie({
-						url: decodeURIComponent(image.url),
-						name: JSON.parse(image.cookie).key,
-						value: JSON.parse(image.cookie).val
+					await page.setViewport({
+						width: parseInt(image.w),
+						height: parseInt(image.h)
 					})
 
-				await page.goto(
-					decodeURIComponent(image.url)
-				)
+					if (image.darkMode)
+						await page.emulateMediaFeatures([{
+							name: 'prefers-color-scheme', value: 'dark'
+						}])
 
-				const screenshotBuffer = await page.screenshot()
-				const screenshot = screenshotBuffer.toString('base64')
-				const cacheId = `${image.link}-${needed.w}x${needed.h}`
+					if (image.cookie.length > 2)
+						await page.setCookie({
+							url: decodeURIComponent(image.url),
+							name: JSON.parse(image.cookie).key,
+							value: JSON.parse(image.cookie).val
+						})
 
-				await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
-				return { src: screenshot, link: image.link }
+					await page.goto(
+						decodeURIComponent(image.url)
+					)
 
-			}
+					const screenshotBuffer = await page.screenshot()
+					const screenshot = screenshotBuffer.toString('base64')
+					const cacheId = `${image.link}-${needed.w}x${needed.h}`
 
-			catch (err) {
-				console.log(err)
-				return { error: err, url: image.url, link: image.link }
-			}
+					await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
+					return { src: screenshot, link: image.link }
 
-		})())
+				}
+
+				catch (err) {
+					console.log(err)
+					return { error: err, url: image.url, link: image.link }
+				}
+
+			})())
 
 	Promise.all(returns)
 		.then(images => {
@@ -200,4 +208,4 @@ app.post('/', async (req, res) => {
 
 })
 
-app.listen(process.env.PORT)
+app.listen(PORT)
