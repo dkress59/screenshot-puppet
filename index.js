@@ -67,67 +67,6 @@ app.use(cache)
 
 app.get('/', (req, res) => {
 	return res.status(403).send({ error: 'GET is forbidden.', redis: REDIS })
-
-		(async () => {
-
-			/*	const browser = await puppeteer.launch({
-					timeout: 6666,
-					handleSIGINT: false,
-					defaultViewport: null,
-					args: [
-						'--no-sandbox',
-						'--disable-setuid-sandbox'
-					]
-				}).catch(e => void e)
-		
-				try {
-		
-					if (!req.query.url || !req.query.w || !req.query.h)
-						throw 'Required param(s) missing.'
-		
-					const page = await browser.newPage()
-		
-					await page.setViewport({
-						width: parseInt(req.query.w),
-						height: parseInt(req.query.h)
-					})
-		
-					if (req.query.darkMode)
-						await page.emulateMediaFeatures([{
-							name: 'prefers-color-scheme', value: 'dark'
-						}])
-		
-					if (req.query.cookie.length > 2)
-						await page.setCookie({
-							url: decodeURIComponent(req.query.url),
-							name: JSON.parse(req.query.cookie).key,
-							value: JSON.parse(req.query.cookie).val
-						})
-		
-					await page.goto(
-						decodeURIComponent(req.query.url)
-					)
-		
-					await browser.close()
-		
-					const screenshotBuffer = await page.screenshot()
-					const screenshot = screenshotBuffer.toString('base64')
-		
-					res.end(JSON.stringify({ img: screenshot }))
-		
-				}
-		
-				catch (err) {
-					res.status(402).send(JSON.stringify({ error: err }))
-					console.log(err)
-				}
-		
-				finally {
-					//await browser.close()
-				}*/
-
-		})()
-
 })
 
 
@@ -157,6 +96,9 @@ app.post('/', async (req, res) => {
 						width: parseInt(image.w),
 						height: parseInt(image.h)
 					})
+				} catch (err) {
+					return res.send(1, err)
+				} try {
 
 					if (image.darkMode)
 						await page.emulateMediaFeatures([{
@@ -169,10 +111,16 @@ app.post('/', async (req, res) => {
 							name: JSON.parse(image.cookie).key,
 							value: JSON.parse(image.cookie).val
 						})
+				} catch (err) {
+					return res.send(2, err)
+				} try {
 
 					await page.goto(
 						decodeURIComponent(image.url)
 					)
+				} catch (err) {
+					return res.send(3, err)
+				} try {
 
 					const screenshotBuffer = await page.screenshot()
 					const screenshot = screenshotBuffer.toString('base64')
@@ -184,7 +132,7 @@ app.post('/', async (req, res) => {
 				}
 
 				catch (err) {
-					console.log(err)
+					console.log(4, err)
 					return { error: err, url: image.url, link: image.link }
 				}
 
