@@ -63,7 +63,7 @@ app.use((req, res, next) => {
 })
 app.use(bodyParser.json())
 app.use(morgan('tiny'))
-app.use(cache)
+//app.use(cache)
 
 app.get('/', (req, res) => {
 	return res.status(403).send({ error: 'GET is forbidden.', redis: REDIS })
