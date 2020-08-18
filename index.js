@@ -6,7 +6,7 @@ const bodyParser = require('body-parser')
 const redis = require('redis')
 const util = require('util')
 
-const PORT = process.env.PORT || 8080
+const PORT = process.env.PORT || 80
 const REDIS = process.env.REDIS_URL || 'redis://127.0.0.1:6379'
 const ALLOW_ACCESS = process.env.ALLOW_ACCESS || '*'
 
