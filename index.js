@@ -81,7 +81,7 @@ app.post('/', async (req, res) => {
 			'--no-sandbox',
 			'--disable-setuid-sandbox'
 		]
-	}).catch(e => void e)
+	}).catch(() => (res.status(500).send({ error: 'error launching puppeteer.' })))
 
 	const returns = []
 	for (const image of needed)
