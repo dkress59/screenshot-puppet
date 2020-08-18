@@ -1,5 +1,5 @@
 <?
 exec('killall node');
 exec('npm install');
-exec('node index.js &');
+exec('PORT=4848 node index.js &');
 ?>
