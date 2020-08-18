@@ -75,13 +75,13 @@ app.post('/', async (req, res) => {
 
 	const browser = await puppeteer.launch({
 		timeout: 6666,
-		handleSIGINT: false,
+		//handleSIGINT: false,
 		defaultViewport: null,
 		args: [
 			'--no-sandbox',
 			'--disable-setuid-sandbox'
 		]
-	}).catch(() => (res.status(500).send({ error: 'error launching puppeteer.' })))
+	}).catch(e => (res.status(500).send({ error: 'error launching puppeteer: ' + e })))
 
 	const returns = []
 	for (const image of needed)
