@@ -65,12 +65,12 @@ app.use(bodyParser.json())
 //app.use(morgan('tiny'))
 app.use(cache)
 
-app.get('/', (req, res) => {
+app.get('/api/', (req, res) => {
 	return res.status(402).send({ error: 'GET forbidden temporarily.' })
 })
 
 
-app.post('/', async (req, res) => {
+app.post('/api/', async (req, res) => {
 	const { cached, needed } = req.body
 
 	const browser = await puppeteer.launch({
