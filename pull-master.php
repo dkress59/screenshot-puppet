@@ -1,4 +1,5 @@
 <?
+echo "PIPELINE\n";
 exec('killall node');
 echo "node.js killed.\n";
 exec('git pull');
