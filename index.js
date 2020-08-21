@@ -25,19 +25,17 @@ const cache = async (req, res, next) => {
 	const needed = []
 	const cached = []
 	for await (const image of req.body) {
-		const cacheId =
-			new Date().getFullYear().toString()
-			+ '-' + new Date().getMonth().toString()
-			+ `-${image.link}-${req.body.w}x${req.body.h}`
+		//console.log(image.w, image.h)
+		const cacheId = `${image.link}-${image.w}x${image.h}`
 
 		try {
 			const isCached = await client.get(cacheId)
 			if (isCached && isCached.length) {
-				console.log('cached')
+				console.log('cached', cacheId)
 				cached.push({ src: isCached, link: image.link })
 			}
 			else {
-				console.log('needed', isCached)
+				console.log('needed', cacheId)
 				needed.push(image)
 			}
 		} catch (err) { console.error(err) }
@@ -115,11 +113,9 @@ app.post('/api', async (req, res) => {
 
 				const screenshotBuffer = await page.screenshot()
 				const screenshot = screenshotBuffer.toString('base64')
-				const cacheId =
-					new Date().getFullYear().toString()
-					+ '-' + new Date().getMonth().toString()
-					+ `-${image.link}-${needed.w}x${needed.h}`
+				const cacheId = `${image.link}-${image.w}x${image.h}`
 
+				console.log(`set cache ${cacheId}`)
 				await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
 				return { src: screenshot, link: image.link }
 
