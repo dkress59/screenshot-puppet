@@ -1,2 +1,2 @@
-<?
-echo 'exec test';
+<?php
+echo 'exec fetch test';
