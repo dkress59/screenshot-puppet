@@ -1,2 +1,2 @@
 <?php
-echo 'exec fetch test';
+echo 'exec fetch test update';
