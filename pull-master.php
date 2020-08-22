@@ -1,15 +1,19 @@
 <?php
 echo "<h1>PIPELINE</h1><br />\n";
 
-`killall -9 node`;
-echo "node.js killed.<br />\n";
+echo `killall -9 node`;
+echo "<br />
+	node.js killed.<br />\n";
 
-`git pull`;
-echo "git repo pulled.<br />\n";
+echo `git pull`;
+echo "<br />
+	git repo pulled.<br />\n";
 
-`npm install`;
-`npm i puppeteer --unsafe-perm=true`;
-echo "npm packages updated.<br />\n";
+echo `npm install`;
+echo `npm i puppeteer --unsafe-perm=true`;
+echo "<br />
+	npm packages updated.<br />\n";
 
-`node index.js &`;
-echo "node.js restarted.<br />\n";
+echo `node index.js &`;
+echo "<br />
+	node.js restarted.<br />\n";
