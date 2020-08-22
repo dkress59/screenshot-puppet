@@ -6,7 +6,7 @@ echo "<br />
 	node.js killed.<br />\n";
 
 echo `git fetch --all`;
-echo `git checkout --force "origin/master`;
+echo `git checkout --force "origin/master"`;
 echo "<br />
 	git repo pulled.<br />\n";
 
