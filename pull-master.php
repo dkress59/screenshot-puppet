@@ -5,7 +5,8 @@ echo `killall -9 node`;
 echo "<br />
 	node.js killed.<br />\n";
 
-echo `git pull`;
+echo `git fetch --all`;
+echo `git checkout --force "origin/master`;
 echo "<br />
 	git repo pulled.<br />\n";
 
