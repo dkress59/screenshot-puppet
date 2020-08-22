@@ -1,5 +1,5 @@
 <?php
-echo "exec fetch test update 1000000<br />\n";
+echo "exec test<br />\n";
 
 if (function_exists('exec')) {
 	echo "exec is enabled<br />\n";
@@ -11,3 +11,5 @@ if (function_exists('shell_exec')) {
 } else {
 	echo "shell_exec is disabled<br />\n";
 }
+
+exec('whoami');
