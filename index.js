@@ -68,6 +68,7 @@ const cache = async (req, res, next) => {
 			} catch (err) {
 				console.error(err)
 			}
+			//req.query = image
 			next()
 			break
 
@@ -86,12 +87,11 @@ app.use(bodyParser.json())
 //app.use(morgan('tiny'))
 app.use(cache)
 
-app.get('/api/', async (req, res) => {
-	//return res.status(402).send({ error: 'GET forbidden temporarily.' })
 
+app.get('/api/', async (req, res) => {
 	const image = req.query
-	if (!image.length)
-		return res.status(402).send({ error: 'Required param(s) missing.' })
+	if (!image || image === {})
+		return res.status(400).send({ error: 'Required param(s) missing.' })
 
 	const browser = await puppeteer.launch({
 		//timeout: 6666,
@@ -231,8 +231,10 @@ app.post('/api/', async (req, res) => {
 
 })
 
+
 app.use('/', (req, res) => {
 	return res.status(402).send({ error: 'GET forbidden for this route.' })
 })
+
 
 app.listen(PORT)
