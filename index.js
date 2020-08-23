@@ -153,7 +153,8 @@ app.get('/api/', async (req, res) => {
 
 app.post('/api/', async (req, res) => {
 	const { cached, needed } = req.body
-	if (!needed || needed.length)//ToDo: fix this
+	console.log('next', needed.length)
+	if (!needed || !needed.length)//ToDo: fix this
 		return res.send(JSON.stringify(cached))
 
 	const browser = await puppeteer.launch({
