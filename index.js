@@ -50,7 +50,7 @@ const cache = async (req, res, next) => {
 			if (!needed || !needed.length || cached.length === req.body.length)
 				return res.send(JSON.stringify(cached))
 
-			res.body = { cached, needed }
+			req.body = { cached, needed }
 			next()
 			break
 
