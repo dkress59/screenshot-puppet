@@ -12,16 +12,17 @@ print_r($output);
 echo "<br />\n";
 unset($output);
 
-exec('git fetch --all', $output);
-exec('git checkout --force "origin/master"', $output);
+exec('git pull', $output);
+/* exec('git fetch --all', $output);
+exec('git checkout --force "origin/master"', $output); */
 echo "<br />
 	git repo pulled:<br />\n";
 print_r($output);
 echo "<br />\n";
 unset($output);
 
-exec('npm install', $output);
-exec('npm i puppeteer --unsafe-perm=true', $output);
+shell_exec('npm install', $output);
+//exec('npm i puppeteer --unsafe-perm=true', $output);
 echo "<br />
 	npm packages updated:<br />\n";
 print_r($output);

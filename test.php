@@ -12,4 +12,4 @@ if (function_exists('shell_exec')) {
 	echo "shell_exec is disabled<br />\n";
 }
 
-echo exec('whoami');
+echo `whoami`;
