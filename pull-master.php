@@ -1,8 +1,3 @@
 <?php
-/* exec('cd /var/www/screenshot-puppet && git pull', $output);
-echo "<h1>PIPELINE</h1><br />\n";
-print_r($output);
-echo "<br />\n";
-unset($output); */
-
-echo `cd /var/www/screenshot-puppet && git pull`;
+exec('git    ALL = (www-data) /usr/bin/git pull', $out);
+print_r($out);
