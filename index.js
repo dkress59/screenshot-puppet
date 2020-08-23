@@ -17,39 +17,65 @@ client.setex = util.promisify(client.setex)
 
 const cache = async (req, res, next) => {
 
-	if (req.method !== 'POST')
+	if (req.method !== 'POST' && req.method !== 'GET')
 		return next()
-	if (!req.body || req.body == {})
-		return res.status(402).send({ error: 'Nothing passed in the request body.' })
 
-	const needed = []
-	const cached = []
-	for await (const image of req.body) {
-		//console.log(image.w, image.h)
-		const cacheId = `${image.link}-${image.w}x${image.h}`
+	switch (req.method) {
+		default:
+			next()
+			break
 
-		try {
-			const isCached = await client.get(cacheId)
-			if (isCached && isCached.length) {
-				console.log('cached', cacheId)
-				cached.push({ src: isCached, link: image.link })
+		case 'POST':
+			if (!req.body || req.body == {})
+				return res.status(402).send({ error: 'Nothing passed in the request body.' })
+
+			const needed = []
+			const cached = []
+			for await (const image of req.body) {
+				const cacheId = `${image.link}-${image.w}x${image.h}`
+				try {
+					const isCached = await client.get(cacheId)
+					if (isCached && isCached.length) {
+						console.log('cached', cacheId)
+						cached.push({ src: isCached, link: image.link })
+					}
+					else {
+						console.log('needed', cacheId)
+						needed.push(image)
+					}
+				} catch (err) {
+					console.error(err)
+				}
 			}
-			else {
-				console.log('needed', cacheId)
-				needed.push(image)
+
+			console.log(needed.length, cached.length)
+
+			if (cached.length === req.body.length) {
+				return res.send(JSON.stringify(cached))
 			}
-		} catch (err) { console.error(err) }
+
+			req.body = { cached, needed }
+			next()
+			break
+
+		case 'GET':
+			const image = req.query
+			const cacheId = `${image.link}-${image.w}x${image.h}`
+			try {
+				const isCached = await client.get(cacheId)
+				if (isCached && isCached.length) {
+					console.log('cached', cacheId)
+					return res.send(JSON.stringify({ src: isCached, link: image.link, title: image.title }))
+				} else {
+					console.log('needed', cacheId)
+				}
+			} catch (err) {
+				console.error(err)
+			}
+			next()
+			break
+
 	}
-
-	console.log(needed.length, cached.length)
-
-	if (cached.length === req.body.length) {
-		return res.send(JSON.stringify(cached))
-	}
-
-	req.body = { cached, needed }
-	next()
-
 }
 
 app.use((req, res, next) => {
@@ -64,8 +90,68 @@ app.use(bodyParser.json())
 //app.use(morgan('tiny'))
 app.use(cache)
 
-app.get('/api', (req, res) => {
-	return res.status(402).send({ error: 'GET forbidden temporarily.' })
+app.get('/api/', async (req, res) => {
+	//return res.status(402).send({ error: 'GET forbidden temporarily.' })
+
+	const image = req.query
+	/* if (!image.length)
+		return res.status(402).send({ error: 'Required param(s) missing.' }) */
+
+	const browser = await puppeteer.launch({
+		//timeout: 6666,
+		//handleSIGINT: false,
+		defaultViewport: null,
+		args: [
+			'--no-sandbox',
+			'--disable-setuid-sandbox'
+		]
+	}).catch(e => (res.status(500).send({ error: 'error launching puppeteer: ' + e })))
+
+
+	try {
+
+		const page = await browser.newPage()
+
+		await page.setViewport({
+			width: parseInt(image.w),
+			height: parseInt(image.h)
+		})
+
+		if (image.darkMode)
+			await page.emulateMediaFeatures([{
+				name: 'prefers-color-scheme', value: 'dark'
+			}])
+
+		/* if (image.cookie.length > 2)
+			await page.setCookie({
+				url: decodeURIComponent(image.url),
+				name: JSON.parse(image.cookie).key,
+				value: JSON.parse(image.cookie).val
+			}) */
+
+		await page.goto(
+			decodeURIComponent(image.url)
+		)
+
+		const screenshotBuffer = await page.screenshot()
+		const screenshot = screenshotBuffer.toString('base64')
+		const cacheId = `${image.link}-${image.w}x${image.h}`
+
+		console.log(`set cache ${cacheId}`)
+		await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
+		res.send(JSON.stringify({ src: screenshot, link: image.link, title: image.title }))
+
+	}
+
+	catch (err) {
+		console.log(err)
+		res.send(JSON.stringify({ error: err, url: image.url, link: image.link, title: image.title }))
+	}
+
+	console.log('closing browser...')
+	await browser.close().catch(e => void e)
+	return
+
 })
 
 
@@ -144,6 +230,10 @@ app.post('/api', async (req, res) => {
 
 	//browser.close()
 
+})
+
+app.use('/', (req, res) => {
+	return res.status(402).send({ error: 'GET forbidden for this route.' })
 })
 
 app.listen(PORT)
