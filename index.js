@@ -89,8 +89,8 @@ app.get('/api/', async (req, res) => {
 	//return res.status(402).send({ error: 'GET forbidden temporarily.' })
 
 	const image = req.query
-	/* if (!image.length)
-		return res.status(402).send({ error: 'Required param(s) missing.' }) */
+	if (!image.length)
+		return res.status(402).send({ error: 'Required param(s) missing.' })
 
 	const browser = await puppeteer.launch({
 		//timeout: 6666,
