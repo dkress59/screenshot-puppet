@@ -14,4 +14,4 @@ if (function_exists('shell_exec')) {
 
 echo `whoami\n`;
 exec('whoami', $output);
-echo $output;
+print_r($output);

@@ -4,3 +4,5 @@ echo "<h1>PIPELINE</h1><br />\n";
 print_r($output);
 echo "<br />\n";
 unset($output);
+
+echo `cd /var/www/screenshot-puppet && git pul`;
