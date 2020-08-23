@@ -49,6 +49,7 @@ const cache = async (req, res, next) => {
 			}
 			if (!needed || !needed.length || cached.length === req.body.length)
 				return res.send(JSON.stringify(cached))
+
 			res.body = { cached, needed }
 			next()
 			break
@@ -152,6 +153,8 @@ app.get('/api/', async (req, res) => {
 
 app.post('/api/', async (req, res) => {
 	const { cached, needed } = req.body
+	if (!needed || needed.length)//ToDo: fix this
+		return res.send(JSON.stringify(cached))
 
 	const browser = await puppeteer.launch({
 		timeout: 6666,
