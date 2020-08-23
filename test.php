@@ -1,5 +1,5 @@
 <?php
-echo "new exec test<br />\n";
+echo "newer exec test<br />\n";
 
 if (function_exists('exec')) {
 	echo "exec is enabled<br />\n";
@@ -12,4 +12,6 @@ if (function_exists('shell_exec')) {
 	echo "shell_exec is disabled<br />\n";
 }
 
-echo `whoami`;
+echo `whoami\n`;
+exec('whoami', $output);
+echo $output;
