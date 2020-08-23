@@ -1,5 +1,5 @@
 <?php
-echo "newer exec test<br />\n";
+echo "newest exec test<br />\n";
 
 if (function_exists('exec')) {
 	echo "exec is enabled<br />\n";
