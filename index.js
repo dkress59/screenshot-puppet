@@ -118,13 +118,14 @@ app.get('/api/', async (req, res) => {
 				name: 'prefers-color-scheme', value: 'dark'
 			}])
 
-		/* if (image.cookie.length > 2)
+		/* console.log(image.cookie)
+		if (image.cookie && image.cookie.length > 2)
 			await page.setCookie({
 				url: decodeURIComponent(image.url),
 				name: JSON.parse(image.cookie).key,
 				value: JSON.parse(image.cookie).val
-			}) */
-
+			})
+ */
 		await page.goto(
 			decodeURIComponent(image.url)
 		)
