@@ -37,24 +37,19 @@ const cache = async (req, res, next) => {
 					const isCached = await client.get(cacheId)
 					if (isCached && isCached.length) {
 						console.log('cached', cacheId)
-						cached.push({ src: isCached, link: image.link })
-					}
-					else {
+						cached.push({ src: isCached, link: image.link, title: image.title })
+					} else {
 						console.log('needed', cacheId)
 						needed.push(image)
 					}
 				} catch (err) {
 					console.error(err)
+					needed.push(image)
 				}
 			}
-
-			console.log(needed.length, cached.length)
-
-			if (cached.length === req.body.length) {
+			if (!needed.length)
 				return res.send(JSON.stringify(cached))
-			}
-
-			req.body = { cached, needed }
+			res.body = { cached, needed }
 			next()
 			break
 
@@ -155,7 +150,7 @@ app.get('/api/', async (req, res) => {
 })
 
 
-app.post('/api', async (req, res) => {
+app.post('/api/', async (req, res) => {
 	const { cached, needed } = req.body
 
 	const browser = await puppeteer.launch({
@@ -186,12 +181,12 @@ app.post('/api', async (req, res) => {
 						name: 'prefers-color-scheme', value: 'dark'
 					}])
 
-				if (image.cookie.length > 2)
+				/* if (image.cookie.length > 2)
 					await page.setCookie({
 						url: decodeURIComponent(image.url),
 						name: JSON.parse(image.cookie).key,
 						value: JSON.parse(image.cookie).val
-					})
+					}) */
 
 				await page.goto(
 					decodeURIComponent(image.url)
@@ -203,13 +198,13 @@ app.post('/api', async (req, res) => {
 
 				console.log(`set cache ${cacheId}`)
 				await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
-				return { src: screenshot, link: image.link }
+				return { src: screenshot, link: image.link, title: image.title }
 
 			}
 
 			catch (err) {
 				console.log(err)
-				return { error: err, url: image.url, link: image.link }
+				return { error: err, url: image.url, link: image.link, title: image.title }
 			}
 
 		})())
