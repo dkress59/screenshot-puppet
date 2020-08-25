@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const puppeteer = require('puppeteer')
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -95,7 +94,7 @@ app.use(cache)
 
 app.get('/', async (req, res) => {
 	if (req.query.pull === 'master') {
-		res.status(200).end()
+		res.status(200).send('deploying...')
 		shell.exec(PULL)
 		return
 	}
