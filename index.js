@@ -55,7 +55,7 @@ const cache = async (req, res, next) => {
 		case 'GET':
 			const image = req.query
 			if (!image || !Object.entries(req.query).length)
-				return res.status(400).send({ error: 'Required param(s) missing. PIPELINE GOOD' })
+				return res.status(400).send({ error: 'Required param(s) missing.' })
 
 			const { w, h, link, title } = image
 			const cacheId = `${link}-${w}x${h}`
@@ -92,8 +92,9 @@ app.use(cache)
 
 app.get('/', async (req, res) => {
 	if (req.query.pull === 'master') {
+		res.status(200).end()
 		shell.exec('../puppet-pull.sh')
-		return res.status(200).end()
+		return
 	}
 
 	const { w, h, link, title, url, darkMode, cookie } = req.query
