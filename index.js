@@ -11,6 +11,7 @@ const REDIS = process.env.REDIS_URL || 'redis://127.0.0.1:6379'
 const ALLOW_ACCESS = process.env.ALLOW_ACCESS || '*'
 const PULL = process.env.PULL_PUPPET || null
 
+
 const app = express()
 const client = redis.createClient(REDIS)
 client.get = util.promisify(client.get)
@@ -64,7 +65,7 @@ const cache = async (req, res, next) => {
 		case 'GET':
 			const image = req.query
 			if (!image || !Object.entries(req.query).length)
-				return res.status(400).send({ error: 'Required param(s) missing. TEST' })
+				return res.status(400).send({ error: 'Required param(s) missing.' })
 
 			const { w, h, link, title } = image
 			const cacheId = `${link}-${w}x${h}`
@@ -85,6 +86,7 @@ const cache = async (req, res, next) => {
 
 	}
 }
+
 
 app.use(headers)
 app.use(bodyParser.json())
