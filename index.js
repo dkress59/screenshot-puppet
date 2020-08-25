@@ -54,7 +54,7 @@ const cache = async (req, res, next) => {
 		case 'GET':
 			const image = req.query
 			if (!image || !image.length || image === {})
-				return res.status(400).send({ error: 'Required param(s) missing. TEST' })
+				return res.status(400).send({ error: 'Required param(s) missing.' })
 
 			const { w, h, link, title } = image
 			const cacheId = `${link}-${w}x${h}`
@@ -91,7 +91,7 @@ app.use(cache)
 
 app.get('/', async (req, res) => {
 
-	const image = req.query
+	const { w, h, link, title, url, darkMode, cookie } = req.query
 	const browser = await puppeteer.launch({
 		//timeout: 6666,
 		//handleSIGINT: false,
@@ -107,42 +107,41 @@ app.get('/', async (req, res) => {
 		const page = await browser.newPage()
 
 		await page.setViewport({
-			width: parseInt(image.w),
-			height: parseInt(image.h)
+			width: parseInt(w),
+			height: parseInt(h)
 		})
 
-		if (image.darkMode)
+		if (darkMode)
 			await page.emulateMediaFeatures([{
 				name: 'prefers-color-scheme', value: 'dark'
 			}])
 
-		/* console.log(image.cookie)
-		if (image.cookie && image.cookie.length > 2)
+		/* console.log(cookie)
+		if (cookie && cookie.length > 2)
 			await page.setCookie({
-				url: decodeURIComponent(image.url),
-				name: JSON.parse(image.cookie).key,
-				value: JSON.parse(image.cookie).val
+				url: decodeURIComponent(url),
+				name: JSON.parse(cookie).key,
+				value: JSON.parse(cookie).val
 			})
  */
 		await page.goto(
-			decodeURIComponent(image.url)
+			decodeURIComponent(url)
 		)
 
-		const screenshotBuffer = await page.screenshot()
-		const screenshot = screenshotBuffer.toString('base64')
-		const cacheId = `${image.link}-${image.w}x${image.h}`
+		const screenshot = await page.screenshot()
+		const src = screenshot.toString('base64')
+		const cacheId = `${link}-${w}x${h}`
 
 		console.log(`set cache ${cacheId}`)
-		await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
-		res.send(JSON.stringify({ src: screenshot, link: image.link, title: image.title }))
-
+		await client.setex(cacheId, 60 * 60 * 24 * 30, src)
+		res.send(JSON.stringify({ src, link, title }))
 
 	}
 
-	catch (err) {
+	catch (error) {
 
-		console.log(err)
-		res.send(JSON.stringify({ error: err, url: image.url, link: image.link, title: image.title }))
+		console.log(error)
+		res.send(JSON.stringify({ error, link, title, url }))
 
 	}
 
@@ -173,45 +172,46 @@ app.post('/', async (req, res) => {
 	const returns = []
 	for (const image of needed)
 		returns.push((async () => {
+			const { w, h, link, title, url, darkMode, cookie } = image
 
 			try {
 
 				const page = await browser.newPage()
 
 				await page.setViewport({
-					width: parseInt(image.w),
-					height: parseInt(image.h)
+					width: parseInt(w),
+					height: parseInt(h)
 				})
 
-				if (image.darkMode)
+				if (darkMode)
 					await page.emulateMediaFeatures([{
 						name: 'prefers-color-scheme', value: 'dark'
 					}])
 
-				/* if (image.cookie.length > 2)
+				/* if (cookie.length > 2)
 					await page.setCookie({
-						url: decodeURIComponent(image.url),
-						name: JSON.parse(image.cookie).key,
-						value: JSON.parse(image.cookie).val
+						url: decodeURIComponent(url),
+						name: JSON.parse(cookie).key,
+						value: JSON.parse(cookie).val
 					}) */
 
 				await page.goto(
-					decodeURIComponent(image.url)
+					decodeURIComponent(url)
 				)
 
-				const screenshotBuffer = await page.screenshot()
-				const screenshot = screenshotBuffer.toString('base64')
-				const cacheId = `${image.link}-${image.w}x${image.h}`
+				const screenshot = await page.screenshot()
+				const src = screenshot.toString('base64')
+				const cacheId = `${link}-${w}x${h}`
 
 				console.log(`set cache ${cacheId}`)
-				await client.setex(cacheId, 60 * 60 * 24 * 30, screenshot)
-				return { src: screenshot, link: image.link, title: image.title }
+				await client.setex(cacheId, 60 * 60 * 24 * 30, src)
+				return { src, link, title }
 
 			}
 
-			catch (err) {
-				console.log(err)
-				return { error: err, url: image.url, link: image.link, title: image.title }
+			catch (error) {
+				console.log(error)
+				return { error, url, link, title }
 			}
 
 		})())
