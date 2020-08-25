@@ -53,7 +53,7 @@ const cache = async (req, res, next) => {
 
 		case 'GET':
 			const image = req.query
-			if (!image || !image.length || image === {})
+			if (!image || !Object.entries(req.query).length)
 				return res.status(400).send({ error: 'Required param(s) missing.' })
 
 			const { w, h, link, title } = image
