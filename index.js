@@ -10,11 +10,21 @@ const shell = require('shelljs')
 const PORT = process.env.PORT || 80
 const REDIS = process.env.REDIS_URL || 'redis://127.0.0.1:6379'
 const ALLOW_ACCESS = process.env.ALLOW_ACCESS || '*'
+const PULL = process.env.PULL_PUPPET || null
 
 const app = express()
 const client = redis.createClient(REDIS)
 client.get = util.promisify(client.get)
 client.setex = util.promisify(client.setex)
+
+const headers = (req, res, next) => {
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+	res.header("Access-Control-Allow-Origin", ALLOW_ACCESS)
+	//res.header("Cache-Control", "private, max-age=" + 60*60*24 * 30)
+	res.header("Cache-Control", "private, max-age=1")
+	res.type('application/json')
+	next()
+}
 
 const cache = async (req, res, next) => {
 	switch (req.method) {
@@ -77,14 +87,7 @@ const cache = async (req, res, next) => {
 	}
 }
 
-app.use((req, res, next) => {
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-	res.header("Access-Control-Allow-Origin", ALLOW_ACCESS)
-	//res.header("Cache-Control", "private, max-age=" + 60*60*24 * 30)
-	res.header("Cache-Control", "private, max-age=1")
-	res.type('application/json')
-	next()
-})
+app.use(headers)
 app.use(bodyParser.json())
 //app.use(morgan('tiny'))
 app.use(cache)
@@ -93,11 +96,15 @@ app.use(cache)
 app.get('/', async (req, res) => {
 	if (req.query.pull === 'master') {
 		res.status(200).end()
-		shell.exec('../puppet-pull.sh')
+		shell.exec(PULL)
 		return
 	}
 
-	const { w, h, link, title, url, darkMode, cookie } = req.query
+	const { w, h, link, title, url, darkMode } = req.query
+	/* const cookie = req.query.cookie
+		? JSON.parse(req.query.cookie)
+		: false */
+
 	const browser = await puppeteer.launch({
 		//timeout: 6666,
 		//handleSIGINT: false,
@@ -122,14 +129,13 @@ app.get('/', async (req, res) => {
 				name: 'prefers-color-scheme', value: 'dark'
 			}])
 
-		/* console.log(cookie)
-		if (cookie && cookie.length > 2)
+		/* if (cookie && Object.entries(cookie).length)
 			await page.setCookie({
 				url: decodeURIComponent(url),
-				name: JSON.parse(cookie).key,
-				value: JSON.parse(cookie).val
-			})
- */
+				name: cookie.key,
+				value: cookie.val
+			}) */
+
 		await page.goto(
 			decodeURIComponent(url)
 		)
@@ -178,7 +184,10 @@ app.post('/', async (req, res) => {
 	const returns = []
 	for (const image of needed)
 		returns.push((async () => {
-			const { w, h, link, title, url, darkMode, cookie } = image
+			const { w, h, link, title, url, darkMode } = image
+			/* const cookie = req.query.cookie
+				? JSON.parse(req.query.cookie)
+				: false */
 
 			try {
 
@@ -194,11 +203,11 @@ app.post('/', async (req, res) => {
 						name: 'prefers-color-scheme', value: 'dark'
 					}])
 
-				/* if (cookie.length > 2)
+				/* if (cookie && Object.entries(cookie).length)
 					await page.setCookie({
 						url: decodeURIComponent(url),
-						name: JSON.parse(cookie).key,
-						value: JSON.parse(cookie).val
+						name: cookie.key,
+						value: cookie.val
 					}) */
 
 				await page.goto(
@@ -228,7 +237,7 @@ app.post('/', async (req, res) => {
 			//browser.close()
 		})
 		.catch(err => {
-			res.status(402).send(JSON.stringify({ error: err }))
+			res.status(500).send(JSON.stringify({ error: err }))
 			//browser.close()
 		})
 		.finally(() => {
@@ -242,7 +251,7 @@ app.post('/', async (req, res) => {
 
 
 app.use('/', (req, res) => {
-	return res.status(402).send({ error: 'GET forbidden for this route.' })
+	return res.status(400).send({ error: 'GET forbidden for this route.' })
 })
 
 
