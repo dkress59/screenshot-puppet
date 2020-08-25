@@ -93,11 +93,6 @@ app.use(cache)
 
 
 app.get('/', async (req, res) => {
-	if (req.query.pull === 'master') {
-		res.status(200).send('deploying...')
-		shell.exec(PULL)
-		return
-	}
 
 	const { w, h, link, title, url, darkMode } = req.query
 	/* const cookie = req.query.cookie
@@ -246,6 +241,12 @@ app.post('/', async (req, res) => {
 
 	//browser.close()
 
+})
+
+app.post('/pull', (req, res) => {
+	res.status(200).send()
+	shell.exec(PULL)
+	return
 })
 
 
