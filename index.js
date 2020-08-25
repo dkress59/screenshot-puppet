@@ -243,7 +243,7 @@ app.post('/', async (req, res) => {
 
 })
 
-app.post('/pull', (req, res) => {
+app.post('/pull/', (req, res) => {
 	res.status(200).send('deploying...')
 	shell.exec(PULL)
 	return
