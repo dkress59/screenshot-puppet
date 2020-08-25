@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 //const morgan = require('morgan')
 const redis = require('redis')
 const util = require('util')
+const shell = require('shelljs')
 
 const PORT = process.env.PORT || 80
 const REDIS = process.env.REDIS_URL || 'redis://127.0.0.1:6379'
@@ -90,6 +91,10 @@ app.use(cache)
 
 
 app.get('/', async (req, res) => {
+	if (req.query.pull === 'master') {
+		shell.exec('../puppet-pull.sh')
+		return res.status(200).end()
+	}
 
 	const { w, h, link, title, url, darkMode, cookie } = req.query
 	const browser = await puppeteer.launch({
