@@ -55,7 +55,7 @@ const cache = async (req, res, next) => {
 		case 'GET':
 			const image = req.query
 			if (!image || !Object.entries(req.query).length)
-				return res.status(400).send({ error: 'Required param(s) missing.' })
+				return res.status(400).send({ error: 'Required param(s) missing. PIPELINE GOOD' })
 
 			const { w, h, link, title } = image
 			const cacheId = `${link}-${w}x${h}`
