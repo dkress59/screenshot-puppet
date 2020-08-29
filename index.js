@@ -63,6 +63,8 @@ const cache = async (req, res, next) => {
 			break
 
 		case 'GET':
+			if (req.path === '/update')
+				next()
 			const image = req.query
 			if (!image || !Object.entries(req.query).length)
 				return res.status(400).send({ error: 'Required param(s) missing.' })
@@ -87,14 +89,7 @@ const cache = async (req, res, next) => {
 	}
 }
 
-
-app.use(headers)
-app.use(bodyParser.json())
-//app.use(morgan('tiny'))
-app.use(cache)
-
-
-app.use('/update', (req, res) => {
+const update = (req, res) => {
 	shell.cd('/var/www/screenshot-puppet')
 	if (shell.exec('/var/www/screenshot-puppet/update.sh').code !== 0) {
 		res.status(500).send({ error: 'Update failed.' })
@@ -102,7 +97,14 @@ app.use('/update', (req, res) => {
 		res.send({ message: 'Update complete.' })
 		shell.exec('/usr/local/bin/pm2 restart screenshot-puppet')
 	}
-})
+}
+
+
+app.use(headers)
+app.use(bodyParser.json())
+//app.use(morgan('tiny'))
+app.use('/update', update)
+app.use(cache)
 
 
 app.get('/', async (req, res) => {
