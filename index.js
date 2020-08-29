@@ -107,7 +107,7 @@ app.use(cache)
 
 app.get('/', async (req, res) => {
 
-	const { w, h, link, title, url, darkMode } = req.query
+	const { w, h, link, title, url, darkMode, remove } = req.query
 	/* const cookie = req.query.cookie
 		? JSON.parse(req.query.cookie)
 		: false */
@@ -142,6 +142,11 @@ app.get('/', async (req, res) => {
 				name: cookie.key,
 				value: cookie.val
 			}) */
+		if (remove && Object.entries(remove).length)
+			await page.evaluate(() => {
+				for (const sel of remove)
+					document.querySelector(sel).remove()
+			})
 
 		await page.goto(
 			decodeURIComponent(url)
