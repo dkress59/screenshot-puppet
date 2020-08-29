@@ -26,6 +26,16 @@ const headers = (req, res, next) => {
 	next()
 }
 
+const update = (req, res) => {
+	shell.cd('/var/www/screenshot-puppet')
+	if (shell.exec('/var/www/screenshot-puppet/update.sh').code !== 0) {
+		res.status(500).send({ error: 'Update failed.' })
+	} else {
+		res.send({ message: 'Update complete.' })
+		shell.exec('/usr/local/bin/pm2 restart screenshot-puppet')
+	}
+}
+
 const cache = async (req, res, next) => {
 	switch (req.method) {
 
@@ -63,8 +73,6 @@ const cache = async (req, res, next) => {
 			break
 
 		case 'GET':
-			if (req.path === '/update')
-				next()
 			const image = req.query
 			if (!image || !Object.entries(req.query).length)
 				return res.status(400).send({ error: 'Required param(s) missing.' })
@@ -89,20 +97,10 @@ const cache = async (req, res, next) => {
 	}
 }
 
-const update = (req, res) => {
-	shell.cd('/var/www/screenshot-puppet')
-	if (shell.exec('/var/www/screenshot-puppet/update.sh').code !== 0) {
-		res.status(500).send({ error: 'Update failed.' })
-	} else {
-		res.send({ message: 'Update complete.' })
-		shell.exec('/usr/local/bin/pm2 restart screenshot-puppet')
-	}
-}
-
 
 app.use(headers)
-app.use(bodyParser.json())
 //app.use(morgan('tiny'))
+app.use(bodyParser.json())
 app.use('/update', update)
 app.use(cache)
 
