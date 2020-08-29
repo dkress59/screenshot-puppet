@@ -6,7 +6,7 @@ const redis = require('redis')
 const util = require('util')
 const shell = require('shelljs')
 
-const PORT = process.env.REDIS || 80
+const PORT = process.env.PUPPET_PORT || 80
 const REDIS = process.env.PUPPET_REDIS || 'redis://127.0.0.1:6379'
 const ALLOW_ACCESS = process.env.PUPPET_ACCESS || '*'
 const PULL = process.env.PUPPET_PULL || null
