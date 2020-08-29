@@ -6,10 +6,10 @@ const redis = require('redis')
 const util = require('util')
 const shell = require('shelljs')
 
-const PORT = process.env.PORT || 80
-const REDIS = process.env.REDIS_URL || 'redis://127.0.0.1:6379'
-const ALLOW_ACCESS = process.env.ALLOW_ACCESS || '*'
-const PULL = process.env.PULL_PUPPET || null
+const PORT = process.env.REDIS || 80
+const REDIS = process.env.PUPPET_REDIS || 'redis://127.0.0.1:6379'
+const ALLOW_ACCESS = process.env.PUPPET_ACCESS || '*'
+const PULL = process.env.PUPPET_PULL || null
 
 
 const app = express()
@@ -92,6 +92,17 @@ app.use(headers)
 app.use(bodyParser.json())
 //app.use(morgan('tiny'))
 app.use(cache)
+
+
+app.use('/update', (req, res) => {
+	shell.cd('/var/www/screenshot-puppet')
+	if (shell.exec('/var/www/screenshot-puppet/update.sh').code !== 0) {
+		res.status(500).send({ error: 'Update failed.' })
+	} else {
+		res.send({ message: 'Update complete.' })
+		shell.exec('/usr/local/bin/pm2 restart screenshot-puppet')
+	}
+})
 
 
 app.get('/', async (req, res) => {
@@ -243,12 +254,6 @@ app.post('/', async (req, res) => {
 
 	//browser.close()
 
-})
-
-app.post('/pull/', (req, res) => {
-	res.status(200).send('deploying...')
-	shell.exec(PULL)
-	return
 })
 
 
