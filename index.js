@@ -107,7 +107,10 @@ app.use(cache)
 
 app.get('/', async (req, res) => {
 
-	const { w, h, link, title, url, darkMode, remove } = req.query
+	const { w, h, link, title, url, darkMode } = req.query
+	const remove = (req.query.remove && req.query.remove !== undefined && req.query.remove !== 'undefined')
+		? JSON.parse(req.query.remove)
+		: false
 	/* const cookie = req.query.cookie
 		? JSON.parse(req.query.cookie)
 		: false */
@@ -136,21 +139,23 @@ app.get('/', async (req, res) => {
 				name: 'prefers-color-scheme', value: 'dark'
 			}])
 
-		/* if (cookie && Object.entries(cookie).length)
-			await page.setCookie({
-				url: decodeURIComponent(url),
-				name: cookie.key,
-				value: cookie.val
-			}) */
-		if (remove && Object.entries(remove).length)
-			await page.evaluate(() => {
-				for (const sel of remove)
-					document.querySelector(sel).remove()
-			})
-
 		await page.goto(
 			decodeURIComponent(url)
 		)
+
+		if (remove)
+			await remove.map(async sel => {
+				console.log('remove', sel)
+				try {
+					await page.evaluate(sel => {
+						if (document.querySelectorAll(sel).length)
+							for (const node of document.querySelectorAll(sel))
+								node.parentNode.removeChild(node)
+					}, sel)
+				} catch (error) {
+					console.error(error)
+				}
+			})
 
 		const screenshot = await page.screenshot()
 		const src = screenshot.toString('base64')
