@@ -102,7 +102,7 @@ app.use(headers)
 //app.use(morgan('tiny'))
 app.use(bodyParser.json())
 app.use('/update', update)
-app.use(cache)
+//app.use(cache)
 
 
 app.get('/', async (req, res) => {
@@ -111,12 +111,9 @@ app.get('/', async (req, res) => {
 	const remove = (req.query.remove && req.query.remove !== undefined && req.query.remove !== 'undefined')
 		? JSON.parse(req.query.remove)
 		: false
-	/* const cookie = req.query.cookie
-		? JSON.parse(req.query.cookie)
-		: false */
 
 	const browser = await puppeteer.launch({
-		//timeout: 6666,
+		timeout: 666,
 		//handleSIGINT: false,
 		defaultViewport: null,
 		args: [
@@ -140,21 +137,27 @@ app.get('/', async (req, res) => {
 			}])
 
 		await page.goto(
-			decodeURIComponent(url)
+			decodeURIComponent(url),
+			//{ waitUntil: 'load' },
 		)
 
+		//await page.waitForNavigation({ waitUntil: 'load' })
+		//page.waitFor(222)
+
 		if (remove)
-			await remove.map(async sel => {
+			remove.map(sel => {
 				console.log('remove', sel)
 				try {
-					await page.evaluate(sel => {
+					page.evaluate(sel => {
+						const nodes = document.querySelectorAll(sel)
 						if (document.querySelectorAll(sel).length)
-							for (const node of document.querySelectorAll(sel))
-								node.parentNode.removeChild(node)
+							for (let i = 0; i < nodes.length; i++)
+								nodes[i].parentNode.removeChild(nodes[i])
 					}, sel)
 				} catch (error) {
 					console.error(error)
 				}
+				return
 			})
 
 		const screenshot = await page.screenshot()
