@@ -27,12 +27,26 @@ const headers = (req, res, next) => {
 }
 
 const update = (req, res) => {
-	shell.cd('/var/www/screenshot-puppet')
-	if (shell.exec('/var/www/screenshot-puppet/update.sh').code !== 0) {
-		res.status(500).send({ error: 'Update failed.' })
+	if (req.query.v === 'fe') {
+
+		shell.cd('/var/www/dkress-mmxx')
+		if (shell.exec('/var/www/dkress-mmxx/update.sh').code !== 0) {
+			res.status(500).send({ error: 'Update failed.' })
+		} else {
+			res.send({ message: 'Update complete.' })
+			shell.exec('/usr/local/bin/pm2 restart DK20')
+		}
+
 	} else {
-		res.send({ message: 'Update complete.' })
-		shell.exec('/usr/local/bin/pm2 restart screenshot-puppet')
+
+		shell.cd('/var/www/screenshot-puppet')
+		if (shell.exec('/var/www/screenshot-puppet/update.sh').code !== 0) {
+			res.status(500).send({ error: 'Update failed.' })
+		} else {
+			res.send({ message: 'Update complete.' })
+			shell.exec('/usr/local/bin/pm2 restart screenshot-puppet')
+		}
+
 	}
 }
 
@@ -102,7 +116,7 @@ app.use(headers)
 //app.use(morgan('tiny'))
 app.use(bodyParser.json())
 app.use('/update', update)
-//app.use(cache)
+app.use(cache)
 
 
 app.get('/', async (req, res) => {
