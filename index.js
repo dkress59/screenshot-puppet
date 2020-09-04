@@ -9,7 +9,6 @@ const shell = require('shelljs')
 const PORT = process.env.PUPPET_PORT || 80
 const REDIS = process.env.PUPPET_REDIS || 'redis://127.0.0.1:6379'
 const ALLOW_ACCESS = process.env.PUPPET_ACCESS || '*'
-const PULL = process.env.PUPPET_PULL || null
 
 
 const app = express()
@@ -20,6 +19,7 @@ client.setex = util.promisify(client.setex)
 const headers = (req, res, next) => {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 	res.header("Access-Control-Allow-Origin", ALLOW_ACCESS)
+	res.header("Access-Control-Allow-Methods", "*")
 	//res.header("Cache-Control", "private, max-age=" + 60*60*24 * 30)
 	res.header("Cache-Control", "private, max-age=1")
 	res.type('application/json')
@@ -33,7 +33,7 @@ const update = (req, res) => {
 		if (shell.exec('/var/www/dkress-mmxx/update.sh').code !== 0) {
 			res.status(500).send({ error: 'Update failed.' })
 		} else {
-			res.send({ message: 'Update complete.' })
+			res.status(200).send({ message: 'Update complete.' })
 			shell.exec('/usr/local/bin/pm2 restart DK20')
 		}
 
@@ -111,6 +111,13 @@ const cache = async (req, res, next) => {
 	}
 }
 
+const fallback = (req, res) => {
+	if (req.method === 'OPTIONS')
+		res.status(200).end()
+
+	return res.status(400).send({ error: `${req.method} forbidden for this route.` })
+}
+
 
 app.use(headers)
 //app.use(morgan('tiny'))
@@ -119,14 +126,8 @@ app.use('/update', update)
 app.use(cache)
 
 
-app.get('/', async (req, res) => {
-
-	const { w, h, link, title, url, darkMode } = req.query
-	const remove = (req.query.remove && req.query.remove !== undefined && req.query.remove !== 'undefined')
-		? JSON.parse(req.query.remove)
-		: false
-
-	const browser = await puppeteer.launch({
+const launchBrowser = async () => await puppeteer
+	.launch({
 		timeout: 666,
 		//handleSIGINT: false,
 		defaultViewport: null,
@@ -134,7 +135,11 @@ app.get('/', async (req, res) => {
 			'--no-sandbox',
 			'--disable-setuid-sandbox'
 		]
-	}).catch(e => (res.status(500).send({ error: 'error launching puppeteer: ' + e })))
+	})
+	.catch(e => res.status(500).send({ error: 'error launching puppeteer: ' + e }))
+
+const makeScreenshot = async (browser, image, remove) => {
+	const { w, h, link, title, url, darkMode } = image
 
 	try {
 
@@ -180,17 +185,34 @@ app.get('/', async (req, res) => {
 
 		console.log(`set cache ${cacheId}`)
 		await client.setex(cacheId, 60 * 60 * 24 * 30, src)
-		res.send(JSON.stringify({ src, link, title }))
+		return { src, link, title }
 
 	}
 
 	catch (error) {
 
 		console.log(error)
-		res.send(JSON.stringify({ error, link, title, url }))
+		return { error, link, title, url }
 
 	}
 
+}
+
+
+app.get('/', async (req, res) => {
+
+	const image = req.query
+	const remove = (image.remove && image.remove !== undefined && image.remove !== 'undefined')
+		? JSON.parse(image.remove)
+		: false
+
+	const browser = await launchBrowser()
+
+	const response = await makeScreenshot(browser, image, remove)
+	const status = response.error === undefined
+		? 200
+		: 500
+	res.status(status).send(JSON.stringify(response))
 
 	console.log('closing browser...')
 	await browser.close().catch(e => void e)
@@ -200,93 +222,50 @@ app.get('/', async (req, res) => {
 
 
 app.post('/', async (req, res) => {
-	const { cached, needed } = req.body
-	console.log('next', needed.length)
-	if (!needed || !needed.length)//ToDo: fix this
-		return res.send(JSON.stringify(cached))
 
-	const browser = await puppeteer.launch({
-		timeout: 6666,
-		//handleSIGINT: false,
-		defaultViewport: null,
-		args: [
-			'--no-sandbox',
-			'--disable-setuid-sandbox'
-		]
-	}).catch(e => (res.status(500).send({ error: 'error launching puppeteer: ' + e })))
+	const { cached, needed } = req.body
+	const browser = await launchBrowser()
 
 	const returns = []
-	for (const image of needed)
+	const errors = []
+	for await (const image of needed)
 		returns.push((async () => {
-			const { w, h, link, title, url, darkMode } = image
-			/* const cookie = req.query.cookie
-				? JSON.parse(req.query.cookie)
-				: false */
+			const remove = (image.remove && image.remove !== undefined && image.remove !== 'undefined')
+				? JSON.parse(image.remove)
+				: false
 
 			try {
-
-				const page = await browser.newPage()
-
-				await page.setViewport({
-					width: parseInt(w),
-					height: parseInt(h)
-				})
-
-				if (darkMode)
-					await page.emulateMediaFeatures([{
-						name: 'prefers-color-scheme', value: 'dark'
-					}])
-
-				/* if (cookie && Object.entries(cookie).length)
-					await page.setCookie({
-						url: decodeURIComponent(url),
-						name: cookie.key,
-						value: cookie.val
-					}) */
-
-				await page.goto(
-					decodeURIComponent(url)
-				)
-
-				const screenshot = await page.screenshot()
-				const src = screenshot.toString('base64')
-				const cacheId = `${link}-${w}x${h}`
-
-				console.log(`set cache ${cacheId}`)
-				await client.setex(cacheId, 60 * 60 * 24 * 30, src)
-				return { src, link, title }
-
+				const response = await makeScreenshot(browser, image, remove)
+				return response
 			}
 
 			catch (error) {
-				console.log(error)
-				return { error, url, link, title }
+				console.error(error)
+				errors.push({ error, url: image.url, link: image.link, title: image.title })
+				return
 			}
 
 		})())
 
 	Promise.all(returns)
 		.then(images => {
-			res.send(JSON.stringify([...cached, ...images]))
-			//browser.close()
+			if (images.filter(i => i.error !== undefined).length)
+				console.log('Error count:', images.filter(i => i.error !== undefined).length)
+			res.status(200).send(JSON.stringify([...cached, ...images]))
 		})
 		.catch(err => {
+			console.error(err)
 			res.status(500).send(JSON.stringify({ error: err }))
-			//browser.close()
 		})
 		.finally(() => {
 			console.log('closing browser...')
 			browser.close().catch(e => void e)
 		})
 
-	//browser.close()
-
 })
 
 
-app.use('/', (req, res) => {
-	return res.status(400).send({ error: 'GET forbidden for this route.' })
-})
+app.use('/', fallback)
 
 
 app.listen(PORT)
