@@ -1,35 +1,36 @@
-import fs from 'fs'
 import { Request, Response } from 'express'
-import { makePDF } from '../util/index'
+import { makePDF, client } from '../util/util'
 
 const pdf = async (req: Request, res: Response) => {
 	const fileName = req.params.id + '.pdf'
-	const fileHeader = {
-		root: './',
-		headers: {
-			'Content-Disposition': 'attachment;fileName=' + fileName
-		},
-		maxAge: 3 * (1000 * 60 * 60 * 24)// 3 days
+	const cached: Boolean = await client.exists(`lv-pdf/${fileName}`)
+	const fileHeaders = [
+		'Content-Disposition', 'attachment;fileName=' + fileName,
+		'Cache-Control', `maxage=${60 * 60 * 24 * 3}`
+	]
+	console.log(`file exists: ${cached}`)
+
+	if (cached) {
+		const file = await client.get(`lv-pdf/${fileName}`)
+		res
+			.header(fileHeaders[0], fileHeaders[1])
+			.header(fileHeaders[2], fileHeaders[3])
+			.send(Buffer.from(file, 'base64'))
+		console.log(`file ${fileName} sent.`)
+		return true
 	}
 
-	console.log('file exists:', fs.existsSync(`pdf/'${fileName}`))
-	if (fs.existsSync(`pdf/'${fileName}`)) {
-		res.sendFile(fileName, fileHeader)
-		console.log('file exists: ', fileName)
-		return true
-	}
-	else {
-		try {
-			await makePDF(fileName)
-		} catch (err) {
-			res.status(500).json({ error: err })
-			console.error(err)
-			return false
-		}
-		res.sendFile(`pdf/${fileName}`, fileHeader)
-		console.log('file sent: ' + fileName)
-		return true
-	}
+	const file = await makePDF(fileName)
+	if (!file)
+		return res.status(500).json({ error: 'File not found.' })
+
+	res
+		.header(fileHeaders[0], fileHeaders[1])
+		.header(fileHeaders[2], fileHeaders[3])
+		.send(file)
+
+	console.log(`file ${fileName} sent.`)
+	return true
 }
 
 export default pdf

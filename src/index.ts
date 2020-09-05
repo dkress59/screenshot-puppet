@@ -1,9 +1,10 @@
 /**
  * ToDo:
- * - improve error handling
+ * - improve error handling (POST!)
  * - add morgan access log
  * - replace console.logs
- * - implement PDF
+ * - advance PDF implementation
+ * - write POST from anew (?)
  * 
  */
 
@@ -15,7 +16,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import { headers, cache, fallback } from './util/middlewares'
 import update from './routes/update'
-import { launchBrowser, makeScreenshot } from './util'
+import { launchBrowser, makeScreenshot } from './util/util'
 import ParsedQuery from './types/ParsedQuery'
 import Screenshot from './types/Screenshot'
 //import morgan from 'morgan';
@@ -37,8 +38,11 @@ app.get('/', async (req: Request, res: Response) => {
 	const browser = await launchBrowser(res)
 
 	const response = await makeScreenshot(browser, image)
-	const status = response.error === undefined ? 200 : 500
-	res.status(status).send(JSON.stringify(response))
+	response.source
+		? res.status(200).send(JSON.stringify(response))
+		: image.error
+			? res.status(500).send(JSON.stringify(response))
+			: res.status(500).send(JSON.stringify({ ...image, error: 'Error while retreiving screen shot.' }))
 
 	console.log('closing browser...')
 	await browser.close().catch((e: unknown) => void e)
@@ -55,17 +59,21 @@ app.post('/', async (req: Request, res: Response) => {
 		returns.push(
 			(async () => {
 				try {
+
 					const response = await makeScreenshot(browser, image)
-					return response
+					if (response.source)
+						return response
+					else
+						errors.push(response)
+
 				} catch (error) {
+
 					console.error(error)
 					errors.push({
+						...image,
 						error,
-						url: image.url,
-						link: image.link,
-						title: image.title,
 					})
-					return
+
 				}
 			})()
 		)
@@ -89,7 +97,7 @@ app.post('/', async (req: Request, res: Response) => {
 		})
 })
 
-app.get('/pdf/:id.pdf', pdf) // from lvivska-invoice v0.1.2
+app.get('/pdf/:id.pdf', pdf)
 
 app.use('/', fallback)
 

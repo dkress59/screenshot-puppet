@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { client } from '../util'
+import { client } from './util'
 
 const ALLOW_ACCESS = process.env.PUPPET_ACCESS || '*'
 

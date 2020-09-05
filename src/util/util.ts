@@ -4,7 +4,9 @@ const REDIS = process.env.PUPPET_REDIS || 'redis://127.0.0.1:6379'
 
 export const client = redis.createClient(REDIS)
 client.get = util.promisify(client.get)
+client.set = util.promisify(client.set)
 client.setex = util.promisify(client.setex)
+client.exists = util.promisify(client.exists)
 
 import puppeteer, { Browser } from 'puppeteer'
 import { Response } from 'express'
@@ -29,21 +31,21 @@ export const launchBrowser = async (res?: Response): Promise<Browser> => {
 }
 
 import Screenshot from '../types/Screenshot'
-export const makeScreenshot = async (browser: Browser, image: Screenshot) => {
-	const { width, height, link, title, url, darkMode, remove } = image
+export const makeScreenshot = async (browser: Browser, image: Screenshot): Promise<Screenshot> => {
+	const { width, height, link, url, darkMode, remove } = image
+	if (!link) image.error = 'No link provided for the screen shot.'
+	if (!link) return image
 
 	try {
-		const page = await browser.newPage()
 
+		const page = await browser.newPage()
 		if (width && height) await page.setViewport({ width, height })
 
 		if (darkMode)
-			await page.emulateMediaFeatures([
-				{
-					name: 'prefers-color-scheme',
-					value: 'dark',
-				},
-			])
+			await page.emulateMediaFeatures([{
+				name: 'prefers-color-scheme',
+				value: 'dark',
+			}])
 
 		await page.goto(url)
 
@@ -58,6 +60,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot) => {
 								nodes[i].parentNode.removeChild(nodes[i])
 					}, sel)
 				} catch (error) {
+					//image.error = error
 					console.error(error)
 				}
 				return
@@ -65,23 +68,23 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot) => {
 
 		const screenshot = await page.screenshot()
 		//@ts-ignore
-		const src = screenshot.toString('base64') // ToDo: Why isn't btoa() working?
-		image.source = src
+		image.source = screenshot.toString('base64') // ToDo: Why isn't btoa() working?
 
 		const cacheId = `${link}-${width}x${height}`
-		await client.setex(cacheId, 60 * 60 * 24 * 30, src)
+		await client.setex(cacheId, 60 * 60 * 24 * 30, image.source)
 		console.log(`cache set for ${cacheId}`)
-		//return { src, link, title };
+
 	} catch (error) {
+
 		console.log(error)
 		image.error = error
-		//return { error, link, title, url };
+
 	}
 	return image
 }
 
-export const makePDF = async (doc: string) => {
-	const path = doc ? process.env.LV_REACT_APP_URL + '/invoice/' + doc : null
+export const makePDF = async (doc: string): Promise<false | Buffer> => {
+	const path = process.env.LV_REACT_APP_URL + '/invoice/' + doc
 	const cookies = [{
 		name: 'allowCookies',
 		value: 'true',
@@ -94,32 +97,27 @@ export const makePDF = async (doc: string) => {
 		expires: -1,
 	}]
 
-	if (!path) return false
-
 	const browser = await launchBrowser()
 	const page = await browser.newPage()
 
 	try {
-		await page.goto(path)
+
+		await page.goto(path, { waitUntil: 'domcontentloaded' })
 		await page.setCookie(...cookies)
-
 		await page.reload({ waitUntil: 'networkidle2' })
-		//await page.addStyleTag({ path: process.env.LV_REACT_APP_URL + '/print.css' })// ToDo: @media print
-
-		//await page.waitFor(1600)
 		await page.emulateMediaType('screen')// ToDo: 'print'
-		const file = await page.pdf({
-			path: `pdf/${doc}`,
-			format: 'A4',
-		})
+
+		const file = await page.pdf({ format: 'A4' })
+		await client.setex(`lv-pdf/${doc}`, 60 * 60 * 24 * 30, file.toString('base64'))
 
 		await browser.close()
-		return true
 		return file
-	}
-	catch (err) {
+
+	} catch (err) {
+
 		console.error(err)
 		await browser.close()
 		return false
+
 	}
 }
