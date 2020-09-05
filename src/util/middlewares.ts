@@ -21,68 +21,72 @@ export const cache = async (
 	res: Response,
 	next: NextFunction
 ) => {
-	switch (req.method) {
-		default:
-			next()
-			break
+	if (req.path.length && req.path !== '/')
+		next()
 
-		case 'POST':
-			if (!req.body || req.body == {})
-				return res
-					.status(402)
-					.send({ error: 'Nothing passed in the request body.' })
+	else
+		switch (req.method) {
+			default:
+				next()
+				break
 
-			const needed = []
-			const cached = []
-			for await (const image of req.body) {
-				const cacheId = `${image.link}-${image.w}x${image.h}`
+			case 'POST':
+				if (!req.body || req.body == {})
+					return res
+						.status(402)
+						.send({ error: 'Nothing passed in the request body.' })
+
+				const needed = []
+				const cached = []
+				for await (const image of req.body) {
+					const cacheId = `${image.link}-${image.w}x${image.h}`
+					try {
+						const isCached = await client.get(cacheId)
+						if (isCached && isCached.length) {
+							console.log('cached', cacheId)
+							cached.push({
+								src: isCached,
+								link: image.link,
+								title: image.title,
+							})
+						} else {
+							console.log('needed', cacheId)
+							needed.push(image)
+						}
+					} catch (err) {
+						console.error(err)
+						needed.push(image)
+					}
+				}
+				if (!needed || !needed.length || cached.length === req.body.length)
+					return res.send(JSON.stringify(cached))
+
+				req.body = { cached, needed }
+				next()
+				break
+
+			case 'GET':
+				const image = req.query
+				if (!image || !Object.entries(req.query).length)
+					return res.status(400).send({ error: 'Required param(s) missing.' })
+
+				const { w, h, link, title } = image
+				const cacheId = `${link}-${w}x${h}`
 				try {
-					const isCached = await client.get(cacheId)
-					if (isCached && isCached.length) {
+					const src = await client.get(cacheId)
+					if (src && src.length) {
 						console.log('cached', cacheId)
-						cached.push({
-							src: isCached,
-							link: image.link,
-							title: image.title,
-						})
+						return res.send(JSON.stringify({ src, link, title }))
 					} else {
 						console.log('needed', cacheId)
-						needed.push(image)
 					}
 				} catch (err) {
 					console.error(err)
-					needed.push(image)
 				}
-			}
-			if (!needed || !needed.length || cached.length === req.body.length)
-				return res.send(JSON.stringify(cached))
 
-			req.body = { cached, needed }
-			next()
-			break
-
-		case 'GET':
-			const image = req.query
-			if (!image || !Object.entries(req.query).length)
-				return res.status(400).send({ error: 'Required param(s) missing.' })
-
-			const { w, h, link, title } = image
-			const cacheId = `${link}-${w}x${h}`
-			try {
-				const src = await client.get(cacheId)
-				if (src && src.length) {
-					console.log('cached', cacheId)
-					return res.send(JSON.stringify({ src, link, title }))
-				} else {
-					console.log('needed', cacheId)
-				}
-			} catch (err) {
-				console.error(err)
-			}
-
-			next()
-			break
-	}
+				next()
+				break
+		}
 }
 
 export const fallback = (req: Request, res: Response) => {

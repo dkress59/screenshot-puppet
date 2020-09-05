@@ -3,3 +3,4 @@ nodemon.json
 .env*
 .env
 dist/*
+pdf/*
