@@ -5,7 +5,7 @@
  * - replace console.logs
  * - advance PDF implementation
  * - write POST from anew (?)
- * 
+ *
  */
 
 if (process.env.NODE_ENV === 'dev')
@@ -21,6 +21,28 @@ import ParsedQuery from './types/ParsedQuery'
 import Screenshot from './types/Screenshot'
 //import morgan from 'morgan';
 import pdf from './routes/pdf'
+import io from '@pm2/io'
+
+io.init({
+	tracing: {
+		/**
+		 * Choose to enable the HTTP tracing system
+		 * 
+		 * default is false
+		 */
+		enabled: true,
+		/**
+		 * Specify specific urls to ignore
+		 */
+		/* ignoreFilter: {
+			url: [''],
+			method: ['']
+		}, */
+		// Log levels: 0-disabled,1-error,2-warn,3-info,4-debug
+		logLevel: 3,
+	}
+})
+
 
 const PORT = process.env.PUPPET_PORT || 80
 
@@ -42,10 +64,15 @@ app.get('/', async (req: Request, res: Response) => {
 		? res.status(200).send(JSON.stringify(response))
 		: image.error
 			? res.status(500).send(JSON.stringify(response))
-			: res.status(500).send(JSON.stringify({ ...image, error: 'Error while retreiving screen shot.' }))
+			: res.status(500).send(
+				JSON.stringify({
+					...image,
+					error: 'Error while retreiving screen shot.',
+				})
+			)
 
 	console.log('closing browser...')
-	await browser.close().catch((e: unknown) => void e)
+	await browser.close()
 	return
 })
 
