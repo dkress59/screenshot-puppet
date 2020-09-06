@@ -11,10 +11,10 @@ client.exists = util.promisify(client.exists)
 import puppeteer, { Browser } from 'puppeteer'
 import { Response } from 'express'
 
-export const launchBrowser = async (res?: Response): Promise<Browser> => {
+export const launchBrowser = async (res?: Response, timeout?: number): Promise<Browser> => {
 	const browser = await puppeteer
 		.launch({
-			timeout: 666,
+			timeout: timeout ? timeout : 6666,
 			defaultViewport: null,
 			ignoreHTTPSErrors: true,
 			args: ['--no-sandbox', '--disable-setuid-sandbox'], // ToDo: neccessary?
