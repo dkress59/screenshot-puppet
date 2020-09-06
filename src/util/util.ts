@@ -12,11 +12,15 @@ import puppeteer, { Browser } from 'puppeteer'
 import { Response } from 'express'
 
 export const launchBrowser = async (res?: Response, timeout?: number): Promise<Browser> => {
+	process.setMaxListeners(16)
 	const browser = await puppeteer
 		.launch({
 			timeout: timeout ? timeout : 6666,
 			defaultViewport: null,
 			ignoreHTTPSErrors: true,
+			//handleSIGINT: false,
+			//handleSIGTERM: false,
+			//handleSIGHUP: false,
 			args: ['--no-sandbox', '--disable-setuid-sandbox'], // ToDo: neccessary?
 		})
 		.catch((e: any) => {
