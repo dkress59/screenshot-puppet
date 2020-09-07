@@ -8,7 +8,7 @@ const update = (req: Request, res: Response) => {
 			res.status(500).send({ error: 'Update failed.' })
 		} else {
 			res.status(200).send({ message: 'Update complete.' })
-			shell.exec('/usr/local/bin/pm2 reload ecosystem.config.js --env production')
+			setTimeout(() => shell.exec('/usr/local/bin/pm2 reload ecosystem.config.js --env production'), 100)
 		}
 	} else {
 		shell.cd('/var/www/screenshot-puppet')
@@ -16,7 +16,7 @@ const update = (req: Request, res: Response) => {
 			res.status(500).send({ error: 'Update failed.' })
 		} else {
 			res.send({ message: 'Update complete.' })
-			shell.exec('/usr/local/bin/pm2 reload ecosystem.config.js')
+			setTimeout(() => shell.exec('/usr/local/bin/pm2 reload ecosystem.config.js'), 100)
 		}
 	}
 }
