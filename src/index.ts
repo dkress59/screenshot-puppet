@@ -26,8 +26,6 @@ import io from '@pm2/io'
 io.init({
 	tracing: {
 		enabled: true,
-		// Log levels: 0-disabled,1-error,2-warn,3-info,4-debug
-		logLevel: 3,
 	}
 })
 
@@ -96,11 +94,7 @@ app.post('/', async (req: Request, res: Response) => {
 	Promise.all(returns)
 		.then((images) => {
 			if (images.filter((i) => i && i.error !== undefined).length)
-				console.log(
-					'Error count:',
-					images.filter((i) => i && i.error !== undefined).length
-				)
-			res.status(200).send(JSON.stringify([...cached, ...images]))
+				res.status(200).send(JSON.stringify([...cached, ...images]))
 		})
 		.catch((err) => {
 			console.error(err)
