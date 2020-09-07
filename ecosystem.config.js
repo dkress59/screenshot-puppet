@@ -2,8 +2,7 @@ module.exports = {
 	apps: [{
 		script: 'npm',
 		args: 'run start',
-		watch: '.',
+		watch: 'dist',
 		name: 'puppet',
-		version: '1.1.2',
 	}]
 }
