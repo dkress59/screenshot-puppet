@@ -21,7 +21,7 @@ import ParsedQuery from './types/ParsedQuery'
 import Screenshot from './types/Screenshot'
 //import morgan from 'morgan';
 import pdf from './routes/pdf'
-/* import io from '@pm2/io'
+import io from '@pm2/io'
 
 io.init({
 	tracing: {
@@ -29,7 +29,7 @@ io.init({
 		// Log levels: 0-disabled,1-error,2-warn,3-info,4-debug
 		logLevel: 3,
 	}
-}) */
+})
 
 
 const PORT = process.env.PUPPET_PORT || 80
