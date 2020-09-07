@@ -21,27 +21,15 @@ import ParsedQuery from './types/ParsedQuery'
 import Screenshot from './types/Screenshot'
 //import morgan from 'morgan';
 import pdf from './routes/pdf'
-import io from '@pm2/io'
+/* import io from '@pm2/io'
 
 io.init({
 	tracing: {
-		/**
-		 * Choose to enable the HTTP tracing system
-		 * 
-		 * default is false
-		 */
 		enabled: true,
-		/**
-		 * Specify specific urls to ignore
-		 */
-		/* ignoreFilter: {
-			url: [''],
-			method: ['']
-		}, */
 		// Log levels: 0-disabled,1-error,2-warn,3-info,4-debug
 		logLevel: 3,
 	}
-})
+}) */
 
 
 const PORT = process.env.PUPPET_PORT || 80
