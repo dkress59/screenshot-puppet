@@ -1,95 +1,76 @@
 import { Request, Response, NextFunction } from 'express'
-import { client } from './util'
+import { ICache } from '../types/Cache'
+import ParsedQuery from '../types/ParsedQuery'
+import Screenshot, { IQSC } from '../types/Screenshot'
+import { client } from './browser'
+import { syncWithCache } from './util'
 
 const ALLOW_ACCESS = process.env.PUPPET_ACCESS || '*'
 
-export const headers = (_req: Request, res: Response, next: NextFunction) => {
+export const headers = (req: Request, res: Response, next: NextFunction): void => {
 	res.header(
 		'Access-Control-Allow-Headers',
 		'Origin, X-Requested-With, Content-Type, Accept'
 	)
 	res.header('Access-Control-Allow-Origin', ALLOW_ACCESS)
 	res.header('Access-Control-Allow-Methods', '*')
-	//res.header("Cache-Control", "private, max-age=" + 60*60*24 * 30)
+	//res.header("Cache-Control", "private, max-age=" + 60*60*24 * 30) // for later
 	res.header('Cache-Control', 'private, max-age=1')
 	res.type('application/json')
 	next()
 }
 
+const needed: IQSC[] = []
+const cached: ICache[] = []
+
 export const cache = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-) => {
+): Promise<Response<unknown> | undefined> => {
 	if (req.path.length && req.path !== '/')
 		next()
 
 	else
 		switch (req.method) {
-			default:
-				next()
-				break
+		default:
+			next()
+			break
 
-			case 'POST':
-				if (!req.body || req.body == {})
-					return res
-						.status(402)
-						.send({ error: 'Nothing passed in the request body.' })
+		case 'POST':
+			if (!req.body || req.body == {})
+				return res
+					.status(402)
+					.send({ error: 'Nothing passed in the request body.' })
 
-				const needed = []
-				const cached = []
-				for await (const image of req.body) {
-					const cacheId = `${image.link}-${image.w}x${image.h}`
-					try {
-						const isCached = await client.get(cacheId)
-						if (isCached && isCached.length) {
-							console.log('cached', cacheId)
-							cached.push({
-								src: isCached,
-								link: image.link,
-								title: image.title,
-							})
-						} else {
-							console.log('needed', cacheId)
-							needed.push(image)
-						}
-					} catch (err) {
-						console.error(err)
-						needed.push(image)
-					}
-				}
-				if (!needed || !needed.length || cached.length === req.body.length)
-					return res.send(JSON.stringify(cached))
+			for await (const image of req.body) {
+				const cacheId = `${image.link}-${image.w}x${image.h}`
+				await syncWithCache({ image, cacheId, cached, needed }, 'POST')
+			}
+			if (!needed || !needed.length || cached.length === req.body.length)
+				return res.send(JSON.stringify(cached) as string)
 
-				req.body = { cached, needed }
-				next()
-				break
+			req.body = { cached, needed }
+			next()
+			break
 
-			case 'GET':
-				const image = req.query
-				if (!image || !Object.entries(req.query).length)
-					return res.status(400).send({ error: 'Required param(s) missing.' })
+		case 'GET': {
+			const image = req.query as unknown as IQSC
+			if (!image || !Object.entries(req.query).length)
+				return res.status(400).send({ error: 'Required param(s) missing.' })
 
-				const { w, h, link, title } = image
-				const cacheId = `${link}-${w}x${h}`
-				try {
-					const src = await client.get(cacheId)
-					if (src && src.length) {
-						console.log('cached', cacheId)
-						return res.send(JSON.stringify({ src, link, title }))
-					} else {
-						console.log('needed', cacheId)
-					}
-				} catch (err) {
-					console.error(err)
-				}
+			const { w, h, link } = image
+			const cacheId = `${link}-${w}x${h}`
+			syncWithCache({ image, cacheId, res })
 
-				next()
-				break
+			next()
+			break
+		}
+
 		}
 }
 
-export const fallback = (req: Request, res: Response) => {
+export const fallback = (req: Request, res: Response): Response<unknown> => {
 	if (req.method === 'OPTIONS') res.status(200).end()
 
 	return res

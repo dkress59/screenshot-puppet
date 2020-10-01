@@ -1,127 +1,74 @@
-import util from 'util'
-const redis = require('redis')
-const REDIS = process.env.PUPPET_REDIS || 'redis://127.0.0.1:6379'
-
-export const client = redis.createClient(REDIS)
-client.get = util.promisify(client.get)
-client.set = util.promisify(client.set)
-client.setex = util.promisify(client.setex)
-client.exists = util.promisify(client.exists)
-
-import puppeteer, { Browser } from 'puppeteer'
 import { Response } from 'express'
+import { ICache } from '../types/Cache'
+import ParsedQuery from '../types/ParsedQuery'
+import Screenshot, { IQSC } from '../types/Screenshot'
+import { client } from './browser'
 
-export const launchBrowser = async (res?: Response, timeout?: number): Promise<Browser> => {
-	process.setMaxListeners(16)
-	const browser = await puppeteer
-		.launch({
-			timeout: timeout ? timeout : 6666,
-			defaultViewport: null,
-			ignoreHTTPSErrors: true,
-			//handleSIGINT: false,
-			//handleSIGTERM: false,
-			//handleSIGHUP: false,
-			args: ['--no-sandbox', '--disable-setuid-sandbox'], // ToDo: neccessary?
-		})
-		.catch((e: any) => {
-			if (res)
-				res
-					.status(500)
-					.send({ error: 'error launching puppeteer: ' + e.toString() })
-			throw new Error('error launching puppeteer: ' + e.toString())
-		})
 
-	return browser
+export const logToConsole = (log1: unknown, log2?: unknown, log3?: unknown): void => {
+	if (process.env.NODE_ENV !== 'dev') return
+
+	console.log(log1)
+	if (log2) console.log(log2)
+	if (log3) console.log(log3)
+	
+}
+export const logErrorToConsole = (log1: unknown, log2?: unknown, log3?: unknown): void => {
+	if (process.env.NODE_ENV !== 'dev') return
+
+	console.error(log1)
+	if (log2) console.error(log2)
+	if (log3) console.error(log3)
+	
 }
 
-import Screenshot from '../types/Screenshot'
-export const makeScreenshot = async (browser: Browser, image: Screenshot): Promise<Screenshot> => {
-	const { width, height, link, url, darkMode, remove } = image
-	if (!link) image.error = 'No link provided for the screen shot.'
-	if (!link) return image
 
-	try {
+export const syncWithCache = async ({ image, cacheId, cached, needed, res } : {
+	image: IQSC
+	cacheId: string
+	res?: Response
+	cached?: ICache[]
+	needed?: IQSC[]
+}, method?: string): Promise<void> => {
 
-		const page = await browser.newPage()
-		if (width && height) await page.setViewport({ width, height })
+	const src: string | null = await client.get(cacheId)
+	const { link, title } = image
 
-		if (darkMode)
-			await page.emulateMediaFeatures([{
-				name: 'prefers-color-scheme',
-				value: 'dark',
-			}])
+	if (method !== 'POST')
+		try {
+			if (!cached || !needed)
+				throw new Error('cached[] and/or needed[] missing from syncWithCache.')
 
-		await page.goto(url)
+			if (src && src.length) {
+				logToConsole('cached', cacheId)
+				cached.push({
+					src,
+					link: link,
+					title: title,
+				})
+			} else {
+				logToConsole('needed', cacheId)
+				needed.push(image as IQSC)
+			}
+		} catch (err) {
+			logErrorToConsole(err)
+			needed?.push(image as IQSC)
+		}
 
-		if (remove)
-			remove.map((sel: string) => {
-				console.log('remove', sel)
-				try {
-					page.evaluate((sel) => {
-						const nodes = document.querySelectorAll(sel)
-						if (document.querySelectorAll(sel).length)
-							for (let i = 0; i < nodes.length; i++)
-								nodes[i].parentNode.removeChild(nodes[i])
-					}, sel)
-				} catch (error) {
-					//image.error = error
-					console.error(error)
-				}
+	else
+		try {
+			if (!res)
+				throw new Error('<Response> missing from syncWithCache.')
+
+			if (src && src.length) {
+				logToConsole('cached', cacheId)
+				res.send(JSON.stringify({ src, link, title }))
 				return
-			})
+			} else {
+				logToConsole('needed', cacheId)
+			}
+		} catch (err) {
+			logErrorToConsole(err)
+		}
 
-		const screenshot = await page.screenshot()
-		//@ts-ignore
-		image.source = screenshot.toString('base64') // ToDo: Why isn't btoa() working?
-
-		const cacheId = `${link}-${width}x${height}`
-		await client.setex(cacheId, 60 * 60 * 24 * 30, image.source)
-		console.log(`cache set for ${cacheId}`)
-
-	} catch (error) {
-
-		console.log(error)
-		image.error = error
-
-	}
-	return image
-}
-
-export const makePDF = async (doc: string): Promise<false | Buffer> => {
-	const path = process.env.LV_REACT_APP_URL + '/invoice/' + doc
-	const cookies = [{
-		name: 'allowCookies',
-		value: 'true',
-		path: '/',
-		expires: -1,
-	}, {
-		name: 'ageIsVerified',
-		value: 'true',
-		path: '/',
-		expires: -1,
-	}]
-
-	const browser = await launchBrowser()
-	const page = await browser.newPage()
-
-	try {
-
-		await page.goto(path, { waitUntil: 'domcontentloaded' })
-		await page.setCookie(...cookies)
-		await page.reload({ waitUntil: 'networkidle2' })
-		await page.emulateMediaType('screen')// ToDo: 'print'
-
-		const file = await page.pdf({ format: 'A4' })
-		await client.setex(`lv-pdf/${doc}`, 60 * 60 * 24 * 30, file.toString('base64'))
-
-		await browser.close()
-		return file
-
-	} catch (err) {
-
-		console.error(err)
-		await browser.close()
-		return false
-
-	}
 }

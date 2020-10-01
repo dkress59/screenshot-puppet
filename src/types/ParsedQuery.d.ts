@@ -1,13 +1,13 @@
 import { Request } from 'express'
 
 export default class ParsedQuery {
-	public w?: string;
-	public h?: string;
-	public url: string = '';
-	public link: string = ''; // ToDo: make optional
-	public title: string = ''; // ToDo: make optional
-	public darkMode?: string;
-	public remove: string[] = [];
+	public w?: string
+	public h?: string
+	public url = ''
+	public link = '' // ToDo: make optional
+	public title = '' // ToDo: make optional
+	public darkMode?: string
+	public remove: string[] = []
 
 	constructor({ query }: Request) {
 		const { w, h, url, link, title, darkMode, remove } = query

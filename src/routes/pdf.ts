@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
-import { makePDF, client } from '../util/util'
+import { makePDF, client } from '../util/browser'
 
 const pdf = async (req: Request, res: Response) => {
 	const fileName = req.params.id + '.pdf'
-	const cached: Boolean = await client.exists(`lv-pdf/${fileName}`)
+	const cached: boolean = await client.exists(`lv-pdf/${fileName}`)
 	const fileHeaders = [
 		'Content-Disposition', 'attachment;fileName=' + fileName,
 		'Cache-Control', `maxage=${60 * 60 * 24 * 3}`

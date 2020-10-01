@@ -9,6 +9,7 @@
  */
 
 if (process.env.NODE_ENV === 'dev')
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	require('dotenv').config({ path: './.env.development.local' })
 
 import { Request, Response } from 'express'
@@ -16,10 +17,10 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import { headers, cache, fallback } from './util/middlewares'
 import update from './routes/update'
-import { launchBrowser, makeScreenshot } from './util/util'
+import { launchBrowser, makeScreenshot } from './util/browser'
 import ParsedQuery from './types/ParsedQuery'
 import Screenshot from './types/Screenshot'
-//import morgan from 'morgan';
+//import morgan from 'morgan' // for later
 import pdf from './routes/pdf'
 import io from '@pm2/io'
 
@@ -35,10 +36,11 @@ const PORT = process.env.PUPPET_PORT || 80
 const app = express()
 
 app.use(headers)
-//app.use(morgan('tiny'))
+//app.use(morgan('tiny')) // for later
 app.use(bodyParser.json())
 app.use('/update', update)
 app.use('/', cache)
+
 
 app.get('/', async (req: Request, res: Response) => {
 	const image = new Screenshot(new ParsedQuery(req))
@@ -61,6 +63,7 @@ app.get('/', async (req: Request, res: Response) => {
 	await browser.close()
 	return
 })
+
 
 app.post('/', async (req: Request, res: Response) => {
 	const { cached, needed } = req.body
@@ -105,6 +108,7 @@ app.post('/', async (req: Request, res: Response) => {
 			browser.close().catch((e: any) => void e)
 		})
 })
+
 
 app.get('/pdf/:id.pdf', pdf)
 
