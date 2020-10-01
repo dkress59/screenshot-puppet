@@ -34,6 +34,7 @@ export const launchBrowser = async (res?: Response, timeout?: number): Promise<B
 
 import Screenshot from '../types/Screenshot'
 import { logToConsole } from './util'
+import ParsedQuery from '../types/ParsedQuery'
 export const makeScreenshot = async (browser: Browser, image: Screenshot): Promise<Screenshot> => {
 	const { width, height, link, url, darkMode, remove } = image
 	if (!link) image.error = 'No link provided for the screen shot.'
@@ -124,4 +125,75 @@ export const makePDF = async (doc: string): Promise<false | Buffer> => {
 		return false
 
 	}
+}
+
+
+export const postRouteScreenshot = async (req: Request, res: Response): Promise<void> => {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	const { cached, needed } = req.body
+	const browser = await launchBrowser(res)
+
+	const returns = []
+	const errors = []
+	for await (const image of needed)
+		returns.push(
+			(async () => {
+				try {
+
+					const response = await makeScreenshot(browser, image)
+					if (response.source)
+						return response
+					else
+						errors.push(response)
+
+				} catch (error) {
+
+					console.error(error)
+					errors.push({
+						...image,
+						error,
+					})
+
+				}
+			})()
+		)
+
+	Promise.all(returns)
+		.then((images) => {
+			if (images.filter((i) => i && i.error !== undefined).length)
+				res.status(200).send(JSON.stringify([...cached, ...images]))
+		})
+		.catch((err) => {
+			console.error(err)
+			res.status(500).send(JSON.stringify({ error: err }))
+		})
+		.finally(() => {
+			console.log('closing browser...')
+			browser.close().catch((e: Error) => void e)
+		})
+}
+
+export const getRouteScreenshot = async (req: Request, res: Response): Promise<void> => {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	const image = new Screenshot(new ParsedQuery(req))
+
+	const browser = await launchBrowser(res)
+
+	const response = await makeScreenshot(browser, image)
+	response.source
+		? res.status(200).send(JSON.stringify(response))
+		: image.error
+			? res.status(500).send(JSON.stringify(response))
+			: res.status(500).send(
+				JSON.stringify({
+					...image,
+					error: 'Error while retreiving screen shot.',
+				})
+			)
+
+	console.log('closing browser...')
+	await browser.close()
+	return
 }

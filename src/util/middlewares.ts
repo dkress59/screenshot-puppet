@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
 import { ICache } from '../types/Cache'
-import ParsedQuery from '../types/ParsedQuery'
-import Screenshot, { IQSC } from '../types/Screenshot'
-import { client } from './browser'
+import { IQSC } from '../types/Screenshot'
 import { syncWithCache } from './util'
 
 const ALLOW_ACCESS = process.env.PUPPET_ACCESS || '*'
+const needed: IQSC[] = []
+const cached: ICache[] = []
 
 export const headers = (req: Request, res: Response, next: NextFunction): void => {
 	res.header(
@@ -19,9 +19,6 @@ export const headers = (req: Request, res: Response, next: NextFunction): void =
 	res.type('application/json')
 	next()
 }
-
-const needed: IQSC[] = []
-const cached: ICache[] = []
 
 export const cache = async (
 	req: Request,

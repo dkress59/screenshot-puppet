@@ -1,7 +1,6 @@
 import { Response } from 'express'
 import { ICache } from '../types/Cache'
-import ParsedQuery from '../types/ParsedQuery'
-import Screenshot, { IQSC } from '../types/Screenshot'
+import { IQSC } from '../types/Screenshot'
 import { client } from './browser'
 
 
