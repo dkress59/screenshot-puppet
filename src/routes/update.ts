@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import shell from 'shelljs'
 
-const update = (req: Request, res: Response) => {
+const update = (req: Request, res: Response): void => {
 	if (req.query.v === 'fe') {
 		shell.cd('/var/www/dkress-mmxx')
 		if (shell.exec('/var/www/dkress-mmxx/update.sh').code !== 0) {

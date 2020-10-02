@@ -1,11 +1,9 @@
 /**
  * ToDo:
- * - improve error handling (POST!)
- * - add morgan access log
- * - replace console.logs
+ * - re-evaluate error handling
  * - advance PDF implementation
- * - write POST from anew (?)
- *
+ * - advance README.md
+ * - ? add morgan access log
  */
 
 if (process.env.NODE_ENV === 'dev')
@@ -15,13 +13,13 @@ if (process.env.NODE_ENV === 'dev')
 import { Request, Response } from 'express'
 import express from 'express'
 import bodyParser from 'body-parser'
-import { headers, cache, fallback } from './util/middlewares'
-import update from './routes/update'
-import { getRouteScreenshot, postRouteScreenshot } from './util/browser'
-//import morgan from 'morgan' // for later
-import pdf from './routes/pdf'
-import io from '@pm2/io'
 
+import { headers, cache, fallback } from './util/middlewares'
+import { pdf, screenshotRoute, update } from './routes'
+
+
+//import morgan from 'morgan' // for later
+import io from '@pm2/io'
 io.init({
 	tracing: {
 		enabled: true,
@@ -29,8 +27,8 @@ io.init({
 })
 
 
+const { getRouteScreenshot, postRouteScreenshot } = screenshotRoute
 const PORT = process.env.PUPPET_PORT || 80
-
 const app = express()
 
 app.use(headers)

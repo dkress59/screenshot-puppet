@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express'
 import { ICache } from '../types/Cache'
 import { IQSC } from '../types/Screenshot'
-import { syncWithCache } from './util'
+import { syncWithCache } from './utils'
 
 const ALLOW_ACCESS = process.env.PUPPET_ACCESS || '*'
 const needed: IQSC[] = []
 const cached: ICache[] = []
 
-export const headers = (req: Request, res: Response, next: NextFunction): void => {
+export const headers = (_req: Request, res: Response, next: NextFunction): void => {
 	res.header(
 		'Access-Control-Allow-Headers',
 		'Origin, X-Requested-With, Content-Type, Accept'
@@ -16,23 +16,20 @@ export const headers = (req: Request, res: Response, next: NextFunction): void =
 	res.header('Access-Control-Allow-Methods', '*')
 	//res.header("Cache-Control", "private, max-age=" + 60*60*24 * 30) // for later
 	res.header('Cache-Control', 'private, max-age=1')
-	res.type('application/json')
 	next()
 }
 
-export const cache = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-): Promise<Response<unknown> | undefined> => {
+export const cache = async (req: Request, res: Response, next: NextFunction): Promise<Response<unknown> | undefined> => {
 	if (req.path.length && req.path !== '/')
 		next()
 
 	else
 		switch (req.method) {
+
 		default:
 			next()
 			break
+
 
 		case 'POST':
 			if (!req.body || req.body == {})
@@ -51,6 +48,7 @@ export const cache = async (
 			next()
 			break
 
+
 		case 'GET': {
 			const image = req.query as unknown as IQSC
 			if (!image || !Object.entries(req.query).length)
@@ -58,9 +56,9 @@ export const cache = async (
 
 			const { w, h, link } = image
 			const cacheId = `${link}-${w}x${h}`
-			syncWithCache({ image, cacheId, res })
+			if (!await syncWithCache({ image, cacheId, res }))
+				next()
 
-			next()
 			break
 		}
 
