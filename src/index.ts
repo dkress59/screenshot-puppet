@@ -6,7 +6,7 @@
  * - ? add morgan access log
  */
 
-if (process.env.NODE_ENV === 'dev')
+if (process.env.NODE_ENV === 'development')
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	require('dotenv').config({ path: './.env.development.local' })
 

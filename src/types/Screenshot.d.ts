@@ -21,6 +21,7 @@ export default class Screenshot {
 		if (query.remove && query.remove.length) this.remove = query.remove
 	}
 
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 	get source() {
 		if (this.src) return this.src
 		else throw new Error('No source found for ' + this.title)
