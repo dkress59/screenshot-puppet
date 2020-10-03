@@ -8,9 +8,9 @@ const update = (req: Request, res: Response): void => {
 	const updateComplete = () => res.status(200).send({ message: 'Update complete.' })
 	const updateFailed = () => res.status(500).send({ error: 'Update failed.' })
 
-	const makeUpdate = (path: string): void => {
+	const makeUpdate = async(path: string): Promise<void> => {
 		shell.cd(`/var/www/${path}`)
-		if (shell.exec(`/var/www/${path}/update.sh`).code !== 0) {
+		if (await shell.exec(`/var/www/${path}/update.sh`).code !== 0) {
 			updateFailed()
 		} else {
 			updateComplete()
