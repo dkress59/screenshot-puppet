@@ -1,6 +1,12 @@
 import util from 'util'
+import puppeteer, { Browser } from 'puppeteer'
+import { Response } from 'express'
+import Screenshot from '../types/Screenshot'
+import { logErrorToConsole, logToConsole } from './utils'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const redis = require('redis')
 const REDIS = process.env.PUPPET_REDIS || 'redis://127.0.0.1:6379'
+
 
 export const client = redis.createClient(REDIS)
 client.get = util.promisify(client.get)
@@ -8,8 +14,6 @@ client.set = util.promisify(client.set)
 client.setex = util.promisify(client.setex)
 client.exists = util.promisify(client.exists)
 
-import puppeteer, { Browser } from 'puppeteer'
-import { Response } from 'express'
 
 export const launchBrowser = async (res?: Response, timeout?: number): Promise<Browser> => {
 	process.setMaxListeners(16)
@@ -18,12 +22,9 @@ export const launchBrowser = async (res?: Response, timeout?: number): Promise<B
 			timeout: timeout ? timeout : 6666,
 			defaultViewport: null,
 			ignoreHTTPSErrors: true,
-			//handleSIGINT: false,
-			//handleSIGTERM: false,
-			//handleSIGHUP: false,
 			args: ['--no-sandbox', '--disable-setuid-sandbox'], // ToDo: neccessary?
 		})
-		.catch((e: any) => {
+		.catch((e) => {
 			if (res)
 				res
 					.status(500)
@@ -34,7 +35,7 @@ export const launchBrowser = async (res?: Response, timeout?: number): Promise<B
 	return browser
 }
 
-import Screenshot from '../types/Screenshot'
+
 export const makeScreenshot = async (browser: Browser, image: Screenshot): Promise<Screenshot> => {
 	const { width, height, link, url, darkMode, remove } = image
 	if (!link) image.error = 'No link provided for the screen shot.'
@@ -55,7 +56,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot): Promi
 
 		if (remove)
 			remove.map((sel: string) => {
-				console.log('remove', sel)
+				logToConsole('remove', sel)
 				try {
 					page.evaluate((sel) => {
 						const nodes = document.querySelectorAll(sel)
@@ -65,22 +66,23 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot): Promi
 					}, sel)
 				} catch (error) {
 					//image.error = error
-					console.error(error)
+					logErrorToConsole(error)
 				}
 				return
 			})
 
 		const screenshot = await page.screenshot()
-		//@ts-ignore
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		image.source = screenshot.toString('base64') // ToDo: Why isn't btoa() working?
 
 		const cacheId = `${link}-${width}x${height}`
 		await client.setex(cacheId, 60 * 60 * 24 * 30, image.source)
-		console.log(`cache set for ${cacheId}`)
+		logToConsole(`cache set for ${cacheId}`)
 
 	} catch (error) {
 
-		console.log(error)
+		logToConsole(error)
 		image.error = error
 
 	}
@@ -119,7 +121,7 @@ export const makePDF = async (doc: string): Promise<false | Buffer> => {
 
 	} catch (err) {
 
-		console.error(err)
+		logErrorToConsole(err)
 		await browser.close()
 		return false
 
