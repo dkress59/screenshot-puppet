@@ -58,6 +58,9 @@ export const getRouteScreenshot = async (req: Request, res: Response): Promise<v
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	const image = new Screenshot(new ParsedQuery(req))
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	image.remove = req.query.remove.split(',')
 
 	const browser = await launchBrowser(res)
 
