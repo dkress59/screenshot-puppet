@@ -52,7 +52,9 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot): Promi
 				value: 'dark',
 			}])
 
-		await page.goto(url)
+		await page.goto(url, {
+			waitUntil: 'networkidle0'
+		})
 
 		if (remove)
 			remove.map((sel: string) => {
