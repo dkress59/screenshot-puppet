@@ -6,7 +6,7 @@ indent_style = tab
 indent_size = 4
 
 end_of_line = lf
-insert_final_newline = true
+insert_final_newline = false
 trim_trailing_whitespace = true
 
 [*.{json,less,sass,scss,sh,yaml,yml}]
@@ -14,6 +14,7 @@ indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
+insert_final_newline = true
 
 [*.yaml,yml]
 indent_style = space

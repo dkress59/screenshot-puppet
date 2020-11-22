@@ -1,51 +1,10 @@
-/**
- * ToDo:
- * - [ ] re-evaluate error handling
- * - [X] advance PDF implementation
- * - [ ] advance README.md
- * - [ ] ? add morgan access log
- * - [ ] improve PDF
- */
+import { Request, Response } from 'express'
+import { getRouteScreenshot, postRouteScreenshot } from './routes'
 
-if (process.env.NODE_ENV === 'development')
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
-	require('dotenv').config({ path: './.env.development.local' })
+export const getSC = async (req: Request, res: Response): Promise<void> =>
+	await getRouteScreenshot(req, res)
 
-import { getSC, postSC } from './routes/screenshot'
-import express from 'express'
-import bodyParser from 'body-parser'
+export const postSC = async (req: Request, res: Response): Promise<void> =>
+	await postRouteScreenshot(req, res)
 
-import { headers, cache, fallback } from './util/middlewares'
-import { pdf, update } from './routes'
-
-
-//import morgan from 'morgan'
-import io from '@pm2/io'
-io.init({
-	tracing: {
-		enabled: true,
-	}
-})
-
-
-const PORT = process.env.PUPPET_PORT || 80
-const app = express()
-
-app.use(headers)
-//app.use(morgan('tiny'))
-app.use(bodyParser.json())
-app.use('/update', update)
-app.use('/', cache)
-
-
-app.get('/', getSC)
-
-
-app.post('/', postSC)
-
-
-app.get('/pdf/:id.pdf', pdf)
-
-app.use('/', fallback)
-
-app.listen(PORT)
+export default { getSC, postSC }

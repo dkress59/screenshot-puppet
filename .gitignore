@@ -1,8 +1,9 @@
-node_modules
+node_modules*/
+node_modules/
 nodemon.json
 .env*
-.env
 dist/*
 pdf/*
-#yarn.lock
 package-lock.json
+#yarn.lock
+.vscode/

@@ -1,18 +1,7 @@
-import util from 'util'
 import puppeteer, { Browser, PDFOptions } from 'puppeteer'
 import { Response } from 'express'
 import { logErrorToConsole, logToConsole } from './utils'
 import { SCOptions, Screenshot } from '../types/Screenshot'
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const redis = require('redis')
-const REDIS = process.env.PUPPET_REDIS || 'redis://127.0.0.1:6379'
-
-
-export const client = redis.createClient(REDIS)
-client.get = util.promisify(client.get)
-client.set = util.promisify(client.set)
-client.setex = util.promisify(client.setex)
-client.exists = util.promisify(client.exists)
 
 
 export const launchBrowser = async (res?: Response, timeout?: number): Promise<Browser> => {
@@ -78,7 +67,6 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 		image.src = screenshot.toString('base64') // ToDo: Why isn't btoa() working?
 
 		const cacheId = `${link}-${w}x${h}`
-		await client.setex(cacheId, 60 * 60 * 24 * 30, image.src)
 		logToConsole(`cache set for ${cacheId}`)
 
 	} catch (error) {
@@ -115,7 +103,6 @@ export const makePDF = async (doc: string): Promise<false | Buffer> => {
 		await page.emulateMediaType('screen')// ToDo: 'print'
 
 		const file = await page.pdf({ format: 'A4' })
-		await client.setex(`lv-pdf/${doc}`, 60 * 60 * 24 * 30, file.toString('base64'))
 
 		await browser.close()
 		return file
