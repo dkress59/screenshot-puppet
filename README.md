@@ -12,15 +12,18 @@ ___
 
 - ToDo
 
-## ToDo
+___
 
-- [ ] add callback (e.g. for redis)
+#### ToDo
+
+- [X] add callback (e.g. for redis)
 - [ ] add options (URLs, ports?, …)
 - [ ] re-evaluate error handling
 - [X] advance PDF implementation
 - [ ] add morgan access log (?)
 - [ ] add unit tests
-- [ ] add dev setup
-- [ ] improve utils
+- [X] add dev setup
+- [ ] improve utils.ts
+- [ ] improve POST
 - [ ] improve PDF
 - [ ] README.md

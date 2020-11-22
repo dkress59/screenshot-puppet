@@ -1,7 +1,112 @@
-import puppeteer, { Browser, PDFOptions } from 'puppeteer'
+import puppeteer, { Browser, PDFOptions, ScreenshotOptions } from 'puppeteer'
 import { Response } from 'express'
 import { logErrorToConsole, logToConsole } from './utils'
-import { SCOptions, Screenshot } from '../types/Screenshot'
+import { Screenshot } from '../types/Screenshot'
+
+
+const qualities = [
+	0,
+	1,
+	2,
+	3,
+	4,
+	5,
+	6,
+	7,
+	8,
+	9,
+	10,
+	11,
+	12,
+	13,
+	14,
+	15,
+	16,
+	17,
+	18,
+	19,
+	20,
+	21,
+	22,
+	23,
+	24,
+	25,
+	26,
+	27,
+	28,
+	29,
+	30,
+	31,
+	32,
+	33,
+	34,
+	35,
+	36,
+	37,
+	38,
+	39,
+	40,
+	41,
+	42,
+	43,
+	44,
+	45,
+	46,
+	47,
+	48,
+	49,
+	50,
+	51,
+	52,
+	53,
+	54,
+	55,
+	56,
+	57,
+	58,
+	59,
+	60,
+	61,
+	62,
+	63,
+	64,
+	65,
+	66,
+	67,
+	68,
+	69,
+	70,
+	71,
+	72,
+	73,
+	74,
+	75,
+	76,
+	77,
+	78,
+	79,
+	80,
+	81,
+	82,
+	83,
+	84,
+	85,
+	86,
+	87,
+	88,
+	89,
+	90,
+	91,
+	92,
+	93,
+	94,
+	95,
+	96,
+	97,
+	98,
+	99,
+	100
+]
 
 
 export const launchBrowser = async (res?: Response, timeout?: number): Promise<Browser> => {
@@ -25,8 +130,27 @@ export const launchBrowser = async (res?: Response, timeout?: number): Promise<B
 }
 
 
-export const makeScreenshot = async (browser: Browser, image: Screenshot, options?: SCOptions): Promise<Screenshot> => {
-	const { w, h, link, url, darkMode, remove, output } = image
+export const makeScreenshot = async (browser: Browser, image: Screenshot, options?: ScreenshotOptions | PDFOptions): Promise<Screenshot> => {
+	const { w, h, url, darkMode, remove, output } = image
+	const safeOptions: ScreenshotOptions | PDFOptions = {
+		...options,
+		path: undefined, // can save to disk
+		type: options && ('type' in options)
+			? options.type
+			: output === 'pdf'
+				? undefined
+				: output === 'jpg'
+					? 'jpeg'
+					: 'png',
+		quality: (
+			options
+			&& ('quality' in options)
+			&& options.quality !== undefined
+			&& qualities.indexOf(options.quality)
+		)
+			? options.quality
+			: undefined
+	}
 
 	try {
 
@@ -60,14 +184,11 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 			}
 
 		const screenshot = (output === 'pdf')
-			? await page.pdf(options as PDFOptions) // FixMe
-			: await page.screenshot(options)
+			? await page.pdf(safeOptions) // FixMe
+			: await page.screenshot(safeOptions)
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		image.src = screenshot.toString('base64') // ToDo: Why isn't btoa() working?
-
-		const cacheId = `${link}-${w}x${h}`
-		logToConsole(`cache set for ${cacheId}`)
 
 	} catch (error) {
 
@@ -76,42 +197,4 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 
 	}
 	return image
-}
-
-export const makePDF = async (doc: string): Promise<false | Buffer> => {
-	const path = process.env.LV_REACT_APP_URL + '/invoice/' + doc
-	const cookies = [{
-		name: 'allowCookies',
-		value: 'true',
-		path: '/',
-		expires: -1,
-	}, {
-		name: 'ageIsVerified',
-		value: 'true',
-		path: '/',
-		expires: -1,
-	}]
-
-	const browser = await launchBrowser()
-	const page = await browser.newPage()
-
-	try {
-
-		await page.goto(path, { waitUntil: 'domcontentloaded' })
-		await page.setCookie(...cookies)
-		await page.reload({ waitUntil: 'networkidle2' })
-		await page.emulateMediaType('screen')// ToDo: 'print'
-
-		const file = await page.pdf({ format: 'A4' })
-
-		await browser.close()
-		return file
-
-	} catch (err) {
-
-		logErrorToConsole(err)
-		await browser.close()
-		return false
-
-	}
 }

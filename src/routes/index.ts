@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
 import { logErrorToConsole, logToConsole } from '../util/utils'
 import { launchBrowser, makeScreenshot } from '../util/browser'
-import { SCOptions, Screenshot } from '../types/Screenshot'
+import { Screenshot } from '../types/Screenshot'
+import { PuppetOptions } from '../types/PuppetOptions'
 
-export const postRouteScreenshot = async (req: Request, res: Response): Promise<void> => {
+export const postRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
 
 	res.type('application/json')
 	const { cached, needed } = req.body
@@ -14,9 +15,10 @@ export const postRouteScreenshot = async (req: Request, res: Response): Promise<
 	for await (const image of needed)
 		returns.push(
 			(async () => {
+				const img = new Screenshot(image)
 				try {
 
-					const response = await makeScreenshot(browser, new Screenshot(image))
+					const response = await makeScreenshot(browser, img, options?.screenshot)
 					if (response.src)
 						return response
 					else
@@ -24,11 +26,9 @@ export const postRouteScreenshot = async (req: Request, res: Response): Promise<
 
 				} catch (error) {
 
+					img.error = error
 					logErrorToConsole(error)
-					errors.push({
-						...image,
-						error,
-					})
+					errors.push(img)
 
 				}
 			})()
@@ -36,6 +36,7 @@ export const postRouteScreenshot = async (req: Request, res: Response): Promise<
 
 	Promise.all(returns)
 		.then((images) => {
+			if (options?.callback) options.callback(images)
 			if (images.filter((i) => i && i.error !== undefined).length)
 				res.status(200).send(JSON.stringify([...cached, ...images]))
 		})
@@ -49,17 +50,16 @@ export const postRouteScreenshot = async (req: Request, res: Response): Promise<
 		})
 }
 
-export const getRouteScreenshot = async (req: Request, res: Response): Promise<void> => {
+export const getRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
 	res.type('application/json')
 	
 	const image = new Screenshot(req)
 
 	const browser = await launchBrowser(res)
 
-	const customOptions: SCOptions = image.output === 'jpg'
-		? { type: 'jpeg'}
-		: {}
-	const response = await makeScreenshot(browser, image, customOptions)
+	const response = await makeScreenshot(browser, image, options?.screenshot)
+
+	if (options?.callback) options.callback(response)
 
 	response.src
 		? res.status(200).send(JSON.stringify(response))

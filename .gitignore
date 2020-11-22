@@ -1,9 +1,12 @@
 node_modules*/
 node_modules/
 nodemon.json
+.npmignore
 .env*
-dist/*
+#dist/*
 pdf/*
 package-lock.json
+yarn-error.log
 #yarn.lock
 .vscode/
+.jest/
