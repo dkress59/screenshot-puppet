@@ -131,25 +131,41 @@ export const launchBrowser = async (res?: Response, timeout?: number): Promise<B
 
 
 export const makeScreenshot = async (browser: Browser, image: Screenshot, options?: ScreenshotOptions | PDFOptions): Promise<Screenshot> => {
+
 	const { w, h, url, darkMode, remove, output } = image
-	const safeOptions: ScreenshotOptions | PDFOptions = {
-		...options,
-		path: undefined, // can save to disk
-		type: options && ('type' in options)
-			? options.type
-			: output === 'pdf'
-				? undefined
-				: output === 'jpg'
-					? 'jpeg'
-					: 'png',
-		quality: (
-			options
+
+	const encoding = (output === 'b64') || (
+		output === 'json'
+		&& options
+		&& 'encoding' in options
+		&& options.encoding === 'base64'
+	)
+		? 'base64'
+		: 'binary'
+	
+	const type = options && ('type' in options)
+		? options.type
+		: output === 'pdf'
+			? undefined
+			: output === 'jpg'
+				? 'jpeg'
+				: 'png'
+
+	const quality = (
+		options
 			&& ('quality' in options)
 			&& options.quality !== undefined
 			&& qualities.indexOf(options.quality)
-		)
-			? options.quality
-			: undefined
+	)
+		? options.quality
+		: undefined
+
+	const safeOptions: ScreenshotOptions | PDFOptions = {
+		...options,
+		encoding,
+		path: undefined, // can save to disk
+		type,
+		quality,
 	}
 
 	try {
@@ -184,11 +200,10 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 			}
 
 		const screenshot = (output === 'pdf')
-			? await page.pdf(safeOptions) // FixMe
+			? await page.pdf(safeOptions)
 			: await page.screenshot(safeOptions)
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		image.src = screenshot.toString('base64') // ToDo: Why isn't btoa() working?
+
+		image.src = screenshot as string // ToDo: test b64/bin + pdf
 
 	} catch (error) {
 
@@ -196,5 +211,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 		image.error.push(error)
 
 	}
+
 	return image
+
 }

@@ -1,6 +1,6 @@
 # Screenshot Puppet
 
-A nifty [express](https://expressjs.com) server to deliver screen shots using [puppeteer](https://pptr.dev) on headless chromium.
+A nifty [express](https://expressjs.com) tool to deliver screen shots using [puppeteer](https://pptr.dev) on headless chromium.
 
 ___
 
@@ -18,6 +18,7 @@ ___
 
 - [X] add callback (e.g. for redis)
 - [ ] add options (URLs, ports?, …)
+- [ ] advance return/output logic
 - [ ] re-evaluate error handling
 - [X] advance PDF implementation
 - [ ] add morgan access log (?)
