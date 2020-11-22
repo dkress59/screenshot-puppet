@@ -1,21 +1,22 @@
 /**
  * ToDo:
- * - re-evaluate error handling
- * - advance PDF implementation
- * - advance README.md
- * - ? add morgan access log
+ * - [ ] re-evaluate error handling
+ * - [X] advance PDF implementation
+ * - [ ] advance README.md
+ * - [ ] ? add morgan access log
+ * - [ ] improve PDF
  */
 
 if (process.env.NODE_ENV === 'development')
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	require('dotenv').config({ path: './.env.development.local' })
 
-import { Request, Response } from 'express'
+import { getSC, postSC } from './routes/screenshot'
 import express from 'express'
 import bodyParser from 'body-parser'
 
 import { headers, cache, fallback } from './util/middlewares'
-import { pdf, screenshotRoute, update } from './routes'
+import { pdf, update } from './routes'
 
 
 //import morgan from 'morgan'
@@ -27,7 +28,6 @@ io.init({
 })
 
 
-const { getRouteScreenshot, postRouteScreenshot } = screenshotRoute
 const PORT = process.env.PUPPET_PORT || 80
 const app = express()
 
@@ -38,10 +38,10 @@ app.use('/update', update)
 app.use('/', cache)
 
 
-app.get('/', async (req: Request, res: Response) => await getRouteScreenshot(req, res))
+app.get('/', getSC)
 
 
-app.post('/', async (req: Request, res: Response) => await postRouteScreenshot(req, res))
+app.post('/', postSC)
 
 
 app.get('/pdf/:id.pdf', pdf)

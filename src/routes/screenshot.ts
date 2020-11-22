@@ -3,11 +3,9 @@ import { logErrorToConsole, logToConsole } from '../util/utils'
 import { launchBrowser, makeScreenshot } from '../util/browser'
 import { SCOptions, Screenshot } from '../types/Screenshot'
 
-export const postRouteScreenshot = async (req: Request, res: Response): Promise<void> => {
+const postRouteScreenshot = async (req: Request, res: Response): Promise<void> => {
 
 	res.type('application/json')
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	const { cached, needed } = req.body
 	const browser = await launchBrowser(res)
 
@@ -18,7 +16,7 @@ export const postRouteScreenshot = async (req: Request, res: Response): Promise<
 			(async () => {
 				try {
 
-					const response = await makeScreenshot(browser, image)
+					const response = await makeScreenshot(browser, new Screenshot(image))
 					if (response.src)
 						return response
 					else
@@ -26,7 +24,7 @@ export const postRouteScreenshot = async (req: Request, res: Response): Promise<
 
 				} catch (error) {
 
-					console.error(error)
+					logErrorToConsole(error)
 					errors.push({
 						...image,
 						error,
@@ -51,7 +49,7 @@ export const postRouteScreenshot = async (req: Request, res: Response): Promise<
 		})
 }
 
-export const getRouteScreenshot = async (req: Request, res: Response): Promise<void> => {
+const getRouteScreenshot = async (req: Request, res: Response): Promise<void> => {
 	res.type('application/json')
 	
 	const image = new Screenshot(req)
@@ -78,3 +76,9 @@ export const getRouteScreenshot = async (req: Request, res: Response): Promise<v
 	await browser.close()
 	return
 }
+
+
+export const getSC = async (req: Request, res: Response) => await getRouteScreenshot(req, res)
+export const postSC = async (req: Request, res: Response) => await postRouteScreenshot(req, res)
+
+export default { getSC, postSC }

@@ -72,11 +72,11 @@ export const syncWithCache = async ({ image, cacheId, cached, needed, res } : {
 				})
 			} else {
 				logToConsole('needed', cacheId)
-				needed.push(image as Screenshot)
+				needed.push(image)
 			}
 		} catch (err) {
 			logErrorToConsole(err)
-			needed?.push(image as Screenshot)
+			needed?.push(image)
 		}
 
 }
