@@ -4,6 +4,14 @@ import { launchBrowser, makeScreenshot } from '../util/browser'
 import { Screenshot } from '../types/Screenshot'
 import { PuppetOptions } from '../types/PuppetOptions'
 
+/**
+ * * output – source of truth
+ * - default
+ * - type
+ * - init
+ * - request
+*/
+
 export const postRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
 
 	res.type('application/json')

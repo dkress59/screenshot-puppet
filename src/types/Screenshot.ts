@@ -14,7 +14,7 @@ export class Screenshot {
 	public output: 'b64' | 'bin' | 'jpg' | 'json' | 'pdf' | 'png'  = 'json'
 
 	constructor({ path, query }: Request) {
-		const { w, h, url, data, darkMode, remove } = query
+		const { w, h, url, data, darkMode, remove, output } = query
 		this.url = url as string
 
 		if (w) this.w = parseInt(w as string)
@@ -29,15 +29,18 @@ export class Screenshot {
 		if (fileExt && ['jpg','jpeg','json','pdf','png'].indexOf(fileExt) > -1) {
 			this.fileName = path.split('.').splice(-1,1).join('.')}
 
-		this.output = fileExt === 'jpg'
-			? 'jpg'
-			: fileExt === 'jpeg'
+		if (output && ['b64', 'bin', 'jpg', 'json', 'pdf', 'png'].indexOf(output as string) > -1)
+			this.output = output as 'b64' | 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
+		else
+			this.output = fileExt === 'jpg'
 				? 'jpg'
-				: fileExt === 'json'
-					? 'json'
-					: fileExt === 'pdf'
-						? 'pdf'
-						: 'png'
+				: fileExt === 'jpeg'
+					? 'jpg'
+					: fileExt === 'json'
+						? 'json'
+						: fileExt === 'pdf'
+							? 'pdf'
+							: 'png'
 
 	}
 
