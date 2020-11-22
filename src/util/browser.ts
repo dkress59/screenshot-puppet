@@ -1,8 +1,8 @@
 import util from 'util'
-import puppeteer, { Browser } from 'puppeteer'
+import puppeteer, { Browser, PDFOptions } from 'puppeteer'
 import { Response } from 'express'
-import Screenshot from '../types/Screenshot'
 import { logErrorToConsole, logToConsole } from './utils'
+import { SCOptions, Screenshot } from '../types/Screenshot'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const redis = require('redis')
 const REDIS = process.env.PUPPET_REDIS || 'redis://127.0.0.1:6379'
@@ -36,15 +36,13 @@ export const launchBrowser = async (res?: Response, timeout?: number): Promise<B
 }
 
 
-export const makeScreenshot = async (browser: Browser, image: Screenshot): Promise<Screenshot> => {
-	const { width, height, link, url, darkMode, remove } = image
-	if (!link) image.error = 'No link provided for the screen shot.'
-	if (!link) return image
+export const makeScreenshot = async (browser: Browser, image: Screenshot, options?: SCOptions): Promise<Screenshot> => {
+	const { w, h, link, url, darkMode, remove, output } = image
 
 	try {
 
 		const page = await browser.newPage()
-		if (width && height) await page.setViewport({ width, height })
+		await page.setViewport({ width: w, height: h })
 
 		if (darkMode)
 			await page.emulateMediaFeatures([{
@@ -57,7 +55,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot): Promi
 		})
 
 		if (remove)
-			remove.map((sel: string) => {
+			for (const sel of remove) {
 				logToConsole('remove', sel)
 				try {
 					page.evaluate((sel) => {
@@ -67,25 +65,26 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot): Promi
 								nodes[i].parentNode.removeChild(nodes[i])
 					}, sel)
 				} catch (error) {
-					//image.error = error
+					image.error.push(error)
 					logErrorToConsole(error)
 				}
-				return
-			})
+			}
 
-		const screenshot = await page.screenshot()
+		const screenshot = (output === 'pdf')
+			? await page.pdf(options as PDFOptions) // FixMe
+			: await page.screenshot(options)
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		image.source = screenshot.toString('base64') // ToDo: Why isn't btoa() working?
+		image.src = screenshot.toString('base64') // ToDo: Why isn't btoa() working?
 
-		const cacheId = `${link}-${width}x${height}`
-		await client.setex(cacheId, 60 * 60 * 24 * 30, image.source)
+		const cacheId = `${link}-${w}x${h}`
+		await client.setex(cacheId, 60 * 60 * 24 * 30, image.src)
 		logToConsole(`cache set for ${cacheId}`)
 
 	} catch (error) {
 
 		logToConsole(error)
-		image.error = error
+		image.error.push(error)
 
 	}
 	return image

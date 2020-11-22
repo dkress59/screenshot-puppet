@@ -18,7 +18,7 @@ import { headers, cache, fallback } from './util/middlewares'
 import { pdf, screenshotRoute, update } from './routes'
 
 
-//import morgan from 'morgan' // for later
+//import morgan from 'morgan'
 import io from '@pm2/io'
 io.init({
 	tracing: {
@@ -32,19 +32,15 @@ const PORT = process.env.PUPPET_PORT || 80
 const app = express()
 
 app.use(headers)
-//app.use(morgan('tiny')) // for later
+//app.use(morgan('tiny'))
 app.use(bodyParser.json())
 app.use('/update', update)
 app.use('/', cache)
 
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 app.get('/', async (req: Request, res: Response) => await getRouteScreenshot(req, res))
 
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 app.post('/', async (req: Request, res: Response) => await postRouteScreenshot(req, res))
 
 

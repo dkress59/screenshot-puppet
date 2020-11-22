@@ -1,8 +1,7 @@
-import { Response } from 'express'
-import Screenshot from '../types/Screenshot'
+import { Request, Response } from 'express'
 import { logErrorToConsole, logToConsole } from '../util/utils'
-import ParsedQuery from '../types/ParsedQuery'
 import { launchBrowser, makeScreenshot } from '../util/browser'
+import { SCOptions, Screenshot } from '../types/Screenshot'
 
 export const postRouteScreenshot = async (req: Request, res: Response): Promise<void> => {
 
@@ -20,7 +19,7 @@ export const postRouteScreenshot = async (req: Request, res: Response): Promise<
 				try {
 
 					const response = await makeScreenshot(browser, image)
-					if (response.source)
+					if (response.src)
 						return response
 					else
 						errors.push(response)
@@ -55,19 +54,18 @@ export const postRouteScreenshot = async (req: Request, res: Response): Promise<
 export const getRouteScreenshot = async (req: Request, res: Response): Promise<void> => {
 	res.type('application/json')
 	
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	const image = new Screenshot(new ParsedQuery(req))
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	image.remove = req.query.remove.split(',')
+	const image = new Screenshot(req)
 
 	const browser = await launchBrowser(res)
 
-	const response = await makeScreenshot(browser, image)
-	response.source
+	const customOptions: SCOptions = image.output === 'jpg'
+		? { type: 'jpeg'}
+		: {}
+	const response = await makeScreenshot(browser, image, customOptions)
+
+	response.src
 		? res.status(200).send(JSON.stringify(response))
-		: image.error
+		: image.error.length
 			? res.status(500).send(JSON.stringify(response))
 			: res.status(500).send(
 				JSON.stringify({

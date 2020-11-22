@@ -1,6 +1,6 @@
 import { Response } from 'express'
-import { ICache } from '../types/Cache'
-import { IQSC } from '../types/Screenshot'
+import { Cache } from '../types/Cache'
+import { Screenshot } from '../types/Screenshot'
 import { client } from './browser'
 
 
@@ -29,11 +29,11 @@ export const logErrorToConsole = (log1: unknown, log2?: unknown, log3?: unknown)
 
 
 export const syncWithCache = async ({ image, cacheId, cached, needed, res } : {
-	image: IQSC
+	image: Screenshot
 	cacheId: string
 	res?: Response
-	cached?: ICache[]
-	needed?: IQSC[]
+	cached?: Cache[]
+	needed?: Screenshot[]
 }, method?: string): Promise<void|true> => {
 
 	const src: string | null = await client.get(cacheId)
@@ -67,16 +67,16 @@ export const syncWithCache = async ({ image, cacheId, cached, needed, res } : {
 				logToConsole('cached', cacheId)
 				cached.push({
 					src,
-					link: link,
-					title: title,
+					link: link ?? '',
+					title: title ?? '',
 				})
 			} else {
 				logToConsole('needed', cacheId)
-				needed.push(image as IQSC)
+				needed.push(image as Screenshot)
 			}
 		} catch (err) {
 			logErrorToConsole(err)
-			needed?.push(image as IQSC)
+			needed?.push(image as Screenshot)
 		}
 
 }

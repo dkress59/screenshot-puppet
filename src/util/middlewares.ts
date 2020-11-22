@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
-import { ICache } from '../types/Cache'
-import { IQSC } from '../types/Screenshot'
+import { Cache } from '../types/Cache'
+import { Screenshot } from '../types/Screenshot'
 import { syncWithCache } from './utils'
 
 const ALLOW_ACCESS = process.env.PUPPET_ACCESS || '*'
-const needed: IQSC[] = []
-const cached: ICache[] = []
+const needed: Screenshot[] = []
+const cached: Cache[] = []
 
 export const headers = (_req: Request, res: Response, next: NextFunction): void => {
 	res.header(
@@ -26,41 +26,41 @@ export const cache = async (req: Request, res: Response, next: NextFunction): Pr
 	else
 		switch (req.method) {
 
-		default:
-			next()
-			break
-
-
-		case 'POST':
-			if (!req.body || req.body == {})
-				return res
-					.status(402)
-					.send({ error: 'Nothing passed in the request body.' })
-
-			for await (const image of req.body) {
-				const cacheId = `${image.link}-${image.w}x${image.h}`
-				await syncWithCache({ image, cacheId, cached, needed }, 'POST')
-			}
-			if (!needed || !needed.length || cached.length === req.body.length)
-				return res.send(JSON.stringify(cached) as string)
-
-			req.body = { cached, needed }
-			next()
-			break
-
-
-		case 'GET': {
-			const image = req.query as unknown as IQSC
-			if (!image || !Object.entries(req.query).length)
-				return res.status(400).send({ error: 'Required param(s) missing.' })
-
-			const { w, h, link } = image
-			const cacheId = `${link}-${w}x${h}`
-			if (!await syncWithCache({ image, cacheId, res }))
+			default:
 				next()
+				break
 
-			break
-		}
+
+			case 'POST':
+				if (!req.body || req.body == {})
+					return res
+						.status(402)
+						.send({ error: 'Nothing passed in the request body.' })
+
+				for await (const image of req.body) {
+					const cacheId = `${image.link}-${image.w}x${image.h}`
+					await syncWithCache({ image, cacheId, cached, needed }, 'POST')
+				}
+				if (!needed || !needed.length || cached.length === req.body.length)
+					return res.send(JSON.stringify(cached) as string)
+
+				req.body = { cached, needed }
+				next()
+				break
+
+
+			case 'GET': {
+				const image = req.query as unknown as Screenshot
+				if (!image || !Object.entries(req.query).length)
+					return res.status(400).send({ error: 'Required param(s) missing.' })
+
+				const { w, h, link } = image
+				const cacheId = `${link}-${w}x${h}`
+				if (!await syncWithCache({ image, cacheId, res }))
+					next()
+
+				break
+			}
 
 		}
 }
