@@ -8,26 +8,27 @@
 		"start": "node dist/index.js",
 		"dev:start": "nodemon dist/server.js",
 		"dev:build": "tsc --watch --preserveWatchOutput",
-		"dev": "concurrently \"npm:dev:build\" \"npm:dev:start\"",
+		"dev": "concurrently \"yarn:dev:build\" \"yarn:dev:start\"",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"lint": "eslint src --fix-dry-run",
 		"fix": "eslint src --fix",
+		"update": "yarn upgrade-interactive --latest",
 		"pub": "cp -f .gitignore .npmignore && yarn publish"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"body-parser": "^1.19.0",
 		"morgan": "^1.10.0",
 		"puppeteer": "^5.3.1"
 	},
 	"devDependencies": {
 		"@types/body-parser": "^1.19.0",
 		"@types/express": "^4.17.9",
-		"@types/puppeteer": "^3.0.1",
+		"@types/puppeteer": "^5.4.0",
 		"@typescript-eslint/eslint-plugin": "^4.8.1",
 		"@typescript-eslint/parser": "^4.8.1",
+		"body-parser": "^1.19.0",
 		"concurrently": "^5.3.0",
 		"eslint": "^7.14.0",
 		"eslint-plugin-import": "^2.22.1",
@@ -37,7 +38,7 @@
 		"jest-puppeteer": "^4.4.0",
 		"nodemon": "^2.0.4",
 		"typescript": "^4.0.2",
-		"webpack": "^4.44.2",
-		"webpack-dev-middleware": "^3.7.2"
+		"webpack": "^5.6.0",
+		"webpack-dev-middleware": "^4.0.2"
 	}
 }
