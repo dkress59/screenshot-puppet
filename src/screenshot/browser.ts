@@ -1,6 +1,6 @@
 import puppeteer, { Browser, PDFOptions, ScreenshotOptions } from 'puppeteer'
 import { Response } from 'express'
-import { logErrorToConsole, logToConsole } from './utils'
+import { logErrorToConsole, logToConsole } from '../util/utils'
 import { Screenshot } from '../types/Screenshot'
 
 

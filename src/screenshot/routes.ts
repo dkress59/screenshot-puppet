@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { logErrorToConsole, logToConsole } from '../util/utils'
-import { launchBrowser, makeScreenshot } from '../util/browser'
+import { launchBrowser, makeScreenshot } from './browser'
 import { Screenshot } from '../types/Screenshot'
 import { PuppetOptions } from '../types/PuppetOptions'
 
