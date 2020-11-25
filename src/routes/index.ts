@@ -6,7 +6,8 @@ import { PuppetOptions } from '../types/PuppetOptions'
 
 export const postRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
 
-	res.type('application/json')
+	res.type('json')
+
 	const { cached, needed } = req.body
 	const browser = await launchBrowser(res)
 
@@ -26,7 +27,7 @@ export const postRouteScreenshot = async (req: Request, res: Response, options?:
 
 				} catch (error) {
 
-					img.error = error
+					img.errors.push(error)
 					logErrorToConsole(error)
 					errors.push(img)
 
@@ -34,13 +35,24 @@ export const postRouteScreenshot = async (req: Request, res: Response, options?:
 			})()
 		)
 
+	const params = req.query
+		? '?' + new URLSearchParams(req.query as Record<string, string>).toString()
+		: ''
+	const originalUrl = options?.return_url
+		? options.return_url + '/' + req.path + params
+		: req.originalUrl
+
 	Promise.all(returns)
 		.then((images) => {
 			if (options?.callback) options.callback(images)
-			if (images.filter((i) => i && i.error !== undefined).length)
-				res.status(200).send(JSON.stringify([...cached, ...images]))
+			res.status(200).send(JSON.stringify({
+				request: req.body,
+				response: [...cached, ...images],
+				originalUrl,
+			}))
 		})
 		.catch((err) => {
+			if (options?.callback) options.callback(err)
 			logErrorToConsole(err)
 			res.status(500).send(JSON.stringify({ error: err }))
 		})
@@ -51,7 +63,6 @@ export const postRouteScreenshot = async (req: Request, res: Response, options?:
 }
 
 export const getRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
-	res.type('application/json')
 	
 	const image = new Screenshot(req)
 
@@ -61,16 +72,48 @@ export const getRouteScreenshot = async (req: Request, res: Response, options?: 
 
 	if (options?.callback) options.callback(response)
 
-	response.src
-		? res.status(200).send(JSON.stringify(response))
-		: image.error.length
-			? res.status(500).send(JSON.stringify(response))
+	switch(response.output) {
+		case 'jpg':
+			res.type('jpg')
+			break
+		case 'pdf':
+			res.type('pdf')
+			break
+		case 'png':
+			res.type('image/png')
+			break
+		default:
+			res.type('json')
+			break
+	}
+
+	const params = req.query
+		? '?' + new URLSearchParams(req.query as Record<string, string>).toString()
+		: ''
+	const originalUrl = options?.return_url
+		? options.return_url + '/' + req.path + params
+		: req.originalUrl as string
+
+	/* const payload = response.errors.length || ['b64', 'bin', 'json'].indexOf(response.output) > -1
+		? JSON.stringify({ response, originalUrl })
+		: response.src
+
+	!response.errors.length
+		? res.status(200).send(payload)
+		: response.src
+			? res.status(500).send(payload)
 			: res.status(500).send(
 				JSON.stringify({
-					...image,
+					request: image,
+					response,
+					originalUrl,
 					error: 'Error while retreiving screen shot.',
 				})
-			)
+			) */
+
+	['b64', 'bin', 'json'].indexOf(response.output) > -1
+		? res.status(200).send(JSON.stringify({ response, originalUrl }))
+		: res.status(200).send(new Buffer(response.src as string, 'base64'))
 
 	logToConsole('closing browser...')
 	await browser.close()

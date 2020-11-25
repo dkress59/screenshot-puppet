@@ -1,6 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import ScreenshotPuppet from '.'
+import Puppet from '.'
 import { fallback } from './util/middlewares'
 
 const PORT = 5900
@@ -8,13 +8,13 @@ const PORT = 5900
 const app = express()
 app.use(bodyParser.json())
 
-const getSC = ScreenshotPuppet()
+const getShot = Puppet()
 
-const postSC = ScreenshotPuppet({ method: 'post' })
+const postShot = Puppet({ method: 'post' })
 
-app.get('/', getSC)
+app.get('/:filename', getShot)
 
-app.post('/', postSC)
+app.post('/:filename', postShot)
 
 app.use(fallback)
 

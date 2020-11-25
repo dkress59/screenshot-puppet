@@ -1,23 +1,11 @@
-export const logToConsole = (log1: unknown, log2?: unknown, log3?: unknown): void | false => {
-	if (process.env.NODE_ENV !== 'development') return
-	if (!log1) return false
+export const logToConsole = (...logs: unknown[]): void | false => {
+	if (!logs || process.env.NODE_ENV !== 'development') return
 
-	log3
-		? console.log(log1, log2, log3)
-		: log2
-			? console.log(log1, log2)
-			: console.log(log1)
-	
+	console.log(...logs)
 }
 
-export const logErrorToConsole = (log1: unknown, log2?: unknown, log3?: unknown): void | false => {
-	if (process.env.NODE_ENV !== 'development') return
-	if (!log1) return false
+export const logErrorToConsole = (...logs: unknown[]): void | false => {
+	if (!logs || process.env.NODE_ENV !== 'development') return
 
-	log3
-		? console.error(log1, log2, log3)
-		: log2
-			? console.error(log1, log2)
-			: console.error(log1)
-	
+	console.error(...logs)
 }

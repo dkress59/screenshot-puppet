@@ -6,9 +6,9 @@ import { Screenshot as IScreenshot } from './types/Screenshot'
 /**
  * * output – source of truth
  * - default
- * - type
- * - init
- * - request
+ * - options
+ * - ?fileext
+ * - ?request
 */
 
 const ScreenshotPuppet = (options?: PuppetOptions | 'get' | 'post'): (req: Request, res: Response) => Promise<void> => {
@@ -21,7 +21,6 @@ const ScreenshotPuppet = (options?: PuppetOptions | 'get' | 'post'): (req: Reque
 		await getRouteScreenshot(req, res, typeof options === 'object' ? options : undefined)
 
 }
-
 
 export type Screenshot = IScreenshot
 

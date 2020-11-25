@@ -134,14 +134,14 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 
 	const { w, h, url, darkMode, remove, output } = image
 
-	const encoding = (output === 'b64') || (
+	const encoding = (output === 'bin') || (
 		output === 'json'
 		&& options
 		&& 'encoding' in options
-		&& options.encoding === 'base64'
+		&& options.encoding === 'binary'
 	)
-		? 'base64'
-		: 'binary'
+		? 'binary'
+		: 'base64'
 	
 	const type = options && ('type' in options)
 		? options.type
@@ -194,7 +194,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 								nodes[i].parentNode.removeChild(nodes[i])
 					}, sel)
 				} catch (error) {
-					image.error.push(error)
+					image.errors.push(error)
 					logErrorToConsole(error)
 				}
 			}
@@ -203,14 +203,15 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 			? await page.pdf(safeOptions)
 			: await page.screenshot(safeOptions)
 
-		image.src = screenshot.toString() // ToDo: test b64/bin + pdf
+		image.src = screenshot as string // ToDo: test b64/bin + pdf / return string
 
 	} catch (error) {
 
 		logToConsole(error)
-		image.error.push(error)
+		image.errors.push(error)
 
 	}
+
 
 	return image
 

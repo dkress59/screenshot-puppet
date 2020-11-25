@@ -33,6 +33,10 @@ module.exports = {
 			'error',
 			'never',
 		],
-		'no-tabs': ['error', { allowIndentationTabs: true }],
+		'no-tabs': [
+			'error',
+			{ allowIndentationTabs: true }
+		],
+		// 'max-len': ['error', { 'code': 96 }]
 	},
 }

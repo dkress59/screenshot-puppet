@@ -16,15 +16,20 @@ ___
 
 #### ToDo
 
+- [ ] !!! bin === Buffer !!!
 - [X] add callback (e.g. for redis)
-- [ ] add options (URLs, ports?, …)
-- [ ] advance return/output logic
+- [X] add options (URLs, ports?, …)
+  - [ ] make all options overridable
+- [X] advance return/output logic
+  - [ ] refine returns
 - [ ] re-evaluate error handling
 - [X] advance PDF implementation
 - [ ] add morgan access log (?)
 - [ ] add unit tests
 - [X] add dev setup
-- [ ] improve utils.ts
+- [X] improve utils.ts
 - [ ] improve POST
-- [ ] improve PDF
+- [X] improve PDF
+  - [ ] test PDF
 - [ ] README.md
+- [ ] implement [puppet.connect()](https://pptr.dev/#?product=Puppeteer&version=v5.5.0&show=api-puppeteerconnectoptions)
