@@ -8,12 +8,13 @@
 		"start": "node dist/index.js",
 		"dev:start": "nodemon dist/server.js",
 		"dev:build": "tsc --watch --preserveWatchOutput",
+		"dev:pub": "cp -f .gitignore .npmignore && sed -i /dist/d .npmignore && tsc && npm publish --dry-run",
 		"dev": "concurrently \"yarn:dev:build\" \"yarn:dev:start\"",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"lint": "eslint src --fix-dry-run",
 		"fix": "eslint src --fix",
 		"update": "yarn upgrade-interactive --latest",
-		"pub": "cp -f .gitignore .npmignore && yarn publish"
+		"pub": "cp -f .gitignore .npmignore && sed -i /dist/d .npmignore && tsc && && yarn publish"
 	},
 	"keywords": [],
 	"author": "",

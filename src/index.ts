@@ -3,6 +3,14 @@ import { getRouteScreenshot, postRouteScreenshot } from './routes'
 import { PuppetOptions } from './types/PuppetOptions'
 import { Screenshot as IScreenshot } from './types/Screenshot'
 
+/**
+ * * output – source of truth
+ * - default
+ * - type
+ * - init
+ * - request
+*/
+
 const ScreenshotPuppet = (options?: PuppetOptions | 'get' | 'post'): (req: Request, res: Response) => Promise<void> => {
 
 	if (options === 'post' || typeof options === 'object' && 'method' in options && options.method === 'post')
