@@ -1,13 +1,12 @@
-import { Request, Response } from 'express'
 import Puppet from '../src'
-
-const getShot = Puppet()
-
-const postShot = Puppet({ method: 'post' })
-
 
 describe('Puppet', () => {
 	it('works', () => {
-		expect(postShot).toBeTruthy()
+		expect(Puppet()).toBeTruthy()
+		expect(Puppet('get')).toBeTruthy()
+		expect(Puppet('post')).toBeTruthy()
+		expect(Puppet(undefined)).toBeTruthy()
+		expect(Puppet({method: 'get'})).toBeTruthy()
+		expect(Puppet({method: 'post'})).toBeTruthy()
 	})
 })

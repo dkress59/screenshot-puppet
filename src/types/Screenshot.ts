@@ -17,9 +17,11 @@ export class Screenshot {
 	constructor({ path, query }: Request, options?: PuppetOptions) {
 		const { w, h, url, data, dark, remove, output } = query as Record<string, string>
 
-		this.url = url.substring(0, 7) === 'http://'
+		this.url = url.substring(0, 5) === 'http:'
 			? url
-			: 'https://' + url
+			: url.substring(0, 6) === 'https:'
+				? url
+				: 'http://' + url
 
 		if (w) this.w = parseInt(w)
 		if (h) this.h = parseInt(h)
@@ -28,11 +30,18 @@ export class Screenshot {
 			this.remove = remove.split(',')
 
 		const fileExt = path && path !== '/'
-			? path.substring(1, path.length - 1).split('.').reverse()[0].toLowerCase()
+			? path
+				.substr(1, path.length -1)
+				.split('.')
+				.reverse()[0]
+				.toLowerCase()
 			: false
 
-		if (fileExt && ['jpg','jpeg','json','pdf','png'].indexOf(fileExt) > -1) {
-			this.fileName = path.split('.').splice(-1,1).join('.')}
+		if (fileExt && ['jpg','jpeg','json','pdf','png'].indexOf(fileExt) > -1)
+			this.fileName = path.substr(1, path.length -1)
+				.split('.')
+				.splice(0, path.split('.').length - 1)
+				.join('.')
 
 		if (options?.override === false) {
 			if (options.output)

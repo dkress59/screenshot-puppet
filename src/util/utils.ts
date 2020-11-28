@@ -9,3 +9,9 @@ export const logErrorToConsole = (...logs: unknown[]): void | false => {
 
 	console.error(...logs)
 }
+
+export const logWarningToConsole = (...logs: unknown[]): void | false => {
+	if (!logs || process.env.NODE_ENV !== 'development') return
+
+	console.warn(...logs)
+}
