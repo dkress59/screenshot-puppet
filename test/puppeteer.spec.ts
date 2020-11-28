@@ -1,11 +1,11 @@
 import 'expect-puppeteer'
 
-describe('Google', () => {
+describe('ddg.png', () => {
 	beforeAll(async () => {
-		await page.goto('https://google.com')
+		await page.goto('http://localhost:5900/ddg.png?url=duckduckgo.com')
 	})
 
-	it('should be titled "Google"', async () => {
-		await expect(page.title()).resolves.toMatch('Google')
+	it('matches snapshot', async () => {
+		await expect(page.content()).resolves.toMatchSnapshot()
 	})
 })
