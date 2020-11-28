@@ -1,4 +1,4 @@
-import puppeteer, { Browser, PDFOptions, ScreenshotOptions } from 'puppeteer'
+import puppeteer, { Browser, LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
 import { Response } from 'express'
 import { logErrorToConsole, logToConsole } from '../util/utils'
 import { Screenshot } from '../types/Screenshot'
@@ -108,15 +108,15 @@ const qualities = [
 	100
 ]
 
-
-export const launchBrowser = async (res?: Response, timeout?: number): Promise<Browser> => {
+export const launchBrowser = async (res?: Response, timeout?: number, options?: LaunchOptions): Promise<Browser> => {
 	process.setMaxListeners(16)
 	const browser = await puppeteer
 		.launch({
-			timeout: timeout ? timeout : 6666,
+			timeout: timeout ? timeout : options?.timeout ? options.timeout : 6666,
 			defaultViewport: null,
 			ignoreHTTPSErrors: true,
 			args: ['--no-sandbox', '--disable-setuid-sandbox'], // ToDo: neccessary?
+			...options
 		})
 		.catch((e) => {
 			if (res)

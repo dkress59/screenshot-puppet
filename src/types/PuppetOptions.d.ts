@@ -1,4 +1,4 @@
-import { PDFOptions, ScreenshotOptions } from 'puppeteer'
+import { BrowserOptions, LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
 
 export interface PuppetOptions {
 	return_url?: string
@@ -11,4 +11,5 @@ export interface PuppetOptions {
 	override?: boolean
 
 	screenshot?: ScreenshotOptions | PDFOptions
+	browser?: LaunchOptions
 }

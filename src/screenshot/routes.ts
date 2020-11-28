@@ -4,6 +4,7 @@ import { launchBrowser, makeScreenshot } from './browser'
 import { Screenshot } from '../types/Screenshot'
 import { PuppetOptions } from '../types/PuppetOptions'
 
+/* istanbul ignore next */ // temp, until remodeled
 export const postRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
 
 	res.type('json')
@@ -64,7 +65,7 @@ export const postRouteScreenshot = async (req: Request, res: Response, options?:
 
 export const getRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
 	
-	const image = new Screenshot(req)
+	const image = new Screenshot(req, options)
 
 	const browser = await launchBrowser(res)
 
@@ -82,7 +83,7 @@ export const getRouteScreenshot = async (req: Request, res: Response, options?: 
 			res.type('pdf')
 			break
 		case 'png':
-			res.type('image/png')
+			res.type('png')
 			break
 		default:
 			res.type('json')
@@ -93,25 +94,8 @@ export const getRouteScreenshot = async (req: Request, res: Response, options?: 
 		? '?' + new URLSearchParams(req.query as Record<string, string>).toString()
 		: ''
 	const originalUrl = options?.return_url
-		? options.return_url + '/' + req.path + params
+		? options.return_url + req.path + params
 		: req.originalUrl as string
-
-	/* const payload = response.errors.length || ['b64', 'bin', 'json'].indexOf(response.output) > -1
-		? JSON.stringify({ response, originalUrl })
-		: response.src */
-
-	/* !response.errors.length
-		? res.status(200).send(payload)
-		: response.src
-			? res.status(500).send(payload)
-			: res.status(500).send(
-				JSON.stringify({
-					request: image,
-					response,
-					originalUrl,
-					error: 'Error while retreiving screen shot.',
-				})
-			) */
 
 	['b64', 'bin', 'json'].indexOf(response.output) > -1
 		? res.status(200).send(JSON.stringify({ response, originalUrl }))

@@ -45,9 +45,9 @@ export class Screenshot {
 
 		if (options?.override === false) {
 			if (options.output)
-				this.output = options?.output
+				this.output = options.output
 			if (options.data)
-				this.data = options?.data
+				this.data = options.data
 			if (options.darkMode)
 				this.darkMode = true
 		} else {
@@ -82,6 +82,8 @@ export class Screenshot {
 							: fileExt === 'pdf'
 								? 'pdf'
 								: 'png'
+			else if (options?.output && ['b64', 'bin', 'jpg', 'json', 'pdf', 'png'].indexOf(options.output) > -1)
+				this.output = options.output
 		}
 
 	}

@@ -37,16 +37,8 @@ describe('Screenshot class', () => {
 			}
 			const image = new Screenshot(mockRequest as unknown as Request)
 
-			// expect(image.w).toBe(1024)
-			// expect(image.h).toBe(768)
-			// expect(image.url).toBe(mockRequest.query.url)
-			// expect(image.src).toBeFalsy()
-			// expect(image.data).toBeFalsy()
 			expect(image.fileName).toBe('filename')
-			// expect(image.darkMode).toBe(false)
 			expect(image.remove).toEqual(['#rmvOne', '.rmvTwo'])
-			// expect(image.errors.length).toBe(0)
-			// expect(image.output).toBe('json')
 		})
 
 		it('options override forbidden', () => {
@@ -67,15 +59,8 @@ describe('Screenshot class', () => {
 			}
 			const image = new Screenshot(mockRequest as unknown as Request, mockOptions)
 
-			// expect(image.w).toBe(1024)
-			// expect(image.h).toBe(768)
-			// expect(image.url).toBe(mockRequest.query.url)
-			// expect(image.src).toBeFalsy()
 			expect(image.data).toEqual(mockOptions.data)
-			// expect(image.fileName).toBeFalsy()
 			expect(image.darkMode).toBe(true)
-			// expect(image.remove).toBeFalsy()
-			// expect(image.errors.length).toBe(0)
 			expect(image.output).toBe('json')
 		})
 
