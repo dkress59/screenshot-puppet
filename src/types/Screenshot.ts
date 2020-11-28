@@ -6,7 +6,7 @@ export class Screenshot {
 	public w = 1024
 	public h = 768
 	public url = ''
-	public src?: string
+	public src?: string | Buffer
 	public data?: Record<string, unknown>
 	public fileName?: string
 	public darkMode = false
@@ -15,7 +15,7 @@ export class Screenshot {
 	public output: 'b64' | 'bin' | 'jpg' | 'json' | 'pdf' | 'png'  = 'json'
 
 	constructor({ path, query }: Request, options?: PuppetOptions) {
-		const { w, h, url, data, darkMode, remove, output } = query as Record<string, string>
+		const { w, h, url, data, dark, remove, output } = query as Record<string, string>
 
 		this.url = url.substring(0, 7) === 'http://'
 			? url
@@ -39,8 +39,14 @@ export class Screenshot {
 				this.output = options?.output
 			if (options.data)
 				this.data = options?.data
+			if (options.darkMode)
+				this.darkMode = true
 		} else {
-			if (darkMode === 'true')
+			if (
+				dark === 'true'
+				|| dark === '1'
+				|| options?.darkMode && dark !== 'false' && dark !== '0'
+			)
 				this.darkMode = true // ToDo: reassure
 
 			const mergedData = options?.data && data

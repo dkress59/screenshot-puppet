@@ -73,6 +73,8 @@ export const getRouteScreenshot = async (req: Request, res: Response, options?: 
 	if (options?.callback) options.callback(response)
 
 	switch(response.output) {
+		case 'bin':
+			break
 		case 'jpg':
 			res.type('jpg')
 			break
@@ -96,9 +98,9 @@ export const getRouteScreenshot = async (req: Request, res: Response, options?: 
 
 	/* const payload = response.errors.length || ['b64', 'bin', 'json'].indexOf(response.output) > -1
 		? JSON.stringify({ response, originalUrl })
-		: response.src
+		: response.src */
 
-	!response.errors.length
+	/* !response.errors.length
 		? res.status(200).send(payload)
 		: response.src
 			? res.status(500).send(payload)
@@ -113,7 +115,7 @@ export const getRouteScreenshot = async (req: Request, res: Response, options?: 
 
 	['b64', 'bin', 'json'].indexOf(response.output) > -1
 		? res.status(200).send(JSON.stringify({ response, originalUrl }))
-		: res.status(200).send(new Buffer(response.src as string, 'base64'))
+		: res.status(200).send(response.output === 'bin' ? response.src : new Buffer(response.src as string, 'base64'))
 
 	logToConsole('closing browser...')
 	await browser.close()

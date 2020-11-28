@@ -203,7 +203,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 			? await page.pdf(safeOptions)
 			: await page.screenshot(safeOptions)
 
-		image.src = screenshot as string // ToDo: test b64/bin + pdf / return string
+		image.src = screenshot // ToDo: test b64/bin + pdf / return string
 
 	} catch (error) {
 

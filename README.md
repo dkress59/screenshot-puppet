@@ -16,10 +16,11 @@ ___
 
 #### ToDo
 
-- [ ] !!! bin === Buffer !!!
+- [X] bin === Buffer
+  - [ ] test, ?remove 
 - [X] add callback (e.g. for redis)
 - [X] add options (URLs, ports?, …)
-  - [ ] make all options overridable
+  - [X] make all options overridable
 - [X] advance return/output logic
   - [ ] refine returns
 - [ ] re-evaluate error handling
