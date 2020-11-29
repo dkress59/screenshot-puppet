@@ -13,9 +13,6 @@ jobs:
 
     steps:
 
-    - name: Install Puppeteer deps
-      run: apk update && apk add -y libgbm-dev
-
     - name: Check out Repository
       uses: actions/checkout@v2
 
@@ -27,6 +24,8 @@ jobs:
 
     - name: Jest
       run: yarn test:ci
+      env:
+        CI: true
 
     - name: Upload Coverage Report
       uses: codecov/codecov-action@v1

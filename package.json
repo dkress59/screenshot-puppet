@@ -12,7 +12,7 @@
 		"dev:pub": "cp -f .gitignore .npmignore && sed -i /dist/d .npmignore && tsc && npm publish --dry-run",
 		"dev:test": "concurrently 'yarn:dev:start' 'sleep 1 && yarn jest -u --watch'",
 		"dev": "concurrently \"yarn:dev:build\" \"yarn:dev:start\"",
-		"test:ci": "tsc && PORT=5900 node dist/index.js & sleep 3 && yarn jest -u --coverage",
+		"test:ci": "tsc && PORT=5900 node dist/index.js & sleep 3 && CI=true yarn jest -u --coverage",
 		"test": "PORT=5900 node dist/server.js & sleep 3 && yarn jest -u --coverage | true && killall -9 node",
 		"lint": "eslint src --fix-dry-run",
 		"fix": "eslint src --fix",

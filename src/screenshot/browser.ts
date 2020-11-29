@@ -116,7 +116,8 @@ export const launchBrowser = async (res?: Response, timeout?: number, options?: 
 			defaultViewport: null,
 			ignoreHTTPSErrors: true,
 			args: ['--no-sandbox', '--disable-setuid-sandbox'], // ToDo: neccessary?
-			...options
+			...options,
+			headless: process.env.CI === 'true' || options?.headless,
 		})
 		.catch((e) => {
 			if (res)
