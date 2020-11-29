@@ -16,8 +16,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: 💥 Set up Node.js
-      run: apt-get update && apt-get install -y libgbm-dev
-      run: curl -sL https://deb.nodesource.com/setup_15.x | sudo -E && apt-get install -y nodejs libgbm-dev
+      run: curl -sL https://deb.nodesource.com/setup_15.x | sudo -E && apt-get update && apt-get install -y nodejs libgbm-dev
 
     - name: 💾 Add Package Dependencies
       run: yarn --frozen-lockfile
