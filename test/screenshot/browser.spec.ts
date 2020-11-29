@@ -125,6 +125,7 @@ describe('Puppeteer Screenshot Mechanism', () => {
 
 			// + document.querySelector
 			expect(image.errors).toEqual(['rejection', 'rejection'])
+			expect(image).toMatchSnapshot()
 		})
 
 	})

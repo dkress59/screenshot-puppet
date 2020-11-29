@@ -27,7 +27,7 @@ ___
 - [ ] re-evaluate error handling
 - [X] advance PDF implementation
 - [ ] add morgan access log (?)
-- [ ] add unit tests
+- [X] add unit tests
 - [X] add dev setup
 - [X] improve utils.ts
 - [ ] improve POST
