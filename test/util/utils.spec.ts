@@ -15,10 +15,6 @@ describe('Utilitites', () => {
 		console.warn = originalWarn
 		console.error = originalError
 	})
-
-	afterAll(() => {
-		process.env = OLD_ENV // restore old env
-	})
 		
 	describe('Check console output', () => {
 		const consoleOutput: string[] = []
@@ -33,6 +29,10 @@ describe('Utilitites', () => {
 			console.log = mockedLog
 			console.warn = mockedWarn
 			console.error = mockedError
+		})
+
+		afterAll(() => {
+			process.env = OLD_ENV // restore old env
 		})
 
 		it('only records to console if NODE_ENV === \'development\'', () => {

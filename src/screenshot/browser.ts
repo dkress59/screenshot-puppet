@@ -123,6 +123,7 @@ export const launchBrowser = async (res?: Response, timeout?: number, options?: 
 				res
 					.status(500)
 					.send({ error: 'error launching puppeteer: ' + e.toString() })
+			browser.close()
 			throw new Error('error launching puppeteer: ' + e.toString())
 		})
 
@@ -187,7 +188,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 			for (const sel of remove) {
 				logToConsole('remove', sel)
 				try {
-					page.evaluate((sel) => {
+					await page.evaluate((sel) => {
 						const nodes = document.querySelectorAll(sel)
 						if (document.querySelectorAll(sel).length)
 							for (let i = 0; i < nodes.length; i++)

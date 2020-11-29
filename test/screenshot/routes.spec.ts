@@ -2,162 +2,143 @@
 import { Request, Response } from 'express'
 import { getRouteScreenshot } from '../../src/screenshot/routes'
 import { PuppetOptions } from '../../src/types/PuppetOptions'
-// + mock launchBrowser()
 
 import * as browser from '../../src/screenshot/browser'
+import { Browser, ScreenshotOptions } from 'puppeteer'
+import { Screenshot } from '../../src/types/Screenshot'
 
-const mockRequest = {
-	path: '/',
-	query: {
-		url: 'https://duckduckgo.com'
-	}
-}
-const mockResponse = ({ type, status, send, end }: {
-	type?: jest.Mock<any, any>
-	status?: jest.Mock<any, any>
-	send?: jest.Mock<any, any>
-	end?: jest.Mock<any, any>
-}) => {
-	const res = {}
-	// @ts-ignore
-	res.type = type ?? jest.fn().mockReturnValue(res)
-	// @ts-ignore
-	res.status = status ?? jest.fn().mockReturnValue(res)
-	// @ts-ignore
-	res.send = send ?? jest.fn().mockReturnValue(res)
-	// @ts-ignore
-	res.end = end ?? jest.fn().mockReturnValue(res)
-	return res
-}
+jest.mock('../../src/screenshot/browser', () => ({
+	launchBrowser: jest.fn(() =>
+		new Promise(resolve =>
+			resolve({
+				close: () => null,
+				newPage: () => ({
+					setViewport: () => null,
+					goto: () => null,
+					screenshot: () => 'abc',
+					pdf: () => 'abc',
+				}),
+			})
+		)
+	),
+	makeScreenshot: (_browser: Browser, image: Screenshot, _options?: ScreenshotOptions) => ({ ...image, src: 'abc' })
+}))
+
+let mockRequest: Partial<Request> = {}
+let mockResponse: Partial<Response> = {}
 
 describe('Screenshot Routes', () => {
 
 	describe('GET route', () => {
 		beforeEach(() => {
-			// @ts-ignore // prevent memory leak
-			browser.launchBrowser = jest.fn(() =>
-				new Promise(resolve =>
-					resolve({
-						close: () => null,
-						newPage: () => ({
-							setViewport: () => null,
-							goto: () => null,
-							screenshot: () => 'abc',
-							pdf: () => 'abc',
-						}),
-					})
-				)
-			)
+			mockRequest = {
+				path: '/',
+				query: {
+					url: 'https://duckduckgo.com'
+				}
+			}
+			mockResponse = {
+				type: jest.fn().mockReturnThis(),
+				status: jest.fn().mockReturnThis(),
+				send: jest.fn().mockReturnThis(),
+				end: jest.fn().mockReturnThis(),
+			}
 		})
 
 		it('returns screenshot', async() => {
-			const res = mockResponse({})
 			const mockOptions: PuppetOptions = {
 				return_url: 'http://return.url',
 			}
-			const mockQuery = {}
-			const req = { ...mockRequest, query: {
-				url: mockRequest.query.url, mockQuery
-			} }
+			/* const mockQuery = {}
+			const req: Partial<Request> = {
+				...mockRequest,
+				query: {
+					url: mockRequest.query!.url,
+					...mockQuery
+				}
+			} */
+			const req: Partial<Request> = { ...mockRequest }
+			const res: Partial<Response> = { ...mockResponse }
 
-			await getRouteScreenshot(req as unknown as Request, res as unknown as Response, mockOptions)
+			await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
-			// @ts-ignore
 			expect(res.type).toHaveBeenCalledWith('json')
 			expect(browser.launchBrowser).toHaveBeenCalled()
-			// @ts-ignore
 			expect(res.status).toHaveBeenCalledWith(200)
-			// @ts-ignore
 			expect(res.send).toMatchSnapshot()
 		})
 
 		describe('content type', () => {
 
 			it('set binary correctly', async() => {
-				const res = mockResponse({})
 				const mockOptions: PuppetOptions = {
 					return_url: 'http://return.url',
 					output: 'bin'
 				}
-				const mockQuery = {
-					output: 'bin'
+				const req: Partial<Request> = {
+					...mockRequest,
+					query: {
+						output: 'bin',
+						url: 'https://duckduckgo.com',
+					}
 				}
-				const req = { ...mockRequest, query: {
-					url: mockRequest.query.url, mockQuery
-				} }
+				const res: Partial<Response> = { ...mockResponse }
 
-				await getRouteScreenshot(req as unknown as Request, res as unknown as Response, mockOptions)
+				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
-				// @ts-ignore
 				expect(res.type).not.toHaveBeenCalled()
 			})
 
 			it('set base64 correctly', async() => {
-				const res = mockResponse({})
 				const mockOptions: PuppetOptions = {
 					return_url: 'http://return.url',
 					output: 'b64'
 				}
-				const mockQuery = {}
-				const req = { ...mockRequest, query: {
-					url: mockRequest.query.url, mockQuery
-				} }
+				const req: Partial<Request> = { ...mockRequest }
+				const res: Partial<Response> = { ...mockResponse }
 
-				await getRouteScreenshot(req as unknown as Request, res as unknown as Response, mockOptions)
+				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
-				// @ts-ignore
 				expect(res.type).toHaveBeenCalledWith('json')
 			})
 
 			it('set jpeg correctly', async() => {
-				const res = mockResponse({})
 				const mockOptions: PuppetOptions = {
 					return_url: 'http://return.url',
 					output: 'jpg'
 				}
-				const mockQuery = {}
-				const req = { ...mockRequest, query: {
-					url: mockRequest.query.url, mockQuery
-				} }
+				const req: Partial<Request> = { ...mockRequest }
+				const res: Partial<Response> = { ...mockResponse }
 
-				await getRouteScreenshot(req as unknown as Request, res as unknown as Response, mockOptions)
+				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
-				// @ts-ignore
 				expect(res.type).toHaveBeenCalledWith('jpg')
 			})
 
 			it('set pdf correctly', async() => {
-				const res = mockResponse({})
 				const mockOptions: PuppetOptions = {
 					return_url: 'http://return.url',
 					output: 'pdf'
 				}
-				const mockQuery = {}
-				const req = { ...mockRequest, query: {
-					url: mockRequest.query.url, mockQuery
-				} }
+				const req: Partial<Request> = { ...mockRequest }
+				const res: Partial<Response> = { ...mockResponse }
 
-				await getRouteScreenshot(req as unknown as Request, res as unknown as Response, mockOptions)
+				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
-				// @ts-ignore
 				expect(res.type).toHaveBeenCalledWith('pdf')
 			})
 
 			it('set png correctly', async() => {
-				const res = mockResponse({})
 				const mockOptions: PuppetOptions = {
 					return_url: 'http://return.url',
 					output: 'png',
 					override: true,
 				}
-				const mockQuery = {}
-				const req = { ...mockRequest, query: {
-					url: mockRequest.query.url, mockQuery
-				} }
+				const req: Partial<Request> = { ...mockRequest }
+				const res: Partial<Response> = { ...mockResponse }
 
-				await getRouteScreenshot(req as unknown as Request, res as unknown as Response, mockOptions)
+				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
-				// @ts-ignore
 				expect(res.type).toHaveBeenCalledWith('png')
 			})
 

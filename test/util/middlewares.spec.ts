@@ -1,49 +1,34 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Request, Response } from 'express'
 import { fallback } from '../../src/util/middlewares'
 
-const mockRequest = (requestMethod: 'GET' | 'POST' | 'OPTIONS') => {
-	return {
-		method: requestMethod,
-	}
-}
 
-
-const mockResponse = () => {
-	const res = {}
-	// @ts-ignore
-	res.status = jest.fn().mockReturnValue(res)
-	// @ts-ignore
-	res.send = jest.fn().mockReturnValue(res)
-	// @ts-ignore
-	res.end = jest.fn().mockReturnValue(res)
-	return res
+const mockResponse: Partial<Response> = {
+	status: jest.fn().mockReturnThis(),
+	send: jest.fn().mockReturnThis(),
+	end: jest.fn().mockReturnThis(),
 }
 
 
 describe('Middlewares', () => {
 	
-	
 	describe('fallback', () => {
-		test('should return 401 if request method !== OPTIONS', async () => {
-			const req = mockRequest('GET')
-			const res = mockResponse()
-			// @ts-ignore
-			await fallback(req, res)
-			// @ts-ignore
-			expect(res.status).toHaveBeenCalledWith(401)
-			// @ts-ignore
-			expect(res.send).toHaveBeenCalledWith({ error: `${req.method} forbidden for this route.` })
+
+		it('should return 401 if request method !== OPTIONS', async () => {
+			const mockRequest: Partial<Request> = { method: 'GET' }
+			await fallback(mockRequest as Request, mockResponse as Response)
+
+			expect(mockResponse.status).toHaveBeenCalledWith(401)
+			expect(mockResponse.send).toHaveBeenCalledWith({ error: `${mockRequest.method} forbidden for this route.` })
 		})
-		test('should return 200 if request method === OPTIONS', async () => {
-			const req = mockRequest('OPTIONS')
-			const res = mockResponse()
-			// @ts-ignore
-			await fallback(req, res)
-			// @ts-ignore
-			expect(res.status).toHaveBeenCalledWith(200)
-			// @ts-ignore
-			expect(res.end).toHaveBeenCalledWith()
+
+		it('should return 200 if request method === OPTIONS', async () => {
+			const mockRequest: Partial<Request> = { method: 'OPTIONS' }
+			await fallback(mockRequest as Request, mockResponse as Response)
+
+			expect(mockResponse.status).toHaveBeenCalledWith(200)
+			expect(mockResponse.end).toHaveBeenCalledWith()
 		})
+
 	})
 
 })
