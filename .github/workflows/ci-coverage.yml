@@ -9,7 +9,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-20.04
-    #container: node:14-alpine
+    #container: ubuntu-20.04
+
+    services:
+      serve:
+        image: node:14-alpine
+        ports:
+          - 5900:5900
 
     steps:
 
