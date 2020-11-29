@@ -16,8 +16,8 @@ jobs:
       # Label used to access the service container
       service:
         # Docker Hub image
-        image: node:15
-        ports: [ 5900:5900 ]
+        image: nodejs:15
+        ports: 5900:5900
 
     steps:
 
