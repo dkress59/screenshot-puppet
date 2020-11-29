@@ -21,12 +21,9 @@ jobs:
                   check-latest: true
             - name: Yarn Install
               run: yarn
-              if: |
-                  steps.cache-yarn-cache.outputs.cache-hit != 'true' ||
-                  steps.cache-node-modules.outputs.cache-hit != 'true'
-            - name: Eslint Check
-              run: yarn check:script
-            - name: Test
+            - name: ESLint Check
+              run: yarn lint
+            - name: Jest
               run: yarn test
             - name: Upload Coverage Report
               uses: codecov/codecov-action@v1
