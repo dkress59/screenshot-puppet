@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: nodejs:15
+    container: node:15
 
     # Service containers to run with `container-job`
     services:
