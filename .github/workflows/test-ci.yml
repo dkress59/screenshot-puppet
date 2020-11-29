@@ -23,7 +23,7 @@ jobs:
             - name: ESLint Check
               run: yarn lint
             - name: Jest
-              run: yarn test
+              run: yarn test:ci
             - name: Upload Coverage Report
               uses: codecov/codecov-action@v1
               with:
