@@ -12,6 +12,9 @@ jobs:
     container: node:14-alpine
 
     steps:
+    - name: Install Puppeteer deps
+      run: apt-get update && apt-get install -y libgbm-dev
+
     - name: Check out Repository
       uses: actions/checkout@v2
 
