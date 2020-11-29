@@ -9,32 +9,27 @@ on:
   pull_request:
     branches: [ master ]
 
+
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x, 14.x]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Yarn Install
-      run: yarn
-      if: |
-          steps.cache-yarn-cache.outputs.cache-hit != 'true' ||
-          steps.cache-node-modules.outputs.cache-hit != 'true'
-    - name: Eslint Check
-      run: yarn check:script
-    - name: Test
-      run: yarn test
-    - name: Upload Coverage Report
-      uses: codecov/codecov-action@v1
-      with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage/coverage-final.json
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: '15'
+                  check-latest: true
+            - name: Yarn Install
+              run: yarn
+              if: |
+                  steps.cache-yarn-cache.outputs.cache-hit != 'true' ||
+                  steps.cache-node-modules.outputs.cache-hit != 'true'
+            - name: Eslint Check
+              run: yarn check:script
+            - name: Test
+              run: yarn test
+            - name: Upload Coverage Report
+              uses: codecov/codecov-action@v1
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  file: ./coverage/coverage-final.json
