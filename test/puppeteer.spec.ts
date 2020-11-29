@@ -1,4 +1,5 @@
 import 'expect-puppeteer'
+// github ci: CONNECTION_REFUSED
 
 describe('ddg.png', () => {
 	beforeAll(async () => {
