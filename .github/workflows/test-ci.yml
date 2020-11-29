@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    image: node:14-alpine
+    container: node:14-alpine
 
     steps:
     - name: Check out Repository
