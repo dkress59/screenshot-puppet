@@ -25,7 +25,6 @@ jobs:
     steps:
     - name: Check out Repository
       uses: actions/checkout@v2
-      uses: actions/setup-node@v2-beta
 
     - name: Yarn Install
       run: yarn
