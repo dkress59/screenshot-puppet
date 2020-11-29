@@ -1,7 +1,4 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: Test CI
+name: Coverage Report
 
 on:
   push:
@@ -9,24 +6,41 @@ on:
   pull_request:
     branches: [ master ]
 
-
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v2-beta
-              with:
-                  node-version: '15'
-                  check-latest: true
-            - name: Yarn Install
-              run: yarn
-            - name: ESLint Check
-              run: yarn lint
-            - name: Jest
-              run: yarn test
-            - name: Upload Coverage Report
-              uses: codecov/codecov-action@v1
-              with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
-                  file: ./coverage/coverage-final.json
+  test:
+    runs-on: ubuntu-20.04
+    #container: ubuntu-20.04
+
+    #services:
+    #  serve:
+    #    image: node:14-alpine
+    #    ports:
+    #      - 5900:5900
+
+    steps:
+
+    - name: Install Node.js
+      run: sudo apt-get update &&curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - && sudo apt-get install -y nodejs libgbm-dev
+
+    - name: Check out Repository
+      uses: actions/checkout@v2
+
+    #- name: Install Puppeteer deps
+    #  run: apt-get update && apt-get install libgm-dev libnss3
+
+    - name: Yarn Install
+      run: yarn install --frozen-lockfile
+
+    - name: ESLint Check
+      run: yarn lint
+
+    - name: Jest
+      run: yarn test:ci
+      env:
+        CI: true
+
+    - name: Upload Coverage Report
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage/coverage-final.json
