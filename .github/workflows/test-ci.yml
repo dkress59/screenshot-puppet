@@ -20,12 +20,6 @@ jobs:
         ports: [ 5900:5900 ]
 
     steps:
-    - name: Check out Repository
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2-beta
-      with:
-        node-version: '15'
-        check-latest: true
 
     - name: Yarn Install
       run: yarn
