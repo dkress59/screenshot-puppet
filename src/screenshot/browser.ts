@@ -119,13 +119,16 @@ export const launchBrowser = async (res?: Response, timeout?: number, options?: 
 			...options,
 			headless: process.env.CI === 'true' || options?.headless,
 		})
-		.catch((e) => {
+		.catch( /* istanbul ignore next */ (e) => {
 			if (res)
 				res
 					.status(500)
-					.send({ error: 'error launching puppeteer: ' + e.toString() })
-			browser.close()
-			throw new Error('error launching puppeteer: ' + e.toString())
+					.send({
+						message: 'error launching puppeteer',
+						error: e,
+					})
+
+			throw new Error('error launching puppeteer: ' + JSON.stringify(e)) // breaks jest
 		})
 
 	return browser

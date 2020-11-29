@@ -4,42 +4,31 @@ on:
   push:
     branches: [ module, master ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, develop ]
 
 jobs:
   test:
     runs-on: ubuntu-20.04
-    #container: ubuntu-20.04
-
-    #services:
-    #  serve:
-    #    image: node:14-alpine
-    #    ports:
-    #      - 5900:5900
 
     steps:
 
-    - name: Install Node.js
-      run: sudo apt-get update &&curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - && sudo apt-get install -y nodejs libgbm-dev
-
-    - name: Check out Repository
+    - name: ✣ Set up Node.js
       uses: actions/checkout@v2
+      run: apt-get update && apt-get install -y libgbm-dev
+      run: curl -sL https://deb.nodesource.com/setup_15.x | sudo -E && apt-get install -y nodejs libgbm-dev
 
-    #- name: Install Puppeteer deps
-    #  run: apt-get update && apt-get install libgm-dev libnss3
+    - name: ✶ Add Package Dependencies
+      run: yarn --frozen-lockfile
 
-    - name: Yarn Install
-      run: yarn install --frozen-lockfile
-
-    - name: ESLint Check
+    - name: ✔️ ESLint Check
       run: yarn lint
 
-    - name: Jest
+    - name: ♛ Unit Tests
       run: yarn test:ci
       env:
         CI: true
 
-    - name: Upload Coverage Report
+    - name: → Share Coverage Report
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}

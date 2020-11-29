@@ -1,7 +1,12 @@
 import { Request, Response } from 'express'
-import { Browser } from 'puppeteer'
 import { launchBrowser, makeScreenshot } from '../../src/screenshot/browser'
 import { Screenshot } from '../../src/types/Screenshot'
+
+import { launch, Browser } from 'puppeteer'
+import { mocked } from 'ts-jest/utils'
+jest.mock('puppeteer')
+
+const mockedLaunch = mocked(launch, true)
 
 const env = process.env
 const mockPage = {
@@ -16,21 +21,17 @@ const mockBrowser = {
 	close: () => null,
 	newPage: () => (mockPage),
 }
-const launchResolve = jest.fn(() => new Promise(resolve => resolve(mockBrowser)))
-const launchReject = jest.fn().mockRejectedValue({ mock_error: 'mock error' })
-
-jest.mock('puppeteer', () => ({
-	//launch: launchResolve
-	launch: () => new Promise(resolve => resolve(mockBrowser))
-	//launch: jest.fn().mockRejectedValue({ mock_error: 'mock error' })
-}))
 
 let mockRequest: Partial<Request> = {}
 let mockResponse: Partial<Response> = {}
 
+
 describe('Puppeteer Screenshot Mechanism', () => {
 	beforeEach(() => {
-		process.env.NODE_ENV ='test'
+		process.env.NODE_ENV = 'test'
+		mockedLaunch.mockImplementation((): Promise<Browser> =>
+			new Promise(resolve => resolve(mockBrowser as unknown as Browser))
+		)
 		mockRequest = {
 			path: '/',
 			query: {
@@ -56,13 +57,17 @@ describe('Puppeteer Screenshot Mechanism', () => {
 			expect(browser).toEqual(mockBrowser)
 		})
 
-		/* it('fails and sends error', async() =>{
+		/* it('fails and sends error', async() => {
+			mockedLaunch.mockRejectedValue({ mock_error: 'mock error' })
 			const browser = await launchBrowser()
 
 			expect(mockResponse.status).toHaveBeenCalledWith(500)
-			expect(mockResponse.send).toHaveBeenCalledWith({ error: 'error launching puppeteer: ' + { mock_error: 'mock error' }.toString() })
+			expect(mockResponse.send).toHaveBeenCalledWith({
+				message: 'error launching puppeteer',
+				error: 'mock error',
+			})
 
-			expect(browser).toEqual(mockBrowser) // throw?
+			expect(await launchBrowser).toThrow()
 		}) */
 	})
 
@@ -101,7 +106,7 @@ describe('Puppeteer Screenshot Mechanism', () => {
 			expect(image).toBeTruthy()
 		})
 
-		it('reject', async() => {
+		it('reject newPage', async() => {
 			const mockOptions = {}
 			const req: Partial<Request> = {
 				path: '/filename.json',
@@ -126,6 +131,17 @@ describe('Puppeteer Screenshot Mechanism', () => {
 			// + document.querySelector
 			expect(image.errors).toEqual(['rejection', 'rejection'])
 			expect(image).toMatchSnapshot()
+		})
+
+		it('reject evauluate', async() => {
+			const mockOptions = {}
+
+			const image = await makeScreenshot({
+				...mockBrowser,
+				newPage: () => Promise.reject('rejection')
+			} as unknown as Browser, new Screenshot(mockRequest as Request), mockOptions)
+
+			expect(image.errors).toEqual(['rejection'])
 		})
 
 	})
