@@ -9,12 +9,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: node:14
+    #container: node:14-alpine
 
     steps:
 
+    - name: Install Node.js
+      run: sudo apt-get update &&curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - && sudo apt-get install -y nodejs libgm-dev
+
     - name: Check out Repository
       uses: actions/checkout@v2
+
+    #- name: Install Puppeteer deps
+    #  run: apt-get update && apt-get install libgm-dev libnss3
 
     - name: Yarn Install
       run: yarn install --frozen-lockfile
