@@ -10,10 +10,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container: node:14
+    before_script:
+      - apt-get update
+      - apt-get install -y libgbm-dev
 
     steps:
-    - name: Install Puppeteer deps
-      run: sudo apt-get update && sudo apt-get install -y libgbm-dev
 
     - name: Check out Repository
       uses: actions/checkout@v2
