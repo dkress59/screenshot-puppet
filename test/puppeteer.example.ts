@@ -1,5 +1,5 @@
 import 'expect-puppeteer'
-// github ci: CONNECTION_REFUSED
+// github ci: Error: Failed to launch the browser process! spawn /__w/screenshot-puppet/screenshot-puppet/node_modules/puppeteer/.local-chromium/linux-818858/chrome-linux/chrome ENOENT
 
 describe('ddg.png', () => {
 	beforeAll(async () => {
