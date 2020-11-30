@@ -1,6 +1,6 @@
 # Screenshot Puppet
 
-![Jest Coverage](https://github.com/dkress59/screenshot-puppet/workflows/Jest%20Coverage/badge.svg?branch=module) [![codecov](https://codecov.io/gh/dkress59/screenshot-puppet/branch/module/graph/badge.svg?token=NEOGL6B5FF)](https://codecov.io/gh/dkress59/screenshot-puppet)
+![Coverage Report](https://github.com/dkress59/screenshot-puppet/workflows/Coverage%20Report/badge.svg?branch=module) [![codecov](https://codecov.io/gh/dkress59/screenshot-puppet/branch/module/graph/badge.svg?token=NEOGL6B5FF)](https://codecov.io/gh/dkress59/screenshot-puppet)
 
 A nifty [express](https://expressjs.com) tool to deliver screen shots using [puppeteer](https://pptr.dev) on headless chromium.
 
