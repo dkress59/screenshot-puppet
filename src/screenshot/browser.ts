@@ -117,7 +117,7 @@ export const launchBrowser = async (res?: Response, timeout?: number, options?: 
 			ignoreHTTPSErrors: true,
 			args: ['--no-sandbox', '--disable-setuid-sandbox'], // ToDo: neccessary?
 			...options,
-			headless: process.env.CI === 'true' || options?.headless,
+			headless: process.env.CI || options?.headless ? true : false,
 		})
 		.catch( /* istanbul ignore next */ (e) => {
 			if (res)
