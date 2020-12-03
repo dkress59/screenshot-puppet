@@ -1,4 +1,4 @@
-name: Coverage Report
+name: Test Coverage
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
 
     steps:
 
-    - name: ➕ Check out Repository
+    - name: 👀 Checkout
       uses: actions/checkout@v2
 
     - name: 💥 Set up Node.js
@@ -24,7 +24,7 @@ jobs:
     - name: ⚠️ ESLint Check
       run: yarn lint
 
-    - name: 🩺 Unit Tests
+    - name: 🦾 Unit Tests
       run: yarn test:ci
       env:
         CI: true

@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import { Request, Response } from 'express'
 import { launchBrowser, makeScreenshot } from '../../src/screenshot/browser'
 import { Screenshot } from '../../src/util/Screenshot'
@@ -74,18 +77,18 @@ describe('Puppeteer Screenshot Mechanism', () => {
 	describe('retreiving screen shot', () => {
 
 		it('resolves', async() => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			/* jest.spyOn(document, 'querySelectorAll').mockImplementation((selector) => {
-				switch (selector) {
-					case '.one':
-						return null
-					case '#two':
-						return [
-							{ parentNode: { removeChild: () => null } },
-							{ parentNode: { removeChild: () => null } },
-						]
-				}
+			jest.spyOn(document, 'querySelectorAll').mockImplementation(() => {
+				const one = document.createElement('p')
+				one.classList.add('one')
+				const two = document.createElement('p')
+				two.setAttribute('id', 'two')
+				const nodeList = document.createElement('div')
+					.appendChild(one)
+					.appendChild(one)
+					.appendChild(two)
+				return nodeList
 			}) */
 
 			const mockOptions = {}

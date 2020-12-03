@@ -6,7 +6,7 @@ interface PuppetQuery {
 	w?: number
 	h?: number
 	url?: string
-	data?: string // JSON.stringify(Record<string, string>)
+	data?: string // JSON.stringify(Record<string, any>)
 	dark?: boolean
 	remove?: string[]
 	output?: 'b64' | 'bin' | 'jpg' | 'json' | 'pdf' | 'png'

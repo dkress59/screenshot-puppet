@@ -12,22 +12,19 @@ import { Screenshot as IScreenshot } from './util/Screenshot'
 */
 
 const ScreenshotPuppet = (options?: PuppetOptions | 'get' | 'post'): (req: Request, res: Response) => Promise<void> => {
+	const validOptions = typeof options === 'object'
+		? options
+		: undefined
 
 	if (
 		options === 'post'
 		|| typeof options === 'object' && 'method' in options && options.method === 'post'
 	)
 		return async (req: Request, res: Response): Promise<void> =>
-			await postRouteScreenshot(req, res, typeof options === 'object'
-				? options
-				: undefined
-			)
+			await postRouteScreenshot(req, res, validOptions)
 
 	return async (req: Request, res: Response): Promise<void> =>
-		await getRouteScreenshot(req, res, typeof options === 'object'
-			? options
-			: undefined
-		)
+		await getRouteScreenshot(req, res, validOptions)
 
 }
 

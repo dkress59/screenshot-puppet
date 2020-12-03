@@ -192,6 +192,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 			for (const sel of remove) {
 				logToConsole('remove', sel)
 				try {
+					/* istanbul ignore next */
 					await page.evaluate((sel) => {
 						const nodes = document.querySelectorAll(sel)
 						if (document.querySelectorAll(sel).length)
