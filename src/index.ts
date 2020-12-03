@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { getRouteScreenshot, postRouteScreenshot } from './screenshot/routes'
-import { PuppetOptions } from './types/PuppetOptions'
-import { Screenshot as IScreenshot } from './types/Screenshot'
+import { PuppetOptions } from './PuppetOptions'
+import { Screenshot as IScreenshot } from './util/Screenshot'
 
 /**
  * * output – source of truth

@@ -7,6 +7,7 @@ import { fallback } from './util/middlewares'
 const PORT = process.env.PORT ?? 6000
 
 const app = express()
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 const getShot = Puppet()

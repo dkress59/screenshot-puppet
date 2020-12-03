@@ -1,7 +1,7 @@
 import puppeteer, { Browser, LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
 import { Response } from 'express'
 import { logErrorToConsole, logToConsole } from '../util/utils'
-import { Screenshot } from '../types/Screenshot'
+import { Screenshot } from '../util/Screenshot'
 
 
 const qualities = [

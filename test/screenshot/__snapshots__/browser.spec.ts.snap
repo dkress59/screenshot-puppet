@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Puppeteer Screenshot Mechanism retreiving screen shot reject newPage 1`] = `
+Screenshot {
+  "darkMode": true,
+  "errors": Array [
+    "rejection",
+    "rejection",
+  ],
+  "fileName": "filename",
+  "h": 600,
+  "output": "png",
+  "remove": Array [
+    ".one",
+    "#two",
+  ],
+  "src": "abc",
+  "url": "http://start.duckduckgo.com",
+  "w": 800,
+}
+`;

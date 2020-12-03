@@ -11,4 +11,3 @@ yarn-error.log
 .vscode/
 .jest/
 coverage/
-__snapshots__

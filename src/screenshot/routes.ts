@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { logErrorToConsole, logToConsole } from '../util/utils'
 import { launchBrowser, makeScreenshot } from './browser'
-import { Screenshot } from '../types/Screenshot'
-import { PuppetOptions } from '../types/PuppetOptions'
+import { Screenshot } from '../util/Screenshot'
+import { PuppetOptions } from '../PuppetOptions'
 
 /* istanbul ignore next */ // temp, until remodeled
 export const postRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {

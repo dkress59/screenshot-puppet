@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { launchBrowser, makeScreenshot } from '../../src/screenshot/browser'
-import { Screenshot } from '../../src/types/Screenshot'
+import { Screenshot } from '../../src/util/Screenshot'
 
 import { launch, Browser } from 'puppeteer'
 import { mocked } from 'ts-jest/utils'

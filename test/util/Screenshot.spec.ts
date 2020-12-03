@@ -1,5 +1,5 @@
-import { Screenshot } from '../../src/types/Screenshot'
-import { PuppetOptions } from '../../src/types/PuppetOptions'
+import { Screenshot } from '../../src/util/Screenshot'
+import { PuppetOptions } from '../../src/PuppetOptions'
 import { Request } from 'express'
 
 describe('Screenshot class', () => {
@@ -69,7 +69,7 @@ describe('Screenshot class', () => {
 				path: '/',
 				query: {
 					url: 'https://duckduckgo.com',
-					dark: '1',
+					dark: 'false',
 					data: JSON.stringify({ editor: 'frontend' }),
 					output: 'png',
 				}
@@ -78,12 +78,12 @@ describe('Screenshot class', () => {
 				override: true,
 				data: { author: 'backend' },
 				output: 'json',
-				darkMode: false,
+				darkMode: true,
 			}
 			const image = new Screenshot(mockRequest as unknown as Request, mockOptions)
 
 			expect(image.data).toEqual({ author: 'backend', editor: 'frontend' })
-			expect(image.darkMode).toBe(true)
+			expect(image.darkMode).toBe(false)
 			expect(image.output).toBe('png')
 		})
 

@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Screenshot Routes GET route returns screenshot 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "{\\"response\\":{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://duckduckgo.com\\",\\"darkMode\\":false,\\"errors\\":[],\\"output\\":\\"json\\",\\"src\\":\\"abc\\"},\\"originalUrl\\":\\"http://return.url/?url=https%3A%2F%2Fduckduckgo.com\\"}",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Object {
+        "end": [MockFunction],
+        "send": [MockFunction] {
+          "calls": Array [
+            Array [
+              "{\\"response\\":{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://duckduckgo.com\\",\\"darkMode\\":false,\\"errors\\":[],\\"output\\":\\"json\\",\\"src\\":\\"abc\\"},\\"originalUrl\\":\\"http://return.url/?url=https%3A%2F%2Fduckduckgo.com\\"}",
+            ],
+          ],
+          "results": [Circular],
+        },
+        "status": [MockFunction] {
+          "calls": Array [
+            Array [
+              200,
+            ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": [Circular],
+            },
+          ],
+        },
+        "type": [MockFunction] {
+          "calls": Array [
+            Array [
+              "json",
+            ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": [Circular],
+            },
+          ],
+        },
+      },
+    },
+  ],
+}
+`;

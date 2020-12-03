@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Request, Response } from 'express'
 import { getRouteScreenshot } from '../../src/screenshot/routes'
-import { PuppetOptions } from '../../src/types/PuppetOptions'
+import { PuppetOptions } from '../../src/PuppetOptions'
 
 import * as browser from '../../src/screenshot/browser'
 import { Browser, ScreenshotOptions } from 'puppeteer'
-import { Screenshot } from '../../src/types/Screenshot'
+import { Screenshot } from '../../src/util/Screenshot'
 
 jest.mock('../../src/screenshot/browser', () => ({
 	launchBrowser: jest.fn(() =>
