@@ -9,7 +9,7 @@ interface PuppetQuery {
 	data?: string // JSON.stringify(Record<string, any>)
 	dark?: boolean
 	remove?: string[]
-	output?: 'b64' | 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
+	output?: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
 }
 
 export class Screenshot {
@@ -17,13 +17,13 @@ export class Screenshot {
 	public w = 1024
 	public h = 768
 	public url = ''
-	public src?: string | Buffer
+	public src: string | Buffer = ''
 	public data?: Record<string, unknown>
 	public fileName?: string
 	public darkMode = false
 	public remove?: string[]
 	public errors: unknown[] = []
-	public output: 'b64' | 'bin' | 'jpg' | 'json' | 'pdf' | 'png'  = 'json'
+	public output: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'  = 'json'
 
 	constructor({ query: expressQuery, path }: Request, options?: PuppetOptions) {
 		const query: PuppetQuery = queryString.parse(
@@ -35,7 +35,7 @@ export class Screenshot {
 		)
 		const { w, h, url, data, dark, remove, output }: PuppetQuery = query 
 
-		const formats = ['b64', 'bin', 'jpg', 'json', 'pdf', 'png']
+		const formats = ['bin', 'jpg', 'json', 'pdf', 'png']
 
 		if (url) // always true
 			this.url = url.substring(0, 5) === 'http:'
@@ -91,7 +91,7 @@ export class Screenshot {
 				this.data = mergedData
 
 			if (output && formats.includes(output))
-				this.output = output as 'b64' | 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
+				this.output = output as 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
 			else if (fileExt)
 				this.output = fileExt === 'jpeg'
 					? 'jpg'

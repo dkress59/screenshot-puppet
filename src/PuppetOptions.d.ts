@@ -1,11 +1,11 @@
-import { BrowserOptions, LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
+import { LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
 
 export interface PuppetOptions {
 	return_url?: string
 	method?: 'get' | 'post'
 	callback?: CallableFunction
 
-	output?: 'b64' | 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
+	output?: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
 	data?: Record<string, unknown>
 	darkMode?: boolean
 	override?: boolean
@@ -13,3 +13,15 @@ export interface PuppetOptions {
 	screenshot?: ScreenshotOptions | PDFOptions
 	browser?: LaunchOptions
 }
+
+/**
+ * | BIN
+ * | B64
+ * - JPG
+ * - PDF
+ * - PNG
+ * | JSON
+ * - JPG
+ * - PDF
+ * - PNG
+ */

@@ -97,9 +97,11 @@ export const getRouteScreenshot = async (req: Request, res: Response, options?: 
 		? options.return_url + req.path + params
 		: req.originalUrl as string
 
-	['b64', 'bin', 'json'].indexOf(response.output) > -1
+	response.output === 'json'
 		? res.status(200).send(JSON.stringify({ response, originalUrl }))
-		: res.status(200).send(response.output === 'bin' ? response.src : new Buffer(response.src as string, 'base64'))
+		: response.output === 'bin'
+			? res.status(200).send(response.src)
+			: res.status(200).send(Buffer.from(response.src as string, 'base64'))
 
 	logToConsole('closing browser...')
 	await browser.close()

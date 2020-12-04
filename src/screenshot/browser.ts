@@ -117,7 +117,7 @@ export const launchBrowser = async (res?: Response, timeout?: number, options?: 
 			ignoreHTTPSErrors: true,
 			args: ['--no-sandbox', '--disable-setuid-sandbox'], // ToDo: neccessary?
 			...options,
-			headless: process.env.CI || options?.headless ? true : false,
+			headless: true,
 		})
 		.catch( /* istanbul ignore next */ (e) => {
 			if (res)
@@ -139,12 +139,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 
 	const { w, h, url, darkMode, remove, output } = image
 
-	const encoding = (output === 'bin') || (
-		output === 'json'
-		&& options
-		&& 'encoding' in options
-		&& options.encoding === 'binary'
-	)
+	const encoding = (output === 'bin')
 		? 'binary'
 		: 'base64'
 	
@@ -158,9 +153,9 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 
 	const quality = (
 		options
-			&& ('quality' in options)
+			&& 'quality' in options
 			&& options.quality !== undefined
-			&& qualities.indexOf(options.quality)
+			&& qualities.includes(options.quality)
 	)
 		? options.quality
 		: undefined
