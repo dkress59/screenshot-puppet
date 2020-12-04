@@ -15,13 +15,13 @@ export interface PuppetOptions {
 }
 
 /**
- * | BIN
- * | B64
- * - JPG
- * - PDF
- * - PNG
  * | JSON
  * - JPG
  * - PDF
  * - PNG
+ * | B64
+ * - JPG
+ * - PDF
+ * - PNG
+ * | BIN
  */

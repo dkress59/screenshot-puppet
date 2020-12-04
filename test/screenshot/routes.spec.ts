@@ -89,10 +89,11 @@ describe('Screenshot Routes', () => {
 				expect(res.type).not.toHaveBeenCalled()
 			})
 
-			it('set base64 correctly', async() => {
+			it('set json correctly', async() => {
 				const mockOptions: PuppetOptions = {
 					return_url: 'http://return.url',
-					output: 'b64'
+					// @ts-ignore
+					output: 'invalid'
 				}
 				const req: Partial<Request> = { ...mockRequest }
 				const res: Partial<Response> = { ...mockResponse }
@@ -140,6 +141,19 @@ describe('Screenshot Routes', () => {
 				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
 				expect(res.type).toHaveBeenCalledWith('png')
+			})
+
+			it('set bin correctly', async() => {
+				const mockOptions: PuppetOptions = {
+					return_url: 'http://return.url',
+					output: 'bin'
+				}
+				const req: Partial<Request> = { ...mockRequest }
+				const res: Partial<Response> = { ...mockResponse }
+
+				await getRouteScreenshot(req as Request, res as Response, mockOptions)
+
+				expect(res.type).not.toHaveBeenCalled()
 			})
 
 		})

@@ -108,11 +108,11 @@ const qualities = [
 	100
 ]
 
-export const launchBrowser = async (res?: Response, timeout?: number, options?: LaunchOptions): Promise<Browser> => {
+export const launchBrowser = async (res?: Response, options?: LaunchOptions): Promise<Browser> => {
 	process.setMaxListeners(16)
 	const browser = await puppeteer
 		.launch({
-			timeout: timeout ? timeout : options?.timeout ? options.timeout : 6666,
+			timeout: 6666,
 			defaultViewport: null,
 			ignoreHTTPSErrors: true,
 			args: ['--no-sandbox', '--disable-setuid-sandbox'], // ToDo: neccessary?
