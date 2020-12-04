@@ -4,8 +4,6 @@
 
 A nifty [express](https://expressjs.com) tool to deliver screen shots using [puppeteer](https://pptr.dev) on headless chromium.
 
-___
-
 ## Installation
 
 1. ToDo
@@ -13,14 +11,14 @@ ___
 ## How to use
 
 - ToDo
-- for now, see src/server.ts
+- for now, see [src/server.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/server.ts)
 
 ___
 
 ### ToDo
 
 - [X] bin === Buffer
-  - [X] test *– may be removed*
+  - [X] test
 - [X] add callback (e.g. for redis)
 - [X] add options (URLs, ports?, …)
   - [X] make all options overridable
