@@ -34,6 +34,7 @@ ___
 - [X] add dev setup
 - [X] improve utils.ts
 - [ ] improve POST
+  - [ ] force JSON
 - [X] improve PDF
   - [X] test PDF
 - [ ] outsource port declarations to env

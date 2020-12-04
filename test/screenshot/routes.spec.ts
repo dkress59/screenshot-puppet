@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Request, Response } from 'express'
-import { getRouteScreenshot } from '../../src/screenshot/routes'
+import { getRouteScreenshot, postRouteScreenshot } from '../../src/screenshot/routes'
 import { PuppetOptions } from '../../src/PuppetOptions'
 
 import * as browser from '../../src/screenshot/browser'
@@ -159,5 +159,33 @@ describe('Screenshot Routes', () => {
 		})
 	
 	})
+
+	describe('POST Route', () => {
+
+		it('returns screenshot', async() => {
+			const mockOptions: PuppetOptions = {
+				return_url: 'http://return.url',
+			}
+			/* const mockQuery = {}
+			const req: Partial<Request> = {
+				...mockRequest,
+				query: {
+					url: mockRequest.query!.url,
+					...mockQuery
+				}
+			} */
+			const req: Partial<Request> = { ...mockRequest }
+			const res: Partial<Response> = { ...mockResponse }
+
+			/* await postRouteScreenshot(req as Request, res as Response, mockOptions)
+
+			expect(res.type).toHaveBeenCalledWith('json')
+			expect(browser.launchBrowser).toHaveBeenCalled()
+			expect(res.status).toHaveBeenCalledWith(200)
+			expect(res.send).toMatchSnapshot() */
+		})
+		
+	})
+	
 
 })
