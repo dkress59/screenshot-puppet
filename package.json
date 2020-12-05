@@ -1,7 +1,8 @@
 {
 	"name": "screenshot-puppet",
-	"version": "1.0.1",
+	"version": "2.0.2",
 	"description": "",
+	"private": "true",
 	"main": "dist/index.js",
 	"type": "commonjs",
 	"scripts": {
@@ -21,7 +22,7 @@
 	},
 	"keywords": [],
 	"author": "",
-	"license": "ISC",
+	"license": "0BSD",
 	"dependencies": {
 		"@types/query-string": "^6.3.0",
 		"morgan": "^1.10.0",

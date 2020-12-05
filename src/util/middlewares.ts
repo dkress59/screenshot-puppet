@@ -9,6 +9,7 @@ export const fallback = (req: Request, res: Response): Response<unknown> => {
 		.send({ error: `${req.method} forbidden for this route.` })
 }
 
+/* istanbul ignore next */
 export const headers = (_req: Request, res: Response, next: NextFunction): void => {
 	res.header(
 		'Access-Control-Allow-Headers',
@@ -24,47 +25,47 @@ export const cache = async (req: Request, res: Response, next: NextFunction): Pr
 	const needed: Screenshot[] = []
 	const cached: Screenshot[] = []
 	
-	if (req.path && req.path !== '/')
+	/* if (req.path && req.path !== '/')
 		next()
 
-	else
-		switch (req.method) {
+	else */
+	switch (req.method) {
 
-			default:
+		default:
+			next()
+			break
+
+
+		case 'GET': {
+			const image = req.query
+			if (!image || !('url' in image))
+				return res.status(400).send({ error: 'Required param(s) missing.' })
+	
+			// Your cache retreival method here!
+			const cache = null
+			if (!cache)
 				next()
-				break
-
-
-			case 'POST':
-				if (!req.body || req.body == {})
-					return res
-						.status(402)
-						.send({ error: 'Nothing passed in the request body.' })
-
-				for await (const image of req.body) {
-					// Your cache retreival method here!
-					needed.push(image)
-				}
-				if (!needed || !needed.length || cached.length === req.body.length)
-					return res.send(JSON.stringify(cached) as string)
-
-				req.body = { cached, needed }
-				next()
-				break
-
-
-			case 'GET': {
-				const image = req.query
-				if (!image || !('url' in image))
-					return res.status(400).send({ error: 'Required param(s) missing.' })
-
-				// Your cache retreival method here!
-				const cache = null
-				if (!cache)
-					next()
-
-				break
-			}
-
+	
+			break
 		}
+
+
+		case 'POST':
+			if (!req.body || req.body === {})
+				return res
+					.status(402)
+					.send({ error: 'Nothing passed in the request body.' })
+
+			// Your cache retreival method here!
+			for await (const image of req.body) {
+				needed.push(image)
+			}
+			/* if (!needed || !needed.length || cached.length === req.body.length)
+				return res.send(JSON.stringify(cached) as string) */
+
+			req.body = { cached, needed }
+			next()
+			break
+
+	}
 }
