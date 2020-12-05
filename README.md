@@ -17,12 +17,24 @@ ___
 
 ### ToDo
 
+- [X] bin === Buffer
+  - [X] test
+- [X] add callback (e.g. for redis)
 - [X] add options (URLs, ports?, …)
   - [X] make all options overridable
   - [ ] make options individually overridable
-- [ ] re-evaluate error handling
-- [ ] improve POST
+- [X] advance return/output logic
+  - [X] refine returns
+- [X] re-evaluate error handling
+- [X] advance PDF implementation
+- [X] add unit tests
+- [X] add dev setup
+- [X] improve utils.ts
+- [X] improve POST
   - [X] force JSON
+- [X] improve PDF
+  - [X] test PDF
+- [ ] improve PuppetQuery (query/body)
 - [ ] outsource port declarations to env
 - [ ] README.md
 - [ ] custom matcher for [index.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/index.ts) tests

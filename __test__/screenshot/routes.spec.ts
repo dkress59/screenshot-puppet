@@ -13,12 +13,17 @@ jest.mock('../../src/screenshot/browser')
 const mockedMakeScreenshot = mocked(makeScreenshot, true)
 const mockedLaunchBrowser = mocked(launchBrowser, true)
 
-let mockRequest: Partial<Request> = {}
+let req: Partial<Request> = {}
 const mockResType = jest.fn()
 const mockResStatus = jest.fn()
 const mockResSend = jest.fn()
 const mockResEnd = jest.fn()
-let mockResponse = {}
+let res: Partial<Response> = {
+	type: mockResType,
+	status: mockResStatus,
+	send: mockResSend,
+	end: mockResEnd,
+}
 
 const env = process.env
 
@@ -26,13 +31,13 @@ describe('Screenshot Routes', () => {
 
 	describe('GET route', () => {
 		beforeEach(() => {
-			mockRequest = {
+			req = {
 				path: '/',
 				query: {
 					url: 'https://duckduckgo.com'
 				}
 			}
-			mockResponse = {
+			res = {
 				type: mockResType.mockReset().mockReturnThis(),
 				status: mockResStatus.mockReset().mockReturnThis(),
 				send: mockResSend.mockReset().mockReturnThis(),
@@ -41,7 +46,9 @@ describe('Screenshot Routes', () => {
 			mockedLaunchBrowser.mockImplementation((): Promise<Browser> =>
 				new Promise(resolve =>
 					resolve({
-						close: () => null,
+						close: () => ({
+							catch: () => null
+						}),
 						newPage: () => ({
 							setViewport: () => null,
 							goto: () => null,
@@ -63,14 +70,12 @@ describe('Screenshot Routes', () => {
 			}
 			/* const mockQuery = {}
 			const req: Partial<Request> = {
-				...mockRequest,
+				...req,
 				query: {
-					url: mockRequest.query!.url,
+					url: req.query!.url,
 					...mockQuery
 				}
 			} */
-			const req: Partial<Request> = { ...mockRequest }
-			const res: Partial<Response> = { ...mockResponse }
 
 			await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
@@ -86,8 +91,6 @@ describe('Screenshot Routes', () => {
 				return_url: 'http://return.url',
 				callback,
 			}
-			const req: Partial<Request> = { ...mockRequest }
-			const res: Partial<Response> = { ...mockResponse }
 
 			await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
@@ -102,8 +105,6 @@ describe('Screenshot Routes', () => {
 					// @ts-ignore
 					output: 'invalid'
 				}
-				const req: Partial<Request> = { ...mockRequest }
-				const res: Partial<Response> = { ...mockResponse }
 
 				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
@@ -115,8 +116,6 @@ describe('Screenshot Routes', () => {
 					return_url: 'http://return.url',
 					output: 'jpg'
 				}
-				const req: Partial<Request> = { ...mockRequest }
-				const res: Partial<Response> = { ...mockResponse }
 
 				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
@@ -128,8 +127,6 @@ describe('Screenshot Routes', () => {
 					return_url: 'http://return.url',
 					output: 'pdf'
 				}
-				const req: Partial<Request> = { ...mockRequest }
-				const res: Partial<Response> = { ...mockResponse }
 
 				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
@@ -142,8 +139,6 @@ describe('Screenshot Routes', () => {
 					output: 'png',
 					override: true,
 				}
-				const req: Partial<Request> = { ...mockRequest }
-				const res: Partial<Response> = { ...mockResponse }
 
 				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
@@ -155,8 +150,6 @@ describe('Screenshot Routes', () => {
 					return_url: 'http://return.url',
 					output: 'bin'
 				}
-				const req: Partial<Request> = { ...mockRequest }
-				const res: Partial<Response> = { ...mockResponse }
 
 				await getRouteScreenshot(req as Request, res as Response, mockOptions)
 
@@ -170,7 +163,7 @@ describe('Screenshot Routes', () => {
 	describe('POST Route', () => {
 		beforeEach(() => {
 			process.env.NODE_ENV = 'test'
-			mockRequest = {
+			req = {
 				path: '/',
 				body: [{
 					url: 'https://duckduckgo.com'
@@ -178,12 +171,27 @@ describe('Screenshot Routes', () => {
 					url: 'https://github.com'
 				}],
 			}
-			mockResponse = {
+			res = {
 				type: mockResType.mockReset().mockReturnThis(),
 				status: mockResStatus.mockReset().mockReturnThis(),
 				send: mockResSend.mockReset().mockReturnThis(),
 				end: mockResEnd.mockReset().mockReturnThis(),
 			}
+			mockedLaunchBrowser.mockImplementation((): Promise<Browser> =>
+				new Promise((resolve) =>
+					resolve({
+						close: () => ({
+							catch: () => null
+						}),
+						newPage: () => ({
+							setViewport: () => null,
+							goto: () => null,
+							screenshot: () => 'abc',
+							pdf: () => 'abc',
+						} as unknown as Page),
+					} as unknown as Browser)
+				)
+			)
 		})
 		afterAll(() => {
 			process.env = env
@@ -193,8 +201,6 @@ describe('Screenshot Routes', () => {
 			const mockOptions: PuppetOptions = {
 				return_url: 'http://return.url',
 			}
-			const req: Partial<Request> = { ...mockRequest }
-			const res: Partial<Response> = { ...mockResponse }
 
 			await postRouteScreenshot(req as Request, res as Response, mockOptions)
 
@@ -208,18 +214,14 @@ describe('Screenshot Routes', () => {
 			const mockOptions: PuppetOptions = {
 				return_url: 'http://return.url',
 			}
-			const req: Partial<Request> = { ...mockRequest }
-			const res: Partial<Response> = {
-				...mockResponse,
-			}
 
-			mockedMakeScreenshot.mockRejectedValue('rejection')
+			mockedMakeScreenshot.mockImplementation(() => Promise.reject('rejection'))
 
 			await postRouteScreenshot(req as Request, res as Response, mockOptions)
 
 			expect(res.type).toHaveBeenCalledWith('json')
-			//expect(res.status).toHaveBeenCalledWith(200) // FIXME
-			//expect(res.send).toBeCalledWith({})
+			expect(res.status).toHaveBeenCalledWith(200) // FIXME
+			expect(res.send).toBeCalledWith('{"errors":[{"w":1024,"h":768,"url":"https://duckduckgo.com","src":"","darkMode":false,"errors":["rejection"],"output":"json"},{"w":1024,"h":768,"url":"https://github.com","src":"","darkMode":false,"errors":["rejection"],"output":"json"}],"originalUrl":"http://return.url/","response":[]}') // FIXME
 			expect(res.send).toMatchSnapshot()
 		})
 
@@ -229,8 +231,6 @@ describe('Screenshot Routes', () => {
 				return_url: 'http://return.url',
 				callback,
 			}
-			const req: Partial<Request> = { ...mockRequest }
-			const res: Partial<Response> = { ...mockResponse }
 
 			await postRouteScreenshot(req as Request, res as Response, mockOptions)
 

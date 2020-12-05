@@ -6,11 +6,12 @@ import { PuppetOptions } from '../PuppetOptions'
 import queryString from 'query-string'
 
 const makeOriginURL = (req: Request, options?: PuppetOptions) => options?.return_url
-	? `${options.return_url}${req.path}${req.query
-		? queryString.stringify(req.query as Record<string, string>)
-		: null
+	? `${options.return_url}${req.path}${
+		req.query
+			? '?' + queryString.stringify(req.query as Record<string, string>)
+			: ''
 	}`
-	: req.originalUrl as string
+	: req.protocol + '://' + req.get('host') + req.originalUrl
 
 export const getRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
 		
@@ -66,45 +67,35 @@ export const postRouteScreenshot = async (req: Request, res: Response, options?:
 
 	const returns = []
 	const errors = []
-	for await (const image of needed)
-		returns.push(
-			(async () => {
-				const img = new Screenshot({ query: image, path: req.path } as Request, options)
-				try {
+	for await (const image of needed) {
+		const img = new Screenshot({ query: image, path: req.path } as Request, options)
+		try {
 
-					const response = await makeScreenshot(browser, img, options?.screenshot)
-					if (response.src)
-						return response
-					else
-						errors.push(response)
+			const response = await makeScreenshot(browser, img, options?.screenshot)
+			if (response.src)
+				returns.push(response)
+			else
+				errors.push(response)
 
-				} catch (error) {
+		} catch (error) {
 
-					img.errors.push(error)
-					logErrorToConsole(error)
-					errors.push(img)
+			img.errors.push(error)
+			logErrorToConsole(error)
+			errors.push(img)
 
-				}
-			})()
-		)
+		}
+	}
 
 	const originalUrl = makeOriginURL(req, options)
+	const conditionalErrors = errors.length ? { errors } :  {}
 
-	Promise.all(returns)
-		.then((images) => {
-			if (options?.callback) options.callback(images)
-			res.status(200).send(JSON.stringify({
-				originalUrl,
-				response: [...cached, ...images],
-			}))
-		})
-		.catch((err) => {
-			if (options?.callback) options.callback(err)
-			logErrorToConsole(err)
-			res.status(500).send(JSON.stringify({ error: err }))
-		})
-		.finally(() => {
-			logToConsole('closing browser...')
-			browser.close().catch((e: Error) => void e)
-		})
+	if (options?.callback) options.callback(returns)
+	res.status(200).send(JSON.stringify({
+		...conditionalErrors,
+		originalUrl,
+		response: [...cached, ...returns],
+	}))
+			
+	logToConsole('closing browser...')
+	browser.close().catch((e: Error) => void e)
 }

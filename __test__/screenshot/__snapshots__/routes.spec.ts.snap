@@ -4,7 +4,7 @@ exports[`Screenshot Routes GET route returns screenshot 1`] = `
 [MockFunction] {
   "calls": Array [
     Array [
-      "{\\"response\\":{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://duckduckgo.com\\",\\"src\\":\\"abc\\",\\"darkMode\\":false,\\"errors\\":[],\\"output\\":\\"json\\"},\\"originalUrl\\":\\"http://return.url/url=https%3A%2F%2Fduckduckgo.com\\"}",
+      "{\\"response\\":{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://duckduckgo.com\\",\\"src\\":\\"abc\\",\\"darkMode\\":false,\\"errors\\":[],\\"output\\":\\"json\\"},\\"originalUrl\\":\\"http://return.url/?url=https%3A%2F%2Fduckduckgo.com\\"}",
     ],
   ],
   "results": Array [
@@ -15,7 +15,7 @@ exports[`Screenshot Routes GET route returns screenshot 1`] = `
         "send": [MockFunction] {
           "calls": Array [
             Array [
-              "{\\"response\\":{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://duckduckgo.com\\",\\"src\\":\\"abc\\",\\"darkMode\\":false,\\"errors\\":[],\\"output\\":\\"json\\"},\\"originalUrl\\":\\"http://return.url/url=https%3A%2F%2Fduckduckgo.com\\"}",
+              "{\\"response\\":{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://duckduckgo.com\\",\\"src\\":\\"abc\\",\\"darkMode\\":false,\\"errors\\":[],\\"output\\":\\"json\\"},\\"originalUrl\\":\\"http://return.url/?url=https%3A%2F%2Fduckduckgo.com\\"}",
             ],
           ],
           "results": [Circular],
@@ -52,6 +52,106 @@ exports[`Screenshot Routes GET route returns screenshot 1`] = `
 }
 `;
 
-exports[`Screenshot Routes POST Route returns errors 1`] = `[MockFunction]`;
+exports[`Screenshot Routes POST Route returns errors 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "{\\"errors\\":[{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://duckduckgo.com\\",\\"src\\":\\"\\",\\"darkMode\\":false,\\"errors\\":[\\"rejection\\"],\\"output\\":\\"json\\"},{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://github.com\\",\\"src\\":\\"\\",\\"darkMode\\":false,\\"errors\\":[\\"rejection\\"],\\"output\\":\\"json\\"}],\\"originalUrl\\":\\"http://return.url/\\",\\"response\\":[]}",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Object {
+        "end": [MockFunction],
+        "send": [MockFunction] {
+          "calls": Array [
+            Array [
+              "{\\"errors\\":[{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://duckduckgo.com\\",\\"src\\":\\"\\",\\"darkMode\\":false,\\"errors\\":[\\"rejection\\"],\\"output\\":\\"json\\"},{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://github.com\\",\\"src\\":\\"\\",\\"darkMode\\":false,\\"errors\\":[\\"rejection\\"],\\"output\\":\\"json\\"}],\\"originalUrl\\":\\"http://return.url/\\",\\"response\\":[]}",
+            ],
+          ],
+          "results": [Circular],
+        },
+        "status": [MockFunction] {
+          "calls": Array [
+            Array [
+              200,
+            ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": [Circular],
+            },
+          ],
+        },
+        "type": [MockFunction] {
+          "calls": Array [
+            Array [
+              "json",
+            ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": [Circular],
+            },
+          ],
+        },
+      },
+    },
+  ],
+}
+`;
 
-exports[`Screenshot Routes POST Route returns screenshot 1`] = `[MockFunction]`;
+exports[`Screenshot Routes POST Route returns screenshot 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "{\\"originalUrl\\":\\"http://return.url/\\",\\"response\\":[{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://duckduckgo.com\\",\\"src\\":\\"abc\\",\\"darkMode\\":false,\\"errors\\":[],\\"output\\":\\"json\\"},{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://github.com\\",\\"src\\":\\"abc\\",\\"darkMode\\":false,\\"errors\\":[],\\"output\\":\\"json\\"}]}",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Object {
+        "end": [MockFunction],
+        "send": [MockFunction] {
+          "calls": Array [
+            Array [
+              "{\\"originalUrl\\":\\"http://return.url/\\",\\"response\\":[{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://duckduckgo.com\\",\\"src\\":\\"abc\\",\\"darkMode\\":false,\\"errors\\":[],\\"output\\":\\"json\\"},{\\"w\\":1024,\\"h\\":768,\\"url\\":\\"https://github.com\\",\\"src\\":\\"abc\\",\\"darkMode\\":false,\\"errors\\":[],\\"output\\":\\"json\\"}]}",
+            ],
+          ],
+          "results": [Circular],
+        },
+        "status": [MockFunction] {
+          "calls": Array [
+            Array [
+              200,
+            ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": [Circular],
+            },
+          ],
+        },
+        "type": [MockFunction] {
+          "calls": Array [
+            Array [
+              "json",
+            ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": [Circular],
+            },
+          ],
+        },
+      },
+    },
+  ],
+}
+`;
