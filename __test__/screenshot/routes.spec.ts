@@ -80,6 +80,20 @@ describe('Screenshot Routes', () => {
 			expect(res.send).toMatchSnapshot()
 		})
 
+		it('calls callback', async() => {
+			const callback = jest.fn()
+			const mockOptions: PuppetOptions = {
+				return_url: 'http://return.url',
+				callback,
+			}
+			const req: Partial<Request> = { ...mockRequest }
+			const res: Partial<Response> = { ...mockResponse }
+
+			await getRouteScreenshot(req as Request, res as Response, mockOptions)
+
+			expect(callback).toHaveBeenCalled()
+		})
+
 		describe('content type', () => {
 
 			it('set json correctly', async() => {
@@ -207,6 +221,20 @@ describe('Screenshot Routes', () => {
 			//expect(res.status).toHaveBeenCalledWith(200) // FIXME
 			//expect(res.send).toBeCalledWith({})
 			expect(res.send).toMatchSnapshot()
+		})
+
+		it('calls callback', async() => {
+			const callback = jest.fn()
+			const mockOptions: PuppetOptions = {
+				return_url: 'http://return.url',
+				callback,
+			}
+			const req: Partial<Request> = { ...mockRequest }
+			const res: Partial<Response> = { ...mockResponse }
+
+			await postRouteScreenshot(req as Request, res as Response, mockOptions)
+
+			expect(callback).toHaveBeenCalled()
 		})
 		
 	})

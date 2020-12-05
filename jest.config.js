@@ -16,6 +16,4 @@ module.exports = {
 	},
 	cacheDirectory: '.jest/cache',
 	transformIgnorePatterns: ['node_modules/(?!frontend-shared-code)'],
-	testRegex: '(/test/.*|(\\.|/)(test|spec))\\.tsx?$',
-	preset: 'jest-puppeteer',
 }
