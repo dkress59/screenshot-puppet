@@ -20,20 +20,24 @@ const ScreenshotPuppet = (options?: PuppetOptions | 'get' | 'post'): (req: Reque
 		options === 'post'
 		|| typeof options === 'object' && 'method' in options && options.method === 'post'
 	)
+		/* istanbul ignore next */	
 		return async (req: Request, res: Response): Promise<void> =>
 			await postRouteScreenshot(req, res, validOptions)
 
+	/* istanbul ignore next */
 	return async (req: Request, res: Response): Promise<void> =>
 		await getRouteScreenshot(req, res, validOptions)
-
+	
 }
 
 export type Screenshot = IScreenshot
 
 export const getScreenshot = async (req: Request, res: Response): Promise<void> =>
+	/* istanbul ignore next */
 	await getRouteScreenshot(req, res)
 
 export const postScreenshot = async (req: Request, res: Response): Promise<void> =>
+	/* istanbul ignore next */
 	await postRouteScreenshot(req, res)
 
 
