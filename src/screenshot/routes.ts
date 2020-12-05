@@ -69,7 +69,7 @@ export const postRouteScreenshot = async (req: Request, res: Response, options?:
 	for await (const image of needed)
 		returns.push(
 			(async () => {
-				const img = new Screenshot(image)
+				const img = new Screenshot({ query: image, path: req.path } as Request, options)
 				try {
 
 					const response = await makeScreenshot(browser, img, options?.screenshot)
@@ -94,9 +94,8 @@ export const postRouteScreenshot = async (req: Request, res: Response, options?:
 		.then((images) => {
 			if (options?.callback) options.callback(images)
 			res.status(200).send(JSON.stringify({
-				request: req.body,
-				response: [...cached, ...images],
 				originalUrl,
+				response: [...cached, ...images],
 			}))
 		})
 		.catch((err) => {

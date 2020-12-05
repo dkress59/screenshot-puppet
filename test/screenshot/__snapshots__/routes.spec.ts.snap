@@ -51,3 +51,7 @@ exports[`Screenshot Routes GET route returns screenshot 1`] = `
   ],
 }
 `;
+
+exports[`Screenshot Routes POST Route returns errors 1`] = `[MockFunction]`;
+
+exports[`Screenshot Routes POST Route returns screenshot 1`] = `[MockFunction]`;
