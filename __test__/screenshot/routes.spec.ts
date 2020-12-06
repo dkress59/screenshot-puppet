@@ -32,7 +32,7 @@ describe('Screenshot Routes', () => {
 	describe('GET route', () => {
 		beforeEach(() => {
 			req = {
-				path: '/',
+				path: '/getRoute/',
 				query: {
 					url: 'https://duckduckgo.com'
 				}
@@ -164,7 +164,7 @@ describe('Screenshot Routes', () => {
 		beforeEach(() => {
 			process.env.NODE_ENV = 'test'
 			req = {
-				path: '/',
+				path: '/postRoute/',
 				body: [{
 					url: 'https://duckduckgo.com'
 				}, {
@@ -206,7 +206,7 @@ describe('Screenshot Routes', () => {
 
 			expect(res.type).toHaveBeenCalledWith('json')
 			expect(mockedLaunchBrowser).toHaveBeenCalled()
-			// expect(res.status).toHaveBeenCalledWith(200) // FIXME
+			// expect(res.status).toHaveBeenCalledWith(200)
 			expect(res.send).toMatchSnapshot()
 		})
 
@@ -220,8 +220,8 @@ describe('Screenshot Routes', () => {
 			await postRouteScreenshot(req as Request, res as Response, mockOptions)
 
 			expect(res.type).toHaveBeenCalledWith('json')
-			expect(res.status).toHaveBeenCalledWith(200) // FIXME
-			expect(res.send).toBeCalledWith('{"errors":[{"w":1024,"h":768,"url":"https://duckduckgo.com","src":"","darkMode":false,"errors":["rejection"],"output":"json"},{"w":1024,"h":768,"url":"https://github.com","src":"","darkMode":false,"errors":["rejection"],"output":"json"}],"originalUrl":"http://return.url/","response":[]}') // FIXME
+			expect(res.status).toHaveBeenCalledWith(200)
+			expect(res.send).toBeCalledWith('{"errors":[{"w":1024,"h":768,"url":"https://duckduckgo.com","src":"","darkMode":false,"errors":["rejection"],"output":"json"},{"w":1024,"h":768,"url":"https://github.com","src":"","darkMode":false,"errors":["rejection"],"output":"json"}],"originalUrl":"http://return.url/postRoute/","response":[]}')
 			expect(res.send).toMatchSnapshot()
 		})
 

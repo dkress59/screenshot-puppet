@@ -29,7 +29,10 @@ describe('Screenshot class', () => {
 
 		it('setters', () => {
 			const mockRequest = {
-				path: '/filename.jpg',
+				path: '/',
+				params: {
+					filename: 'filename.test.jpg'
+				},
 				query: {
 					url: 'https://duckduckgo.com',
 					remove: '#rmvOne,.rmvTwo'
@@ -37,7 +40,7 @@ describe('Screenshot class', () => {
 			}
 			const image = new Screenshot(mockRequest as unknown as Request)
 
-			expect(image.fileName).toBe('filename')
+			expect(image.fileName).toBe('filename.test')
 			expect(image.remove).toEqual(['#rmvOne', '.rmvTwo'])
 		})
 

@@ -25,7 +25,7 @@ export class Screenshot {
 	public errors: unknown[] = []
 	public output: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'  = 'json'
 
-	constructor({ query: expressQuery, path }: Request, options?: PuppetOptions) {
+	constructor({ query: expressQuery, params }: Request, options?: PuppetOptions) {
 		const query: PuppetQuery = queryString.parse(
 			queryString.stringify(expressQuery as Record<string, string>), {
 				arrayFormat: 'comma',
@@ -47,17 +47,17 @@ export class Screenshot {
 		if (remove?.length)
 			this.remove = remove
 
-		const fileExt = path && path !== '/'
-			? path
-				.substr(1, path.length -1)
+		const fileExt = params && params.filename
+			? params.filename
+				.substr(1, params.filename.length -1)
 				.split('.')
 				.reverse()[0]
 				.toLowerCase()
 			: false
 		if (fileExt && formats.includes(fileExt))
-			this.fileName = path.substr(1, path.length - 1)
+			this.fileName = params.filename
 				.split('.')
-				.splice(0, path.split('.').length - 1)
+				.splice(0, params.filename.split('.').length - 1)
 				.join('.')
 
 
