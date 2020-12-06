@@ -47,18 +47,10 @@ export class Screenshot {
 		if (remove?.length)
 			this.remove = remove
 
-		const fileExt = params && params.filename
-			? params.filename
-				.substr(1, params.filename.length -1)
-				.split('.')
-				.reverse()[0]
-				.toLowerCase()
-			: false
-		if (fileExt && formats.includes(fileExt))
-			this.fileName = params.filename
-				.split('.')
-				.splice(0, params.filename.split('.').length - 1)
-				.join('.')
+		this.fileName = params.filename
+			.split('.')
+			.splice(0, params.filename.split('.').length - 1)
+			.join('.')
 
 
 		if (options?.override === false) {
@@ -90,16 +82,23 @@ export class Screenshot {
 			if (mergedData)
 				this.data = mergedData
 
-			if (output && formats.includes(output))
-				this.output = output as 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
-			else if (fileExt)
+			const fileExt = params && params.filename
+				? params.filename
+					.split('.')
+					.reverse()[0]
+					.toLowerCase()
+				: false
+
+			if (options?.output && formats.includes(options.output))
+				this.output = options.output
+			if (fileExt)
 				this.output = fileExt === 'jpeg'
 					? 'jpg'
 					: ['jpg', 'json', 'pdf', 'png'].includes(fileExt)
 						? fileExt as 'jpg' | 'json' | 'pdf' | 'png'
 						: 'png'
-			else if (options?.output && formats.includes(options.output))
-				this.output = options.output
+			if (output && formats.includes(output))
+				this.output = output as 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
 		}
 
 	}

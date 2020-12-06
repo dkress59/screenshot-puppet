@@ -35,9 +35,6 @@ ___
 - [X] improve PDF
   - [X] test PDF
 - [ ] improve PuppetQuery (query/body)
-- [ ] outsource port declarations to env
 - [ ] README.md
 - [ ] custom matcher for [index.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/index.ts) tests
 - [ ] implement [puppet.connect()](https://pptr.dev/#?product=Puppeteer&version=v5.5.0&show=api-puppeteerconnectoptions)
-
-![Coverage Graph](https://codecov.io/gh/dkress59/screenshot-puppet/branch/module/graphs/sunburst.svg)
