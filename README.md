@@ -1,4 +1,4 @@
-# Screenshot Puppet
+# ScreenshotR
 
 ![Test Coverage](https://github.com/dkress59/screenshot-puppet/workflows/Test%20Coverage/badge.svg?branch=module) [![codecov](https://codecov.io/gh/dkress59/screenshot-puppet/branch/module/graph/badge.svg?token=NEOGL6B5FF)](https://codecov.io/gh/dkress59/screenshot-puppet)
 
@@ -11,7 +11,44 @@ A nifty [express](https://expressjs.com) tool to deliver screen shots using [pup
 ## How to use
 
 - ToDo
-- for now, see [src/server.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/server.ts)
+
+<!-- ### Express
+
+### Options
+
+### Caching -->
+
+#### Basic Example ([src/server.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/server.ts))
+
+```js
+import express from 'express'
+import bodyParser from 'body-parser'
+import { cache, headers, fallback } from './util/middlewares'
+import ScreenshotR from '@dkress/screenshotr'
+
+const PORT = process.env.PORT ?? 6000
+const app = express()
+
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+
+app.use('/', headers) // Check out the example middleware!
+app.use('/', cache) // Check out the example middleware!
+
+/******************************************/
+const getShot = ScreenshotR()
+const postShot = ScreenshotR('post')
+
+app.get('/', getShot)
+app.get('/:filename', getShot)
+
+app.post('/', postShot)
+/******************************************/
+
+app.use(fallback)
+
+app.listen(PORT, () => console.log(`App listening on port ${PORT}`))
+```
 
 ___
 

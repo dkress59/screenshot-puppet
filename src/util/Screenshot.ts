@@ -47,10 +47,12 @@ export class Screenshot {
 		if (remove?.length)
 			this.remove = remove
 
-		this.fileName = params.filename
-			.split('.')
-			.splice(0, params.filename.split('.').length - 1)
-			.join('.')
+		this.fileName = params && params.filename && params.filename.includes('.')
+			? params.filename
+				.split('.')
+				.splice(0, params.filename.split('.').length - 1)
+				.join('.')
+			: undefined
 
 
 		if (options?.override === false) {

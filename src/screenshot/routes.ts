@@ -6,14 +6,14 @@ import { PuppetOptions } from '../PuppetOptions'
 import queryString from 'query-string'
 
 const makeOriginURL = (req: Request, options?: PuppetOptions) => options?.return_url
-	? `${options.return_url}${req.path}${
+	? `${options.return_url}${req.path}${req.params?.filename ?? ''}${
 		req.query
 			? '?' + queryString.stringify(req.query as Record<string, string>)
 			: ''
 	}`
 	: req.protocol + '://' + req.get('host') + req.originalUrl
 
-export const getRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
+export const getScreenshotRoute = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
 		
 	const image = new Screenshot(req, options)
 	
@@ -53,7 +53,7 @@ export const getRouteScreenshot = async (req: Request, res: Response, options?: 
 	return
 }
 
-export const postRouteScreenshot = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
+export const postScreenshotRoute = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
 
 	res.type('json')
 

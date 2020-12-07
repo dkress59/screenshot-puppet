@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Request, Response } from 'express'
-import { getRouteScreenshot, postRouteScreenshot } from '../../src/screenshot/routes'
+import { getScreenshotRoute, postScreenshotRoute } from '../../src/screenshot/routes'
 import { PuppetOptions } from '../../src/PuppetOptions'
 
 import { Browser, Page, ScreenshotOptions } from 'puppeteer'
@@ -77,7 +77,7 @@ describe('Screenshot Routes', () => {
 				}
 			} */
 
-			await getRouteScreenshot(req as Request, res as Response, mockOptions)
+			await getScreenshotRoute(req as Request, res as Response, mockOptions)
 
 			expect(res.type).toHaveBeenCalledWith('json')
 			expect(mockedLaunchBrowser).toHaveBeenCalled()
@@ -92,7 +92,7 @@ describe('Screenshot Routes', () => {
 				callback,
 			}
 
-			await getRouteScreenshot(req as Request, res as Response, mockOptions)
+			await getScreenshotRoute(req as Request, res as Response, mockOptions)
 
 			expect(callback).toHaveBeenCalled()
 		})
@@ -106,7 +106,7 @@ describe('Screenshot Routes', () => {
 					output: 'invalid'
 				}
 
-				await getRouteScreenshot(req as Request, res as Response, mockOptions)
+				await getScreenshotRoute(req as Request, res as Response, mockOptions)
 
 				expect(res.type).toHaveBeenCalledWith('json')
 			})
@@ -117,7 +117,7 @@ describe('Screenshot Routes', () => {
 					output: 'jpg'
 				}
 
-				await getRouteScreenshot(req as Request, res as Response, mockOptions)
+				await getScreenshotRoute(req as Request, res as Response, mockOptions)
 
 				expect(res.type).toHaveBeenCalledWith('jpg')
 			})
@@ -128,7 +128,7 @@ describe('Screenshot Routes', () => {
 					output: 'pdf'
 				}
 
-				await getRouteScreenshot(req as Request, res as Response, mockOptions)
+				await getScreenshotRoute(req as Request, res as Response, mockOptions)
 
 				expect(res.type).toHaveBeenCalledWith('pdf')
 			})
@@ -140,7 +140,7 @@ describe('Screenshot Routes', () => {
 					override: true,
 				}
 
-				await getRouteScreenshot(req as Request, res as Response, mockOptions)
+				await getScreenshotRoute(req as Request, res as Response, mockOptions)
 
 				expect(res.type).toHaveBeenCalledWith('png')
 			})
@@ -151,7 +151,7 @@ describe('Screenshot Routes', () => {
 					output: 'bin'
 				}
 
-				await getRouteScreenshot(req as Request, res as Response, mockOptions)
+				await getScreenshotRoute(req as Request, res as Response, mockOptions)
 
 				expect(res.type).not.toHaveBeenCalled()
 			})
@@ -202,7 +202,7 @@ describe('Screenshot Routes', () => {
 				return_url: 'http://return.url',
 			}
 
-			await postRouteScreenshot(req as Request, res as Response, mockOptions)
+			await postScreenshotRoute(req as Request, res as Response, mockOptions)
 
 			expect(res.type).toHaveBeenCalledWith('json')
 			expect(mockedLaunchBrowser).toHaveBeenCalled()
@@ -217,7 +217,7 @@ describe('Screenshot Routes', () => {
 
 			mockedMakeScreenshot.mockImplementation(() => Promise.reject('rejection'))
 
-			await postRouteScreenshot(req as Request, res as Response, mockOptions)
+			await postScreenshotRoute(req as Request, res as Response, mockOptions)
 
 			expect(res.type).toHaveBeenCalledWith('json')
 			expect(res.status).toHaveBeenCalledWith(200)
@@ -232,7 +232,7 @@ describe('Screenshot Routes', () => {
 				callback,
 			}
 
-			await postRouteScreenshot(req as Request, res as Response, mockOptions)
+			await postScreenshotRoute(req as Request, res as Response, mockOptions)
 
 			expect(callback).toHaveBeenCalled()
 		})

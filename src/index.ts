@@ -1,17 +1,9 @@
 import { Request, Response } from 'express'
-import { getRouteScreenshot, postRouteScreenshot } from './screenshot/routes'
+import { getScreenshotRoute, postScreenshotRoute } from './screenshot/routes'
 import { PuppetOptions } from './PuppetOptions'
-import { Screenshot as IScreenshot } from './util/Screenshot'
+export { Screenshot } from './util/Screenshot'
 
-/**
- * * output – source of truth
- * - default
- * - options
- * - ?fileext
- * - ?request
-*/
-
-const ScreenshotPuppet = (options?: PuppetOptions | 'get' | 'post'): (req: Request, res: Response) => Promise<void> => {
+export default function ScreenshotR(options?: PuppetOptions | 'get' | 'post'): (req: Request, res: Response) => Promise<void> {
 	const validOptions = typeof options === 'object'
 		? options
 		: undefined
@@ -22,23 +14,18 @@ const ScreenshotPuppet = (options?: PuppetOptions | 'get' | 'post'): (req: Reque
 	)
 		/* istanbul ignore next */
 		return async (req: Request, res: Response): Promise<void> =>
-			await postRouteScreenshot(req, res, validOptions)
+			await postScreenshotRoute(req, res, validOptions)
 
 	/* istanbul ignore next */
 	return async (req: Request, res: Response): Promise<void> =>
-		await getRouteScreenshot(req, res, validOptions)
+		await getScreenshotRoute(req, res, validOptions)
 	
 }
 
-export type Screenshot = IScreenshot
-
 export const getScreenshot = async (req: Request, res: Response): Promise<void> =>
 	/* istanbul ignore next */
-	await getRouteScreenshot(req, res)
+	await getScreenshotRoute(req, res)
 
 export const postScreenshot = async (req: Request, res: Response): Promise<void> =>
 	/* istanbul ignore next */
-	await postRouteScreenshot(req, res)
-
-
-export default ScreenshotPuppet
+	await postScreenshotRoute(req, res)

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import Puppet from '../src'
-import { getRouteScreenshot } from '../src/screenshot/routes'
+import { getScreenshotRoute } from '../src/screenshot/routes'
 const mockPuppet = async (_req: Request, _res: Response) => await Promise.resolve()
 
 describe('Puppet', () => {

@@ -7,6 +7,7 @@ Screenshot {
     "rejection",
     "rejection",
   ],
+  "fileName": undefined,
   "h": 600,
   "output": "png",
   "remove": Array [
