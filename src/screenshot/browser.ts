@@ -109,7 +109,7 @@ const qualities = [
 ]
 
 export const launchBrowser = async (res?: Response, options?: LaunchOptions): Promise<Browser> => {
-	process.setMaxListeners(16)
+	process.setMaxListeners(16) // ToDo: options?
 	const browser = await puppeteer
 		.launch({
 			timeout: 6666,

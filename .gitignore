@@ -3,6 +3,7 @@ node_modules/
 nodemon.json
 .npmignore
 *.env*
+.git/
 dist/
 pdf/*
 package-lock.json

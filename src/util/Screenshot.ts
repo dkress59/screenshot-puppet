@@ -25,15 +25,14 @@ export class Screenshot {
 	public errors: unknown[] = []
 	public output: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'  = 'json'
 
-	constructor({ query: expressQuery, params }: Request, options?: PuppetOptions) {
-		const query: PuppetQuery = queryString.parse(
-			queryString.stringify(expressQuery as Record<string, string>), {
+	constructor({ params, query }: Request, options?: PuppetOptions) {
+		const { w, h, url, data, dark, remove, output }: PuppetQuery = queryString.parse(
+			queryString.stringify(query as Record<string, string>), {
 				arrayFormat: 'comma',
 				parseBooleans: true,
 				parseNumbers: true,
 			}
-		)
-		const { w, h, url, data, dark, remove, output }: PuppetQuery = query 
+		) 
 
 		const formats = ['bin', 'jpg', 'json', 'pdf', 'png']
 

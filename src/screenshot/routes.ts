@@ -67,8 +67,8 @@ export const postScreenshotRoute = async (req: Request, res: Response, options?:
 
 	const returns = []
 	const errors = []
-	for await (const image of needed) {
-		const img = new Screenshot({ query: image, path: req.path } as Request, options)
+	for await (const query of needed) {
+		const img = new Screenshot({ query, path: req.path } as Request, options)
 		try {
 
 			const response = await makeScreenshot(browser, img, options?.screenshot)

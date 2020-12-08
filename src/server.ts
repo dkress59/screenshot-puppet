@@ -2,7 +2,7 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import { cache, headers, fallback } from './util/middlewares'
-import ScreenshotR from '.'
+import screenshotR from '.'
 
 const PORT = process.env.PORT ?? 6000
 const app = express()
@@ -14,8 +14,8 @@ app.use('/', headers) // Check out the example middleware!
 app.use('/', cache) // Check out the example middleware!
 
 /******************************************/
-const getShot = ScreenshotR()
-const postShot = ScreenshotR({ method: 'post' })
+const getShot = screenshotR()
+const postShot = screenshotR({ method: 'post' })
 
 app.get('/', getShot)
 app.get('/:filename', getShot)
