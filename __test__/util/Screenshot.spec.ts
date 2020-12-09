@@ -1,6 +1,6 @@
-import { Screenshot } from '../../src/util/Screenshot'
 import { PuppetOptions } from '../../src/PuppetOptions'
 import { Request } from 'express'
+import { Screenshot } from '../../src/util/Screenshot'
 
 describe('Screenshot class', () => {
 

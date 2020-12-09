@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { PuppetOptions } from '../../src/PuppetOptions'
 import { Request, Response } from 'express'
 import { getScreenshotRoute, postScreenshotRoute } from '../../src/screenshot/routes'
-import { PuppetOptions } from '../../src/PuppetOptions'
 
 import { Browser, Page, ScreenshotOptions } from 'puppeteer'
 import { Screenshot } from '../../src/util/Screenshot'
 
-import { makeScreenshot, launchBrowser } from '../../src/screenshot/browser'
+import { launchBrowser, makeScreenshot } from '../../src/screenshot/browser'
 import { mocked } from 'ts-jest/utils'
 jest.mock('../../src/screenshot/browser')
 
@@ -221,7 +221,7 @@ describe('Screenshot Routes', () => {
 
 			expect(res.type).toHaveBeenCalledWith('json')
 			expect(res.status).toHaveBeenCalledWith(200)
-			expect(res.send).toBeCalledWith('{"errors":[{"w":1024,"h":768,"url":"https://duckduckgo.com","src":"","darkMode":false,"errors":["rejection"],"output":"json"},{"w":1024,"h":768,"url":"https://github.com","src":"","darkMode":false,"errors":["rejection"],"output":"json"}],"originalUrl":"http://return.url/postRoute/","response":[]}')
+			expect(res.send).toHaveBeenCalledWith('{"errors":[{"w":1024,"h":768,"url":"https://duckduckgo.com","src":"","darkMode":false,"errors":["rejection"],"output":"json"},{"w":1024,"h":768,"url":"https://github.com","src":"","darkMode":false,"errors":["rejection"],"output":"json"}],"originalUrl":"http://return.url/postRoute/","response":[]}')
 			expect(res.send).toMatchSnapshot()
 		})
 

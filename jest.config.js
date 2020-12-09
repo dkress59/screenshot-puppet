@@ -15,5 +15,4 @@ module.exports = {
 		},
 	},
 	cacheDirectory: '.jest/cache',
-	transformIgnorePatterns: ['node_modules/(?!frontend-shared-code)'],
 }

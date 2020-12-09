@@ -2,14 +2,11 @@
  * @jest-environment jsdom
  */
 import { Request, Response } from 'express'
-import { launchBrowser, makeScreenshot } from '../../src/screenshot/browser'
 import { Screenshot } from '../../src/util/Screenshot'
+import { launchBrowser, makeScreenshot } from '../../src/screenshot/browser'
 
-import { launch, Browser } from 'puppeteer'
-import { mocked } from 'ts-jest/utils'
-jest.mock('puppeteer')
-
-const mockedLaunch = mocked(launch, true)
+import puppeteer from 'puppeteer'
+jest.mock('puppeteer', () => jest.fn())
 
 const env = process.env
 const mockPage = {
@@ -32,9 +29,8 @@ let mockResponse: Partial<Response> = {}
 describe('Puppeteer Screenshot Mechanism', () => {
 	beforeEach(() => {
 		process.env.NODE_ENV = 'test'
-		mockedLaunch.mockImplementation((): Promise<Browser> =>
-			new Promise(resolve => resolve(mockBrowser as unknown as Browser))
-		)
+		puppeteer.launch = (): Promise<puppeteer.Browser> =>
+			new Promise(resolve => resolve(mockBrowser as unknown as puppeteer.Browser))
 		mockRequest = {
 			path: '/',
 			query: {
@@ -104,7 +100,7 @@ describe('Puppeteer Screenshot Mechanism', () => {
 				},
 			}
 
-			const image = await makeScreenshot(mockBrowser as unknown as Browser, new Screenshot(req as Request), mockOptions)
+			const image = await makeScreenshot(mockBrowser as unknown as puppeteer.Browser, new Screenshot(req as Request), mockOptions)
 
 			expect(image).toBeTruthy()
 		})
@@ -129,7 +125,7 @@ describe('Puppeteer Screenshot Mechanism', () => {
 					...mockPage,
 					evaluate: () => Promise.reject('rejection')
 				})
-			} as unknown as Browser, new Screenshot(req as Request), mockOptions)
+			} as unknown as puppeteer.Browser, new Screenshot(req as Request), mockOptions)
 
 			// + document.querySelector
 			expect(image.errors).toEqual(['rejection', 'rejection'])
@@ -142,7 +138,7 @@ describe('Puppeteer Screenshot Mechanism', () => {
 			const image = await makeScreenshot({
 				...mockBrowser,
 				newPage: () => Promise.reject('rejection')
-			} as unknown as Browser, new Screenshot(mockRequest as Request), mockOptions)
+			} as unknown as puppeteer.Browser, new Screenshot(mockRequest as Request), mockOptions)
 
 			expect(image.errors).toEqual(['rejection'])
 		})
