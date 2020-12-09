@@ -1,10 +1,10 @@
-import puppeteer, { Browser, LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
 import { Response } from 'express'
-import { logErrorToConsole, logToConsole } from '../util/utils'
 import { Screenshot } from '../util/Screenshot'
+import { logErrorToConsole, logToConsole } from '../util/utils'
+import puppeteer, { Browser, LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
 
 
-const qualities = [
+const qualities = new Set([
 	0,
 	1,
 	2,
@@ -106,11 +106,11 @@ const qualities = [
 	98,
 	99,
 	100
-]
+])
 
 export const launchBrowser = async (res?: Response, options?: LaunchOptions): Promise<Browser> => {
 	process.setMaxListeners(16) // ToDo: options?
-	const browser = await puppeteer
+	return await puppeteer
 		.launch({
 			timeout: 6666,
 			defaultViewport: null,
@@ -119,22 +119,22 @@ export const launchBrowser = async (res?: Response, options?: LaunchOptions): Pr
 			...options,
 			headless: true,
 		})
-		.catch( /* istanbul ignore next */ (e) => {
+		.catch( /* istanbul ignore next */ (error) => {
 			if (res)
 				res
 					.status(500)
 					.send({
 						message: 'error launching puppeteer',
-						error: e,
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+						error: error.message,
 					})
 
-			throw new Error('error launching puppeteer: ' + JSON.stringify(e)) // breaks jest
+			throw new Error('error launching puppeteer: ' + JSON.stringify(error)) // breaks jest
 		})
-
-	return browser
 }
 
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const makeScreenshot = async (browser: Browser, image: Screenshot, options?: ScreenshotOptions | PDFOptions): Promise<Screenshot> => {
 
 	const { w, h, url, darkMode, remove, output } = image
@@ -155,7 +155,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 		options
 			&& 'quality' in options
 			&& options.quality !== undefined
-			&& qualities.includes(options.quality)
+			&& qualities.has(options.quality)
 	)
 		? options.quality
 		: undefined
@@ -192,7 +192,8 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 						const nodes = document.querySelectorAll(sel)
 						if (document.querySelectorAll(sel).length)
 							for (let i = 0; i < nodes.length; i++)
-								nodes[i].parentNode.removeChild(nodes[i])
+								// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+								nodes[i].remove()
 					}, sel)
 				} catch (error) {
 					image.errors.push(error)
@@ -204,7 +205,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 			? await page.pdf(safeOptions)
 			: await page.screenshot(safeOptions)
 
-		image.src = screenshot // ToDo: test b64/bin + pdf / return string
+		image.src = screenshot
 
 	} catch (error) {
 

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 export const logToConsole = (...logs: unknown[]): void | false => {
 	if (!logs || process.env.NODE_ENV !== 'development') return
 

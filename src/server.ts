@@ -1,7 +1,8 @@
 /* istanbul ignore file */
-import express from 'express'
+/* eslint-disable no-console */
+import { cache, fallback, headers } from './util/middlewares'
 import bodyParser from 'body-parser'
-import { cache, headers, fallback } from './util/middlewares'
+import express from 'express'
 import screenshotR from '.'
 
 const PORT = process.env.PORT ?? 6000

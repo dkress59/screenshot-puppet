@@ -1,6 +1,23 @@
-import queryString from 'query-string'
-import { Request } from 'express'
 import { PuppetOptions } from '../PuppetOptions'
+import { Request } from 'express'
+import queryString from 'query-string'
+
+const mergeData = (options: PuppetOptions | undefined, data: string | undefined): Record<string, unknown> | undefined => {
+	const settings = options?.data
+	const user = data
+
+	if (settings && user)
+		return {
+			...settings,
+			...JSON.parse(user) as Record<string, unknown>,
+		}
+
+	if (user)
+		return JSON.parse(user) as Record<string, unknown>
+
+	if (settings)
+		return settings
+}
 
 interface PuppetQuery {
 	w?: number
@@ -25,6 +42,7 @@ export class Screenshot {
 	public errors: unknown[] = []
 	public output: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'  = 'json'
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	constructor({ params, query }: Request, options?: PuppetOptions) {
 		const { w, h, url, data, dark, remove, output }: PuppetQuery = queryString.parse(
 			queryString.stringify(query as Record<string, string>), {
@@ -34,19 +52,19 @@ export class Screenshot {
 			}
 		) 
 
-		const formats = ['bin', 'jpg', 'json', 'pdf', 'png']
+		const formats = new Set(['bin', 'jpg', 'json', 'pdf', 'png'])
 
 		if (url) // always true
-			this.url = url.substring(0, 5) === 'http:'
+			this.url = url.slice(0, 5) === 'http:'
 				? url
-				: url.substring(0, 6) === 'https:'
+				: url.slice(0, 6) === 'https:'
 					? url
 					: 'http://' + url
 
 		if (remove?.length)
 			this.remove = remove
 
-		this.fileName = params && params.filename && params.filename.includes('.')
+		this.fileName = params?.filename
 			? params.filename
 				.split('.')
 				.splice(0, params.filename.split('.').length - 1)
@@ -71,26 +89,17 @@ export class Screenshot {
 			if (dark || options?.darkMode && !!dark)
 				this.darkMode = true // ToDo: reassure
 
-			const mergedData = options?.data && data && typeof JSON.parse(data) === 'object'
-				? {
-					...options.data,
-					...JSON.parse(data),
-				}
-				: data
-					? data
-					: options?.data
+			if (mergeData(options, data))
+				this.data = mergeData(options, data)
 
-			if (mergedData)
-				this.data = mergedData
-
-			const fileExt = params && params.filename
+			const fileExt = params?.filename
 				? params.filename
 					.split('.')
 					.reverse()[0]
 					.toLowerCase()
 				: false
 
-			if (options?.output && formats.includes(options.output))
+			if (options?.output && formats.has(options.output))
 				this.output = options.output
 			if (fileExt)
 				this.output = fileExt === 'jpeg'
@@ -98,8 +107,8 @@ export class Screenshot {
 					: ['jpg', 'json', 'pdf', 'png'].includes(fileExt)
 						? fileExt as 'jpg' | 'json' | 'pdf' | 'png'
 						: 'png'
-			if (output && formats.includes(output))
-				this.output = output as 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
+			if (output && formats.has(output))
+				this.output = output 
 		}
 
 	}

@@ -17,17 +17,17 @@ describe('Middlewares', () => {
 	
 	describe('fallback', () => {
 
-		it('should return 401 if request method !== OPTIONS', async () => {
+		it('should return 401 if request method !== OPTIONS', () => {
 			const mockRequest: Partial<Request> = { method: 'GET' }
-			await fallback(mockRequest as Request, mockResponse as Response)
+			fallback(mockRequest as Request, mockResponse as Response)
 
 			expect(mockResponse.status).toHaveBeenCalledWith(401)
-			expect(mockResponse.send).toHaveBeenCalledWith({ error: `${mockRequest.method} forbidden for this route.` })
+			expect(mockResponse.send).toHaveBeenCalledWith({ error: `${mockRequest.method ?? 'Method'} forbidden for this route.` })
 		})
 
-		it('should return 200 if request method === OPTIONS', async () => {
+		it('should return 200 if request method === OPTIONS', () => {
 			const mockRequest: Partial<Request> = { method: 'OPTIONS' }
-			await fallback(mockRequest as Request, mockResponse as Response)
+			fallback(mockRequest as Request, mockResponse as Response)
 
 			expect(mockResponse.status).toHaveBeenCalledWith(200)
 			expect(mockResponse.end).toHaveBeenCalledWith()

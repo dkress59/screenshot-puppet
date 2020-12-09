@@ -16,8 +16,8 @@
 		"dev": "concurrently \"yarn:dev:build\" \"yarn:dev:start\"",
 		"test:ci": "tsc && node dist/index.js & yarn jest --coverage",
 		"test": "node dist/server.js & yarn jest -u --coverage | true && killall -9 node",
-		"lint": "eslint src --fix-dry-run",
-		"fix": "eslint src --fix",
+		"lint": "eslint . --fix-dry-run",
+		"fix": "eslint . --fix",
 		"update": "yarn upgrade-interactive --latest",
 		"pub": "cp -f .gitignore .npmignore && sed -i /dist/d .npmignore && tsc && && yarn publish"
 	},
@@ -40,6 +40,7 @@
 		"@babel/core": "^7.12.9",
 		"@babel/preset-env": "^7.12.7",
 		"@babel/preset-typescript": "^7.12.7",
+		"@sprylab/eslint-config": "^1.1.6",
 		"@types/body-parser": "^1.19.0",
 		"@types/expect-puppeteer": "^4.4.5",
 		"@types/express": "^4.17.9",

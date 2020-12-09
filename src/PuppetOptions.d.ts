@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from 'express'
 import { LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
+import { NextFunction, Request, Response } from 'express'
 
 export interface PuppetOptions {
 	return_url?: string
