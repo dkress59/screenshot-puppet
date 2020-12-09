@@ -6,7 +6,7 @@ import { launchBrowser, makeScreenshot } from '../../src/screenshot/browser'
 import { Screenshot } from '../../src/util/Screenshot'
 
 import { launch, Browser } from 'puppeteer'
-import { mocked } from 'ts-jest/utils'
+import { mocked } from 'ts-jest/dist/utils/testing'
 jest.mock('puppeteer')
 
 const mockedLaunch = mocked(launch, true)

@@ -13,7 +13,8 @@ app.use(bodyParser.json())
 app.use('/', headers) // Check out the example middleware!
 app.use('/', cache) // Check out the example middleware!
 
-/******************************************/
+/**********************************************/
+
 const getShot = screenshotR()
 const postShot = screenshotR({ method: 'post' })
 
@@ -21,7 +22,8 @@ app.get('/', getShot)
 app.get('/:filename', getShot)
 
 app.post('/', postShot)
-/******************************************/
+/**********************************************/
+
 
 app.use(fallback)
 

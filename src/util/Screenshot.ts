@@ -12,6 +12,23 @@ interface PuppetQuery {
 	output?: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
 }
 
+const mergeData = (options: PuppetOptions | undefined, data: string | undefined): Record<string, unknown> | undefined => {
+	const settings = options?.data
+	const user = data
+
+	if (settings && user)
+		return {
+			...settings,
+			...JSON.parse(user) as Record<string, unknown>,
+		}
+
+	if (user)
+		return JSON.parse(user) as Record<string, unknown>
+
+	if (settings)
+		return settings
+}
+
 export class Screenshot {
 
 	public w = 1024
@@ -71,17 +88,8 @@ export class Screenshot {
 			if (dark || options?.darkMode && !!dark)
 				this.darkMode = true // ToDo: reassure
 
-			const mergedData = options?.data && data && typeof JSON.parse(data) === 'object'
-				? {
-					...options.data,
-					...JSON.parse(data),
-				}
-				: data
-					? data
-					: options?.data
-
-			if (mergedData)
-				this.data = mergedData
+			if (mergeData(options, data))
+				this.data = mergeData(options, data)
 
 			const fileExt = params && params.filename
 				? params.filename

@@ -4,6 +4,8 @@
 
 A nifty [Express](https://expressjs.com) tool for [Node.js](https://nodejs.org/) to deliver screen shots using [Puppeteer](https://pptr.dev) on headless chromium.
 
+With screenshotR you can…
+
 ## How to use
 
 ### Installation
@@ -18,7 +20,7 @@ Then you can install screenshotR:
 
 ### Basic Example ([src/server.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/server.ts))
 
-```js
+```ts
 import express from 'express'
 import bodyParser from 'body-parser'
 import { cache, headers, fallback } from './util/middlewares'
@@ -33,7 +35,8 @@ app.use(bodyParser.json())
 app.use('/', headers) // Check out the example middleware!
 app.use('/', cache) // Check out the example middleware!
 
-/******************************************/
+/***********************************/
+
 const getShot = screenshotR()
 const postShot = screenshotR('post')
 
@@ -41,7 +44,8 @@ app.get('/', getShot)
 app.get('/:filename', getShot)
 
 app.post('/', postShot)
-/******************************************/
+
+/***********************************/
 
 app.use(fallback)
 
@@ -52,13 +56,67 @@ app.listen(PORT, () => console.log(`App listening on port ${PORT}`))
 
 #### Express
 
+screenshotR is not a express middleware, it is an end point to an express route. _ToDo_
+
+##### GET routes
+
+The only required parameter for a GET route using screenshotR is `?url=` …
+_ToDo_
+
+##### POST routes
+
+screenshotR expects the body of the request to be constructed as a dictionary of two lists, `cached` and `needed`:
+
+```ts
+{
+	cached: Screenshot[],
+	needed: PuppetQuery[],
+}
+```
+
+You can either write your own middleware to implement a cacheing mechanism before taking the screen shots, or else you can just directly pass a list of [PuppetQuery]()s to screenshotR in your POST request, e.g.:
+
+```json
+{
+	needed: [
+		{ "url": "https://github.com" },
+		{ "url": "https//duckduckgo.com" },
+	]
+}
+```
+
+The `data` query parameter is mainly designed to be used as an identifier or to provide an ability to enrichen the (json) response object with meta data:
+
+###### Request
+
+```json
+{
+	needed: [
+		{ "data": "{id:1,title:\"GitHub\"}", "url": "https://github.com" },
+	]
+}
+```
+
+###### Response
+
+```json
+[{
+	"data": {
+		"id": 1,
+		"title": "GitHub"
+	},
+	"src": "<base64.string>",
+	"url": "https://github.com",
+}]
+```
+
 _ToDo_
 
 #### Options
 
 _ToDo_
 
-#### Caching
+#### Cacheing
 
 _ToDo_
 
@@ -68,6 +126,7 @@ ___
 
 - [ ] make options individually overridable
 - [X] improve PuppetQuery (query/body)
+- [ ] rename PuppetQuery, PuppetOptions, …
 - [ ] README.md
 - [ ] custom matcher for [index.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/index.ts) tests
 - [ ] implement [puppet.connect()](https://pptr.dev/#?product=Puppeteer&version=v5.5.0&show=api-puppeteerconnectoptions)
