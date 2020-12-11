@@ -1,1 +1,3 @@
-export * from './src/index'
+declare module 'screenshotr' {
+	export * from './src/index'
+}
