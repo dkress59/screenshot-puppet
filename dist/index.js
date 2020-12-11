@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { getScreenshotRoute, postScreenshotRoute } from './screenshot/routes';
-export { Screenshot } from './util/Screenshot';
 export default function screenshotR(options) {
     const validOptions = typeof options === 'object'
         ? options
