@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -14,21 +15,26 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
-import { logErrorToConsole, logToConsole } from '../util/utils';
-import { launchBrowser, makeScreenshot } from './browser';
-import { Screenshot } from '../util/Screenshot';
-import queryString from 'query-string';
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.postScreenshotRoute = exports.getScreenshotRoute = void 0;
+const utils_1 = require("../util/utils");
+const browser_1 = require("./browser");
+const Screenshot_1 = require("../util/Screenshot");
+const query_string_1 = __importDefault(require("query-string"));
 const makeOriginURL = (req, options) => {
     var _a, _b;
     return (options === null || options === void 0 ? void 0 : options.return_url) ? `${options.return_url}${req.path}${(_b = (_a = req.params) === null || _a === void 0 ? void 0 : _a.filename) !== null && _b !== void 0 ? _b : ''}${req.query
-        ? '?' + queryString.stringify(req.query)
+        ? '?' + query_string_1.default.stringify(req.query)
         : ''}`
         : req.protocol + '://' + req.get('host') + req.originalUrl;
 };
-export const getScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void 0, function* () {
-    const image = new Screenshot(req, options);
-    const browser = yield launchBrowser(res);
-    const response = yield makeScreenshot(browser, image, options === null || options === void 0 ? void 0 : options.screenshot);
+exports.getScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void 0, function* () {
+    const image = new Screenshot_1.Screenshot(req, options);
+    const browser = yield browser_1.launchBrowser(res);
+    const response = yield browser_1.makeScreenshot(browser, image, options === null || options === void 0 ? void 0 : options.screenshot);
     if (options === null || options === void 0 ? void 0 : options.callback)
         options.callback(response);
     switch (response.output) {
@@ -53,11 +59,11 @@ export const getScreenshotRoute = (req, res, options) => __awaiter(void 0, void 
         : response.output === 'bin'
             ? res.status(200).send(response.src)
             : res.status(200).send(Buffer.from(response.src, 'base64'));
-    logToConsole('closing browser...');
+    utils_1.logToConsole('closing browser...');
     yield browser.close();
     return;
 });
-export const postScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void 0, function* () {
     var e_1, _a;
     res.type('json');
     const { cached, needed } = req.body.cached && req.body.needed
@@ -66,15 +72,15 @@ export const postScreenshotRoute = (req, res, options) => __awaiter(void 0, void
             cached: [],
             needed: req.body
         };
-    const browser = yield launchBrowser(res);
+    const browser = yield browser_1.launchBrowser(res);
     const returns = [];
     const errors = [];
     try {
         for (var needed_1 = __asyncValues(needed), needed_1_1; needed_1_1 = yield needed_1.next(), !needed_1_1.done;) {
             const query = needed_1_1.value;
-            const img = new Screenshot({ query, path: req.path }, options);
+            const img = new Screenshot_1.Screenshot({ query, path: req.path }, options);
             try {
-                const response = yield makeScreenshot(browser, img, options === null || options === void 0 ? void 0 : options.screenshot);
+                const response = yield browser_1.makeScreenshot(browser, img, options === null || options === void 0 ? void 0 : options.screenshot);
                 if (response.src)
                     returns.push(response);
                 else
@@ -82,7 +88,7 @@ export const postScreenshotRoute = (req, res, options) => __awaiter(void 0, void
             }
             catch (error) {
                 img.errors.push(error);
-                logErrorToConsole(error);
+                utils_1.logErrorToConsole(error);
                 errors.push(img);
             }
         }
@@ -99,7 +105,7 @@ export const postScreenshotRoute = (req, res, options) => __awaiter(void 0, void
     if (options === null || options === void 0 ? void 0 : options.callback)
         options.callback(returns);
     res.status(200).send(JSON.stringify(Object.assign(Object.assign({}, conditionalErrors), { originalUrl, response: [...cached, ...returns] })));
-    logToConsole('closing browser...');
+    utils_1.logToConsole('closing browser...');
     browser.close().catch((e) => void e);
 });
 //# sourceMappingURL=routes.js.map

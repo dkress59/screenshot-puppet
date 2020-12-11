@@ -1,22 +1,27 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
 /* istanbul ignore file */
-import express from 'express';
-import bodyParser from 'body-parser';
-import { cache, headers, fallback } from './util/middlewares';
-import screenshotR from '.';
+const express_1 = __importDefault(require("express"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const middlewares_1 = require("./util/middlewares");
+const _1 = __importDefault(require("."));
 const PORT = (_a = process.env.PORT) !== null && _a !== void 0 ? _a : 6000;
-const app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use('/', headers); // Check out the example middleware!
-app.use('/', cache); // Check out the example middleware!
+const app = express_1.default();
+app.use(body_parser_1.default.urlencoded({ extended: false }));
+app.use(body_parser_1.default.json());
+app.use('/', middlewares_1.headers); // Check out the example middleware!
+app.use('/', middlewares_1.cache); // Check out the example middleware!
 /**********************************************/
-const getShot = screenshotR();
-const postShot = screenshotR({ method: 'post' });
+const getShot = _1.default();
+const postShot = _1.default({ method: 'post' });
 app.get('/', getShot);
 app.get('/:filename', getShot);
 app.post('/', postShot);
 /**********************************************/
-app.use(fallback);
+app.use(middlewares_1.fallback);
 app.listen(PORT, () => console.log(`App listening on port ${PORT}`));
 //# sourceMappingURL=server.js.map

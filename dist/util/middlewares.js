@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -14,7 +15,9 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
-export const fallback = (req, res) => {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.cache = exports.headers = exports.fallback = void 0;
+exports.fallback = (req, res) => {
     if (req.method === 'OPTIONS')
         res.status(200).end();
     return res
@@ -22,7 +25,7 @@ export const fallback = (req, res) => {
         .send({ error: `${req.method} forbidden for this route.` });
 };
 /* istanbul ignore next */
-export const headers = (_req, res, next) => {
+exports.headers = (_req, res, next) => {
     var _a;
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     res.header('Access-Control-Allow-Origin', (_a = process.env.ALLOW_ACCESS) !== null && _a !== void 0 ? _a : '*');
@@ -30,7 +33,7 @@ export const headers = (_req, res, next) => {
     res.header('Cache-Control', 'private, max-age=1');
     next();
 };
-export const cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var e_1, _a;
     const needed = [];
     const cached = [];

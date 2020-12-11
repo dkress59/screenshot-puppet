@@ -1,4 +1,10 @@
-import queryString from 'query-string';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Screenshot = void 0;
+const query_string_1 = __importDefault(require("query-string"));
 const mergeData = (options, data) => {
     const settings = options === null || options === void 0 ? void 0 : options.data;
     const user = data;
@@ -9,7 +15,7 @@ const mergeData = (options, data) => {
     if (settings)
         return settings;
 };
-export class Screenshot {
+class Screenshot {
     constructor({ params, query }, options) {
         this.w = 1024;
         this.h = 768;
@@ -18,7 +24,7 @@ export class Screenshot {
         this.darkMode = false;
         this.errors = [];
         this.output = 'json';
-        const { w, h, url, data, dark, remove, output } = queryString.parse(queryString.stringify(query), {
+        const { w, h, url, data, dark, remove, output } = query_string_1.default.parse(query_string_1.default.stringify(query), {
             arrayFormat: 'comma',
             parseBooleans: true,
             parseNumbers: true,
@@ -74,4 +80,5 @@ export class Screenshot {
         }
     }
 }
+exports.Screenshot = Screenshot;
 //# sourceMappingURL=Screenshot.js.map

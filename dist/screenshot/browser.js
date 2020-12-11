@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,8 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import puppeteer from 'puppeteer';
-import { logErrorToConsole, logToConsole } from '../util/utils';
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeScreenshot = exports.launchBrowser = void 0;
+const puppeteer_1 = __importDefault(require("puppeteer"));
+const utils_1 = require("../util/utils");
 const qualities = [
     0,
     1,
@@ -112,9 +118,9 @@ const qualities = [
     99,
     100
 ];
-export const launchBrowser = (res, options) => __awaiter(void 0, void 0, void 0, function* () {
+exports.launchBrowser = (res, options) => __awaiter(void 0, void 0, void 0, function* () {
     process.setMaxListeners(16); // ToDo: options?
-    const browser = yield puppeteer
+    const browser = yield puppeteer_1.default
         .launch(Object.assign(Object.assign({ timeout: 6666, defaultViewport: null, ignoreHTTPSErrors: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] }, options), { headless: true }))
         .catch(/* istanbul ignore next */ (e) => {
         if (res)
@@ -128,7 +134,7 @@ export const launchBrowser = (res, options) => __awaiter(void 0, void 0, void 0,
     });
     return browser;
 });
-export const makeScreenshot = (browser, image, options) => __awaiter(void 0, void 0, void 0, function* () {
+exports.makeScreenshot = (browser, image, options) => __awaiter(void 0, void 0, void 0, function* () {
     const { w, h, url, darkMode, remove, output } = image;
     const encoding = (output === 'bin')
         ? 'binary'
@@ -162,7 +168,7 @@ export const makeScreenshot = (browser, image, options) => __awaiter(void 0, voi
         });
         if (remove)
             for (const sel of remove) {
-                logToConsole('remove', sel);
+                utils_1.logToConsole('remove', sel);
                 try {
                     /* istanbul ignore next */
                     yield page.evaluate((sel) => {
@@ -174,7 +180,7 @@ export const makeScreenshot = (browser, image, options) => __awaiter(void 0, voi
                 }
                 catch (error) {
                     image.errors.push(error);
-                    logErrorToConsole(error);
+                    utils_1.logErrorToConsole(error);
                 }
             }
         const screenshot = (output === 'pdf')
@@ -183,7 +189,7 @@ export const makeScreenshot = (browser, image, options) => __awaiter(void 0, voi
         image.src = screenshot; // ToDo: test b64/bin + pdf / return string
     }
     catch (error) {
-        logToConsole(error);
+        utils_1.logToConsole(error);
         image.errors.push(error);
     }
     return image;
