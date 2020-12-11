@@ -69,19 +69,19 @@ screenshotR expects the body of the request to be constructed as a dictionary of
 
 ```ts
 {
-	cached: Screenshot[],
-	needed: PuppetQuery[],
+ cached: Screenshot[],
+ needed: ShotQuery[],
 }
 ```
 
-You can either write your own middleware to implement a cacheing mechanism before taking the screen shots, or else you can just directly pass a list of [PuppetQuery]()s to screenshotR in your POST request, e.g.:
+You can either write your own middleware to implement a cacheing mechanism before taking the screen shots, or else you can just directly pass a list of [ShotQuery]()s to screenshotR in your POST request, e.g.:
 
 ```json
 {
-	needed: [
-		{ "url": "https://github.com" },
-		{ "url": "https//duckduckgo.com" },
-	]
+ needed: [
+  { "url": "https://github.com" },
+  { "url": "https//duckduckgo.com" },
+ ]
 }
 ```
 
@@ -91,9 +91,9 @@ The `data` query parameter is mainly designed to be used as an identifier or to 
 
 ```json
 {
-	needed: [
-		{ "data": "{id:1,title:\"GitHub\"}", "url": "https://github.com" },
-	]
+ needed: [
+  { "data": "{id:1,title:\"GitHub\"}", "url": "https://github.com" },
+ ]
 }
 ```
 
@@ -101,12 +101,12 @@ The `data` query parameter is mainly designed to be used as an identifier or to 
 
 ```json
 [{
-	"data": {
-		"id": 1,
-		"title": "GitHub"
-	},
-	"src": "<base64.string>",
-	"url": "https://github.com",
+ "data": {
+  "id": 1,
+  "title": "GitHub"
+ },
+ "src": "<base64.string>",
+ "url": "https://github.com",
 }]
 ```
 
@@ -125,8 +125,8 @@ ___
 ## ToDo
 
 - [ ] make options individually overridable
-- [X] improve PuppetQuery (query/body)
-- [ ] rename PuppetQuery, PuppetOptions, …
+- [X] improve ShotQuery (query/body)
+- [X] rename ShotQuery, ShotOptions, …
 - [ ] README.md
 - [ ] custom matcher for [index.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/index.ts) tests
 - [ ] implement [puppet.connect()](https://pptr.dev/#?product=Puppeteer&version=v5.5.0&show=api-puppeteerconnectoptions)

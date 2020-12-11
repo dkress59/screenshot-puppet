@@ -1,8 +1,8 @@
 import queryString from 'query-string'
 import { Request } from 'express'
-import { PuppetOptions } from '../PuppetOptions'
+import { ShotOptions } from '../Options'
 
-interface PuppetQuery {
+interface ShotQuery {
 	w?: number
 	h?: number
 	url?: string
@@ -12,7 +12,7 @@ interface PuppetQuery {
 	output?: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
 }
 
-const mergeData = (options: PuppetOptions | undefined, data: string | undefined): Record<string, unknown> | undefined => {
+const mergeData = (options: ShotOptions | undefined, data: string | undefined): Record<string, unknown> | undefined => {
 	const settings = options?.data
 	const user = data
 
@@ -42,8 +42,8 @@ export class Screenshot {
 	public errors: unknown[] = []
 	public output: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'  = 'json'
 
-	constructor({ params, query }: Request, options?: PuppetOptions) {
-		const { w, h, url, data, dark, remove, output }: PuppetQuery = queryString.parse(
+	constructor({ params, query }: Request, options?: ShotOptions) {
+		const { w, h, url, data, dark, remove, output }: ShotQuery = queryString.parse(
 			queryString.stringify(query as Record<string, string>), {
 				arrayFormat: 'comma',
 				parseBooleans: true,

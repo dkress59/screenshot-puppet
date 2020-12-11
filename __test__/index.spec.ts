@@ -1,17 +1,17 @@
 import { Request, Response } from 'express'
-import Puppet from '../src'
+import screenshotR from '../src'
 import { getScreenshotRoute } from '../src/screenshot/routes'
-const mockPuppet = async (_req: Request, _res: Response) => await Promise.resolve()
+const mockScreenshotR = async (_req: Request, _res: Response) => await Promise.resolve()
 
-describe('Puppet', () => {
+describe('screenshotR', () => {
 	it('works', () => {
-		// expect(Puppet()).toEqual(async (_req: Request, _res: Response) => await Promise.resolve())
-		expect(Puppet()).toBeTruthy()
-		expect(Puppet('get')).toBeTruthy()
-		expect(Puppet({ method: 'post' })).toBeTruthy()
-		// expect(Puppet(undefined)).toBeTruthy()
-		// expect(Puppet({method: 'get'})).toBeTruthy()
-		// expect(Puppet({method: 'post'})).toBeTruthy()
+		// expect(screenshotR()).toEqual(async (_req: Request, _res: Response) => await Promise.resolve())
+		expect(screenshotR()).toBeTruthy()
+		expect(screenshotR('get')).toBeTruthy()
+		expect(screenshotR({ method: 'post' })).toBeTruthy()
+		// expect(screenshotR(undefined)).toBeTruthy()
+		// expect(screenshotR({method: 'get'})).toBeTruthy()
+		// expect(screenshotR({method: 'post'})).toBeTruthy()
 	})
 	// + mockGetRouteScreenshot
 	// + mockPostRouteScreenshot

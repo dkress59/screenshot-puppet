@@ -1,10 +1,10 @@
 import { Request, Response } from 'express'
 import { getScreenshotRoute, postScreenshotRoute } from './screenshot/routes'
-import { PuppetOptions } from './PuppetOptions'
-export { PuppetOptions } from './PuppetOptions'
+import { ShotOptions } from './Options'
+export { ShotOptions } from './Options'
 export { Screenshot } from './util/Screenshot'
 
-export default function screenshotR(options?: PuppetOptions | 'get' | 'post'): (req: Request, res: Response) => Promise<void> {
+export default function screenshotR(options?: ShotOptions | 'get' | 'post'): (req: Request, res: Response) => Promise<void> {
 	const validOptions = typeof options === 'object'
 		? options
 		: undefined

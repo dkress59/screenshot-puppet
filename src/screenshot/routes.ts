@@ -2,10 +2,10 @@ import { Request, Response } from 'express'
 import { logErrorToConsole, logToConsole } from '../util/utils'
 import { launchBrowser, makeScreenshot } from './browser'
 import { Screenshot } from '../util/Screenshot'
-import { PuppetOptions } from '../PuppetOptions'
+import { ShotOptions } from '../Options'
 import queryString from 'query-string'
 
-const makeOriginURL = (req: Request, options?: PuppetOptions) => options?.return_url
+const makeOriginURL = (req: Request, options?: ShotOptions) => options?.return_url
 	? `${options.return_url}${req.path}${req.params?.filename ?? ''}${
 		req.query
 			? '?' + queryString.stringify(req.query as Record<string, string>)
@@ -13,7 +13,7 @@ const makeOriginURL = (req: Request, options?: PuppetOptions) => options?.return
 	}`
 	: req.protocol + '://' + req.get('host') + req.originalUrl
 
-export const getScreenshotRoute = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
+export const getScreenshotRoute = async (req: Request, res: Response, options?: ShotOptions): Promise<void> => {
 		
 	const image = new Screenshot(req, options)
 	
@@ -53,7 +53,7 @@ export const getScreenshotRoute = async (req: Request, res: Response, options?: 
 	return
 }
 
-export const postScreenshotRoute = async (req: Request, res: Response, options?: PuppetOptions): Promise<void> => {
+export const postScreenshotRoute = async (req: Request, res: Response, options?: ShotOptions): Promise<void> => {
 
 	res.type('json')
 

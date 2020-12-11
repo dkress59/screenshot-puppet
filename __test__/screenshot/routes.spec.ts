@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Request, Response } from 'express'
 import { getScreenshotRoute, postScreenshotRoute } from '../../src/screenshot/routes'
-import { PuppetOptions } from '../../src/PuppetOptions'
+import { ShotOptions } from '../../src/Options'
 
 import { Browser, Page, ScreenshotOptions } from 'puppeteer'
 import { Screenshot } from '../../src/util/Screenshot'
@@ -65,7 +65,7 @@ describe('Screenshot Routes', () => {
 		})
 
 		it('returns screenshot', async() => {
-			const mockOptions: PuppetOptions = {
+			const mockOptions: ShotOptions = {
 				return_url: 'http://return.url',
 			}
 			/* const mockQuery = {}
@@ -87,7 +87,7 @@ describe('Screenshot Routes', () => {
 
 		it('calls callback', async() => {
 			const callback = jest.fn()
-			const mockOptions: PuppetOptions = {
+			const mockOptions: ShotOptions = {
 				return_url: 'http://return.url',
 				callback,
 			}
@@ -100,7 +100,7 @@ describe('Screenshot Routes', () => {
 		describe('content type', () => {
 
 			it('set json correctly', async() => {
-				const mockOptions: PuppetOptions = {
+				const mockOptions: ShotOptions = {
 					return_url: 'http://return.url',
 					// @ts-ignore
 					output: 'invalid'
@@ -112,7 +112,7 @@ describe('Screenshot Routes', () => {
 			})
 
 			it('set jpeg correctly', async() => {
-				const mockOptions: PuppetOptions = {
+				const mockOptions: ShotOptions = {
 					return_url: 'http://return.url',
 					output: 'jpg'
 				}
@@ -123,7 +123,7 @@ describe('Screenshot Routes', () => {
 			})
 
 			it('set pdf correctly', async() => {
-				const mockOptions: PuppetOptions = {
+				const mockOptions: ShotOptions = {
 					return_url: 'http://return.url',
 					output: 'pdf'
 				}
@@ -134,7 +134,7 @@ describe('Screenshot Routes', () => {
 			})
 
 			it('set png correctly', async() => {
-				const mockOptions: PuppetOptions = {
+				const mockOptions: ShotOptions = {
 					return_url: 'http://return.url',
 					output: 'png',
 					override: true,
@@ -146,7 +146,7 @@ describe('Screenshot Routes', () => {
 			})
 
 			it('set bin correctly', async() => {
-				const mockOptions: PuppetOptions = {
+				const mockOptions: ShotOptions = {
 					return_url: 'http://return.url',
 					output: 'bin'
 				}
@@ -198,7 +198,7 @@ describe('Screenshot Routes', () => {
 		})
 
 		it('returns screenshot', async() => {
-			const mockOptions: PuppetOptions = {
+			const mockOptions: ShotOptions = {
 				return_url: 'http://return.url',
 			}
 
@@ -211,7 +211,7 @@ describe('Screenshot Routes', () => {
 		})
 
 		it('returns errors', async() => {
-			const mockOptions: PuppetOptions = {
+			const mockOptions: ShotOptions = {
 				return_url: 'http://return.url',
 			}
 
@@ -227,7 +227,7 @@ describe('Screenshot Routes', () => {
 
 		it('calls callback', async() => {
 			const callback = jest.fn()
-			const mockOptions: PuppetOptions = {
+			const mockOptions: ShotOptions = {
 				return_url: 'http://return.url',
 				callback,
 			}

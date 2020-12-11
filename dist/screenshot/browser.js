@@ -118,7 +118,7 @@ const qualities = [
     99,
     100
 ];
-exports.launchBrowser = (res, options) => __awaiter(void 0, void 0, void 0, function* () {
+const launchBrowser = (res, options) => __awaiter(void 0, void 0, void 0, function* () {
     process.setMaxListeners(16); // ToDo: options?
     const browser = yield puppeteer_1.default
         .launch(Object.assign(Object.assign({ timeout: 6666, defaultViewport: null, ignoreHTTPSErrors: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] }, options), { headless: true }))
@@ -134,7 +134,8 @@ exports.launchBrowser = (res, options) => __awaiter(void 0, void 0, void 0, func
     });
     return browser;
 });
-exports.makeScreenshot = (browser, image, options) => __awaiter(void 0, void 0, void 0, function* () {
+exports.launchBrowser = launchBrowser;
+const makeScreenshot = (browser, image, options) => __awaiter(void 0, void 0, void 0, function* () {
     const { w, h, url, darkMode, remove, output } = image;
     const encoding = (output === 'bin')
         ? 'binary'
@@ -194,4 +195,5 @@ exports.makeScreenshot = (browser, image, options) => __awaiter(void 0, void 0, 
     }
     return image;
 });
+exports.makeScreenshot = makeScreenshot;
 //# sourceMappingURL=browser.js.map

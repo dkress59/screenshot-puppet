@@ -1,5 +1,5 @@
 import { Screenshot } from '../../src/util/Screenshot'
-import { PuppetOptions } from '../../src/PuppetOptions'
+import { ShotOptions } from '../../src/Options'
 import { Request } from 'express'
 
 describe('Screenshot class', () => {
@@ -54,7 +54,7 @@ describe('Screenshot class', () => {
 					data: JSON.stringify({ author :'frontend' }),
 				}
 			}
-			const mockOptions: PuppetOptions = {
+			const mockOptions: ShotOptions = {
 				override: false,
 				output: 'json',
 				darkMode: true,
@@ -77,7 +77,7 @@ describe('Screenshot class', () => {
 					output: 'png',
 				}
 			}
-			const mockOptions: PuppetOptions = {
+			const mockOptions: ShotOptions = {
 				override: true,
 				data: { author: 'backend' },
 				output: 'json',
