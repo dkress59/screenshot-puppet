@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { getScreenshotRoute, postScreenshotRoute } from './screenshot/routes'
 import { PuppetOptions } from './PuppetOptions'
 export { PuppetOptions } from './PuppetOptions'
+export { Screenshot } from './util/Screenshot'
 
 export default function screenshotR(options?: PuppetOptions | 'get' | 'post'): (req: Request, res: Response) => Promise<void> {
 	const validOptions = typeof options === 'object'

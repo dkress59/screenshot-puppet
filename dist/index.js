@@ -9,8 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postScreenshot = exports.getScreenshot = void 0;
+exports.postScreenshot = exports.getScreenshot = exports.Screenshot = void 0;
 const routes_1 = require("./screenshot/routes");
+var Screenshot_1 = require("./util/Screenshot");
+Object.defineProperty(exports, "Screenshot", { enumerable: true, get: function () { return Screenshot_1.Screenshot; } });
 function screenshotR(options) {
     const validOptions = typeof options === 'object'
         ? options
