@@ -4,7 +4,9 @@ nodemon.json
 .npmignore
 *.env*
 .git/
-dist/
+#dist/
+dist/src
+dist/__test__
 pdf/*
 package-lock.json
 yarn-error.log
