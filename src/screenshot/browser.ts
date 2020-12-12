@@ -184,7 +184,7 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 		})
 
 		if (remove)
-			for (const sel of remove) {
+			for await (const sel of remove) {
 				logToConsole('remove', sel)
 				try {
 					/* istanbul ignore next */
@@ -199,6 +199,8 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 					logErrorToConsole(error)
 				}
 			}
+
+		//page.waitForTimeout(20)
 
 		const screenshot = (output === 'pdf')
 			? await page.pdf(safeOptions)

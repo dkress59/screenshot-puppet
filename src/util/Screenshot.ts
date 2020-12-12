@@ -8,7 +8,7 @@ interface ShotQuery {
 	url?: string
 	data?: string // JSON.stringify(Record<string, any>)
 	dark?: boolean
-	remove?: string[]
+	remove?: string
 	output?: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
 }
 
@@ -61,7 +61,7 @@ export class Screenshot {
 					: 'http://' + url
 
 		if (remove?.length)
-			this.remove = remove
+			this.remove = JSON.parse(remove)
 
 		this.fileName = params && params.filename && params.filename.includes('.')
 			? params.filename

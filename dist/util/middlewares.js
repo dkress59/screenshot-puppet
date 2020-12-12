@@ -17,16 +17,15 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cache = exports.headers = exports.fallback = void 0;
-const fallback = (req, res) => {
+exports.fallback = (req, res) => {
     if (req.method === 'OPTIONS')
         res.status(200).end();
     return res
         .status(401)
         .send({ error: `${req.method} forbidden for this route.` });
 };
-exports.fallback = fallback;
 /* istanbul ignore next */
-const headers = (_req, res, next) => {
+exports.headers = (_req, res, next) => {
     var _a;
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     res.header('Access-Control-Allow-Origin', (_a = process.env.ALLOW_ACCESS) !== null && _a !== void 0 ? _a : '*');
@@ -34,8 +33,7 @@ const headers = (_req, res, next) => {
     res.header('Cache-Control', 'private, max-age=1');
     next();
 };
-exports.headers = headers;
-const cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var e_1, _a;
     const needed = [];
     const cached = [];
@@ -83,5 +81,4 @@ const cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
             break;
     }
 });
-exports.cache = cache;
 //# sourceMappingURL=middlewares.js.map

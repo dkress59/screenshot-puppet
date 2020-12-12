@@ -31,7 +31,7 @@ const makeOriginURL = (req, options) => {
         : ''}`
         : req.protocol + '://' + req.get('host') + req.originalUrl;
 };
-const getScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void 0, function* () {
     const image = new Screenshot_1.Screenshot(req, options);
     const browser = yield browser_1.launchBrowser(res);
     const response = yield browser_1.makeScreenshot(browser, image, options === null || options === void 0 ? void 0 : options.screenshot);
@@ -63,8 +63,7 @@ const getScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void
     yield browser.close();
     return;
 });
-exports.getScreenshotRoute = getScreenshotRoute;
-const postScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void 0, function* () {
     var e_1, _a;
     res.type('json');
     const { cached, needed } = req.body.cached && req.body.needed
@@ -109,5 +108,4 @@ const postScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, voi
     utils_1.logToConsole('closing browser...');
     browser.close().catch((e) => void e);
 });
-exports.postScreenshotRoute = postScreenshotRoute;
 //# sourceMappingURL=routes.js.map

@@ -37,7 +37,7 @@ class Screenshot {
                     ? url
                     : 'http://' + url;
         if (remove === null || remove === void 0 ? void 0 : remove.length)
-            this.remove = remove;
+            this.remove = JSON.parse(remove);
         this.fileName = params && params.filename && params.filename.includes('.')
             ? params.filename
                 .split('.')
