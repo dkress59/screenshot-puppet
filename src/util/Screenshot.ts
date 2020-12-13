@@ -44,9 +44,6 @@ const mergeData = (options: ShotOptions | undefined, data: string | undefined): 
 
 	if (user)
 		return JSON.parse(user) as Record<string, unknown>
-
-	if (settings)
-		return settings
 }
 
 export class Screenshot {

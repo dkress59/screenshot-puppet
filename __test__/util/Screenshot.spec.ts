@@ -63,6 +63,7 @@ describe('Screenshot class', () => {
 			const image = new Screenshot(mockRequest as unknown as Request, mockOptions)
 
 			expect(image.data).toEqual(mockOptions.data)
+			expect(image.data).toEqual({ author: 'backend' })
 			expect(image.darkMode).toBe(true)
 			expect(image.output).toBe('json')
 		})
@@ -78,15 +79,35 @@ describe('Screenshot class', () => {
 				}
 			}
 			const mockOptions: ShotOptions = {
-				data: { author: 'backend' },
 				output: 'json',
 				darkMode: true,
+				override: {
+					darkMode: true,
+					data: true,
+					output: true,
+				}
+			}
+			const image = new Screenshot(mockRequest as unknown as Request, mockOptions)
+
+			expect(image.data).toEqual({ editor: 'frontend' })
+			expect(image.darkMode).toBe(false)
+			expect(image.output).toBe('png')
+		})
+
+		it('combined response data', () => {
+			const mockRequest = {
+				path: '/',
+				query: {
+					url: 'https://duckduckgo.com',
+					data: JSON.stringify({ editor: 'frontend' }),
+				}
+			}
+			const mockOptions: ShotOptions = {
+				data: { author: 'backend' },
 			}
 			const image = new Screenshot(mockRequest as unknown as Request, mockOptions)
 
 			expect(image.data).toEqual({ author: 'backend', editor: 'frontend' })
-			expect(image.darkMode).toBe(false)
-			expect(image.output).toBe('png')
 		})
 
 	})

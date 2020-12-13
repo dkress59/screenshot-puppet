@@ -72,10 +72,7 @@ export async function postScreenshotRoute(req: Request, res: Response, options?:
 		try {
 
 			const response = await makeScreenshot(browser, img, options?.screenshot)
-			if (response.src)
-				returns.push(response)
-			else
-				errors.push(response)
+			returns.push(response)
 
 		} catch (error) {
 
