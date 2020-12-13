@@ -1,6 +1,6 @@
 import queryString from 'query-string'
 import { Request } from 'express'
-import { ShotOptions } from '../Options'
+import { ShotOptions } from '../types'
 
 interface ShotQuery {
 	w?: number

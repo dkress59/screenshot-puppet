@@ -1,6 +1,5 @@
-import screenshotR, { Screenshot as oScreenshot, ShotOptions as oShotOptions } from './src'
+import screenshotR from './src'
 declare module 'screenshotr' {
-	export type Screenshot = oScreenshot
-	export type ShotOptions = oShotOptions
+	export * from './src'
 	export default screenshotR
 }

@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { logErrorToConsole, logToConsole } from '../util/utils'
 import { launchBrowser, makeScreenshot } from './browser'
 import { Screenshot } from '../util/Screenshot'
-import { ShotOptions } from '../Options'
+import { ShotOptions } from '../types'
 import queryString from 'query-string'
 
 const makeOriginURL = (req: Request, options?: ShotOptions) => options?.return_url

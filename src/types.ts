@@ -1,12 +1,21 @@
 import { NextFunction, Request, Response } from 'express'
 import { LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
+export { LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
 
 export interface ShotOptions {
 	return_url?: string
 	method?: 'get' | 'post'
 	callback?: CallableFunction
 	middleware?: (req: Request, res: Response, next: NextFunction) => void // ??
-
+	
+	/**
+	 * 'bin':
+	 * – Direct Buffer output
+	 * 'json':
+	 * – JSON containing JPEG/PDF/PNG Base64 String
+	 * 'jpg' | 'pdf' | 'png':
+	 * – JPEG/PDF/PNG Base64 String
+	 */
 	output?: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
 	data?: Record<string, unknown>
 	darkMode?: boolean
@@ -16,14 +25,12 @@ export interface ShotOptions {
 	browser?: LaunchOptions
 }
 
-/**
- * | JSON
- * - JPG
- * - PDF
- * - PNG
- * | B64
- * - JPG
- * - PDF
- * - PNG
- * | BIN
- */
+export interface ShotQuery {
+	w?: number
+	h?: number
+	url?: string
+	data?: string // JSON.stringify(Record<string, any>)
+	dark?: boolean
+	remove?: string // JSON.stringify(List)
+	output?: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
+}

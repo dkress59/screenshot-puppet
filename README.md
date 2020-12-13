@@ -16,7 +16,7 @@ You will need to have express installed in your repository. If you do not yet ha
 
 Then you can install screenshotR:
 
-`yarn add @dkress/screenshotr` or `npm install @dkress/screenshotr`
+`yarn add screenshotr` or `npm install screenshotr`
 
 ### Basic Example ([src/server.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/server.ts))
 
@@ -74,7 +74,7 @@ screenshotR expects the body of the request to be constructed as a dictionary of
 }
 ```
 
-You can either write your own middleware to implement a cacheing mechanism before taking the screen shots, or else you can just directly pass a list of [ShotQuery]()s to screenshotR in your POST request, e.g.:
+You can either write your own middleware to implement a cacheing mechanism before taking the screen shots, or else you can just directly pass a list of [ShotQuery](https://github.com/dkress59/screenshot-puppet/blob/module/src/types.ts#)s to screenshotR in your POST request, e.g.:
 
 ```json
 {

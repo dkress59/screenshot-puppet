@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { getScreenshotRoute, postScreenshotRoute } from './screenshot/routes'
-import { ShotOptions } from './Options'
-export { ShotOptions } from './Options'
+import { ShotOptions } from './types'
+export * from './types'
 export { Screenshot } from './util/Screenshot'
 
 export default function screenshotR(options?: ShotOptions | 'get' | 'post'): (req: Request, res: Response) => Promise<void> {

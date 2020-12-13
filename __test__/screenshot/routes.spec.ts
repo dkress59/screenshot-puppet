@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Request, Response } from 'express'
 import { getScreenshotRoute, postScreenshotRoute } from '../../src/screenshot/routes'
-import { ShotOptions } from '../../src/Options'
+import { ShotOptions } from '../../src/types'
 
 import { Browser, Page, ScreenshotOptions } from 'puppeteer'
 import { Screenshot } from '../../src/util/Screenshot'

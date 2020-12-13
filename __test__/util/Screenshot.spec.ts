@@ -1,5 +1,5 @@
 import { Screenshot } from '../../src/util/Screenshot'
-import { ShotOptions } from '../../src/Options'
+import { ShotOptions } from '../../src/types'
 import { Request } from 'express'
 
 describe('Screenshot class', () => {
@@ -35,7 +35,7 @@ describe('Screenshot class', () => {
 				},
 				query: {
 					url: 'https://duckduckgo.com',
-					remove: '#rmvOne,.rmvTwo'
+					remove: JSON.stringify(['#rmvOne','.rmvTwo'])
 				}
 			}
 			const image = new Screenshot(mockRequest as unknown as Request)

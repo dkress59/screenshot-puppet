@@ -99,7 +99,7 @@ describe('Puppeteer Screenshot Mechanism', () => {
 					h: '600',
 					url: 'start.duckduckgo.com',
 					dark: '1',
-					remove: '.one,#two',
+					remove: JSON.stringify(['.one','#two']),
 					output: 'png',
 				},
 			}
@@ -118,7 +118,7 @@ describe('Puppeteer Screenshot Mechanism', () => {
 					h: '600',
 					url: 'start.duckduckgo.com',
 					dark: '1',
-					remove: '.one,#two',
+					remove: JSON.stringify(['.one','#two']),
 					output: 'png',
 				},
 			}
