@@ -12,6 +12,26 @@ interface ShotQuery {
 	output?: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
 }
 
+const isOverridable = (name: string, options: ShotOptions | undefined) => {
+	if (
+		!options
+		|| options.override === true
+		|| options.override === undefined
+	)
+		return true
+
+	if (
+		options.override
+		&& name in options.override
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		&& options.override[name] === true
+	)
+		return true
+
+	return false
+}
+
 const mergeData = (options: ShotOptions | undefined, data: string | undefined): Record<string, unknown> | undefined => {
 	const settings = options?.data
 	const user = data
@@ -43,15 +63,16 @@ export class Screenshot {
 	public output: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'  = 'json'
 
 	constructor({ params, query }: Request, options?: ShotOptions) {
+
+		const formats = ['bin', 'jpg', 'json', 'pdf', 'png']
 		const { w, h, url, data, dark, remove, output }: ShotQuery = queryString.parse(
 			queryString.stringify(query as Record<string, string>), {
 				arrayFormat: 'comma',
 				parseBooleans: true,
 				parseNumbers: true,
 			}
-		) 
+		)
 
-		const formats = ['bin', 'jpg', 'json', 'pdf', 'png']
 
 		if (url) // always true
 			this.url = url.substring(0, 5) === 'http:'
@@ -60,56 +81,53 @@ export class Screenshot {
 					? url
 					: 'http://' + url
 
-		if (remove?.length)
+
+		if (w && isOverridable('width', options)) this.w = w
+		if (h && isOverridable('height', options)) this.h = h
+
+
+		if (remove)
 			this.remove = JSON.parse(remove)
 
-		this.fileName = params && params.filename && params.filename.includes('.')
-			? params.filename
+
+		if (params && 'filename' in params && params.filename.includes('.'))
+			this.fileName = params.filename
 				.split('.')
 				.splice(0, params.filename.split('.').length - 1)
 				.join('.')
-			: undefined
+
+		const fileExt = params && 'filename' in params
+			? params.filename
+				.split('.')
+				.reverse()[0]
+				.toLowerCase()
+			: false
 
 
-		if (options?.override === false) {
-
-			if (options.output)
-				this.output = options.output
-			if (options.data)
-				this.data = options.data
-			if (options.darkMode)
-				this.darkMode = true
-
-		} else {
-
-			if (w) this.w = w
-			if (h) this.h = h
-
-			if (dark || options?.darkMode && !!dark)
-				this.darkMode = true // ToDo: reassure
-
-			if (mergeData(options, data))
-				this.data = mergeData(options, data)
-
-			const fileExt = params && params.filename
-				? params.filename
-					.split('.')
-					.reverse()[0]
-					.toLowerCase()
-				: false
-
-			if (options?.output && formats.includes(options.output))
-				this.output = options.output
-			if (fileExt)
+		if (options?.output)
+			this.output = options.output
+		if (isOverridable('output', options))
+			if (output && formats.includes(output))
+				this.output = output
+			else if (fileExt)
 				this.output = fileExt === 'jpeg'
 					? 'jpg'
 					: ['jpg', 'json', 'pdf', 'png'].includes(fileExt)
 						? fileExt as 'jpg' | 'json' | 'pdf' | 'png'
 						: 'png'
-			if (output && formats.includes(output))
-				this.output = output as 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
-		}
+
+
+		if (options?.data)
+			this.data = options.data
+		if (data && isOverridable('data', options))
+			this.data = mergeData(options, data) ? mergeData(options, data) : JSON.parse(data)
+
+
+		if (options?.darkMode)
+			this.darkMode = options.darkMode
+		if (dark !== undefined && isOverridable('darkMode', options))
+			this.darkMode = dark
 
 	}
-
+	
 }

@@ -19,10 +19,19 @@ export interface ShotOptions {
 	output?: 'bin' | 'jpg' | 'json' | 'pdf' | 'png'
 	data?: Record<string, unknown>
 	darkMode?: boolean
-	override?: boolean
+	override?: boolean | ShotOverrides
 
 	screenshot?: ScreenshotOptions | PDFOptions
 	browser?: LaunchOptions
+}
+
+export interface ShotOverrides {
+	output?: boolean
+	data?: boolean
+	darkMode?: boolean
+	//return_url?: boolean
+	width?: boolean
+	height?: boolean
 }
 
 export interface ShotQuery {

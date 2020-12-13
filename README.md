@@ -74,11 +74,11 @@ screenshotR expects the body of the request to be constructed as a dictionary of
 }
 ```
 
-You can either write your own middleware to implement a cacheing mechanism before taking the screen shots, or else you can just directly pass a list of [ShotQuery](https://github.com/dkress59/screenshot-puppet/blob/module/src/types.ts#)s to screenshotR in your POST request, e.g.:
+You can either write your own middleware to implement a cacheing mechanism before taking the screen shots, or else you can just directly pass a list of [ShotQuery](https://github.com/dkress59/screenshot-puppet/blob/module/src/types.ts#L28)s to screenshotR in your POST request, e.g.:
 
 ```json
 {
- needed: [
+ "needed": [
   { "url": "https://github.com" },
   { "url": "https//duckduckgo.com" },
  ]
@@ -91,7 +91,7 @@ The `data` query parameter is mainly designed to be used as an identifier or to 
 
 ```json
 {
- needed: [
+ "needed": [
   { "data": "{id:1,title:\"GitHub\"}", "url": "https://github.com" },
  ]
 }
@@ -124,7 +124,8 @@ ___
 
 ## ToDo
 
-- [ ] make options individually overridable
+- [X] make options individually overridable
+  - [ ] improve return_url
 - [X] improve ShotQuery (query/body)
 - [X] rename ShotQuery, ShotOptions, …
 - [ ] README.md

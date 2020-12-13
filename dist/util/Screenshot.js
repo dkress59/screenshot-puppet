@@ -5,6 +5,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Screenshot = void 0;
 const query_string_1 = __importDefault(require("query-string"));
+const isOverridable = (name, options) => {
+    if (!options
+        || options.override === true
+        || options.override === undefined)
+        return true;
+    if (options.override
+        && name in options.override
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        && options.override[name] === true)
+        return true;
+    return false;
+};
 const mergeData = (options, data) => {
     const settings = options === null || options === void 0 ? void 0 : options.data;
     const user = data;
@@ -24,60 +37,54 @@ class Screenshot {
         this.darkMode = false;
         this.errors = [];
         this.output = 'json';
+        const formats = ['bin', 'jpg', 'json', 'pdf', 'png'];
         const { w, h, url, data, dark, remove, output } = query_string_1.default.parse(query_string_1.default.stringify(query), {
             arrayFormat: 'comma',
             parseBooleans: true,
             parseNumbers: true,
         });
-        const formats = ['bin', 'jpg', 'json', 'pdf', 'png'];
         if (url) // always true
             this.url = url.substring(0, 5) === 'http:'
                 ? url
                 : url.substring(0, 6) === 'https:'
                     ? url
                     : 'http://' + url;
-        if (remove === null || remove === void 0 ? void 0 : remove.length)
+        if (w && isOverridable('width', options))
+            this.w = w;
+        if (h && isOverridable('height', options))
+            this.h = h;
+        if (remove)
             this.remove = JSON.parse(remove);
-        this.fileName = params && params.filename && params.filename.includes('.')
-            ? params.filename
+        if (params && 'filename' in params && params.filename.includes('.'))
+            this.fileName = params.filename
                 .split('.')
                 .splice(0, params.filename.split('.').length - 1)
-                .join('.')
-            : undefined;
-        if ((options === null || options === void 0 ? void 0 : options.override) === false) {
-            if (options.output)
-                this.output = options.output;
-            if (options.data)
-                this.data = options.data;
-            if (options.darkMode)
-                this.darkMode = true;
-        }
-        else {
-            if (w)
-                this.w = w;
-            if (h)
-                this.h = h;
-            if (dark || (options === null || options === void 0 ? void 0 : options.darkMode) && !!dark)
-                this.darkMode = true; // ToDo: reassure
-            if (mergeData(options, data))
-                this.data = mergeData(options, data);
-            const fileExt = params && params.filename
-                ? params.filename
-                    .split('.')
-                    .reverse()[0]
-                    .toLowerCase()
-                : false;
-            if ((options === null || options === void 0 ? void 0 : options.output) && formats.includes(options.output))
-                this.output = options.output;
-            if (fileExt)
+                .join('.');
+        const fileExt = params && 'filename' in params
+            ? params.filename
+                .split('.')
+                .reverse()[0]
+                .toLowerCase()
+            : false;
+        if (options === null || options === void 0 ? void 0 : options.output)
+            this.output = options.output;
+        if (isOverridable('output', options))
+            if (output && formats.includes(output))
+                this.output = output;
+            else if (fileExt)
                 this.output = fileExt === 'jpeg'
                     ? 'jpg'
                     : ['jpg', 'json', 'pdf', 'png'].includes(fileExt)
                         ? fileExt
                         : 'png';
-            if (output && formats.includes(output))
-                this.output = output;
-        }
+        if (options === null || options === void 0 ? void 0 : options.data)
+            this.data = options.data;
+        if (data && isOverridable('data', options))
+            this.data = mergeData(options, data) ? mergeData(options, data) : JSON.parse(data);
+        if (options === null || options === void 0 ? void 0 : options.darkMode)
+            this.darkMode = options.darkMode;
+        if (dark !== undefined && isOverridable('darkMode', options))
+            this.darkMode = dark;
     }
 }
 exports.Screenshot = Screenshot;
