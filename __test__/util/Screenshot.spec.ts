@@ -81,11 +81,7 @@ describe('Screenshot class', () => {
 			const mockOptions: ShotOptions = {
 				output: 'json',
 				darkMode: true,
-				override: {
-					darkMode: true,
-					data: true,
-					output: true,
-				}
+				override: true
 			}
 			const image = new Screenshot(mockRequest as unknown as Request, mockOptions)
 
@@ -104,6 +100,9 @@ describe('Screenshot class', () => {
 			}
 			const mockOptions: ShotOptions = {
 				data: { author: 'backend' },
+				override: {
+					data: true,
+				}
 			}
 			const image = new Screenshot(mockRequest as unknown as Request, mockOptions)
 

@@ -4,7 +4,7 @@
 
 A nifty [Express](https://expressjs.com) tool for [Node.js](https://nodejs.org/) to deliver screen shots using [Puppeteer](https://pptr.dev) on headless chromium.
 
-With screenshotR you can…
+With screenshotR you can… _ToDo_
 
 ## How to use
 
@@ -54,6 +54,10 @@ app.listen(PORT, () => console.log(`App listening on port ${PORT}`))
 
 ### Configuration
 
+#### Options
+
+_ToDo_
+
 #### Express
 
 screenshotR is not a express middleware, it is an end point to an express route. _ToDo_
@@ -74,7 +78,7 @@ screenshotR expects the body of the request to be constructed as a dictionary of
 }
 ```
 
-You can either write your own middleware to implement a cacheing mechanism before taking the screen shots, or else you can just directly pass a list of [ShotQuery](https://github.com/dkress59/screenshot-puppet/blob/module/src/types.ts#L28)s to screenshotR in your POST request, e.g.:
+You can either write your own middleware to implement a cacheing mechanism before taking the screen shots, or else you can just directly pass a list of [ShotQuery](https://github.com/dkress59/screenshot-puppet/blob/module/src/types.ts#L37)s to screenshotR in your POST request, e.g.:
 
 ```json
 {
@@ -109,10 +113,6 @@ The `data` query parameter is mainly designed to be used as an identifier or to 
  "url": "https://github.com",
 }]
 ```
-
-_ToDo_
-
-#### Options
 
 _ToDo_
 

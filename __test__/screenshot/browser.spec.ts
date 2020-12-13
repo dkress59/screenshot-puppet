@@ -5,8 +5,9 @@ import { Request, Response } from 'express'
 import { launchBrowser, makeScreenshot } from '../../src/screenshot/browser'
 import { Screenshot } from '../../src/util/Screenshot'
 
-import { launch, Browser } from 'puppeteer'
+import { launch, Browser, ScreenshotOptions } from 'puppeteer'
 import { mocked } from 'ts-jest/dist/utils/testing'
+import { ShotOptions } from '../../src/types'
 jest.mock('puppeteer')
 
 const mockedLaunch = mocked(launch, true)
@@ -16,9 +17,9 @@ const mockPage = {
 	emulateMediaFeatures: () => null,
 	evaluate: () => null,
 	goto: () => null,
-	screenshot: () => 'abc',
+	screenshot: jest.fn(),
 	setViewport: () => null,
-	pdf: () => 'abc',
+	pdf: jest.fn(),
 }
 const mockBrowser = {
 	close: () => null,
@@ -76,20 +77,12 @@ describe('Puppeteer Screenshot Mechanism', () => {
 
 	describe('retreiving screen shot', () => {
 
+		beforeEach(() => {
+			mockPage.screenshot.mockReset().mockImplementation(() => 'abc')
+			mockPage.pdf.mockReset().mockImplementation(() => 'abc')
+		})
+
 		it('resolves', async() => {
-			/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			jest.spyOn(document, 'querySelectorAll').mockImplementation(() => {
-				const one = document.createElement('p')
-				one.classList.add('one')
-				const two = document.createElement('p')
-				two.setAttribute('id', 'two')
-				const nodeList = document.createElement('div')
-					.appendChild(one)
-					.appendChild(one)
-					.appendChild(two)
-				return nodeList
-			}) */
 
 			const mockOptions = {}
 			const req: Partial<Request> = {
@@ -107,6 +100,22 @@ describe('Puppeteer Screenshot Mechanism', () => {
 			const image = await makeScreenshot(mockBrowser as unknown as Browser, new Screenshot(req as Request), mockOptions)
 
 			expect(image).toBeTruthy()
+		})
+
+		it('resolves binary', async() => {
+
+			const mockOptions = {}
+			const req: Partial<Request> = {
+				path: '/filename',
+				query: {
+					output: 'bin',
+				},
+			}
+
+			await makeScreenshot(mockBrowser as unknown as Browser, new Screenshot(req as Request), mockOptions)
+
+			expect(mockPage.screenshot).toHaveBeenCalledWith({'encoding': 'binary','path': undefined,'quality': undefined,'type': 'png',
+			})
 		})
 
 		it('reject newPage', async() => {
@@ -147,6 +156,56 @@ describe('Puppeteer Screenshot Mechanism', () => {
 			expect(image.errors).toEqual(['rejection'])
 		})
 
+		it('configures jpeg screen shot correctly', async() => {
+			const mockOptions: ScreenshotOptions = {
+				type: 'jpeg'
+			}
+
+			await makeScreenshot(mockBrowser as unknown as Browser, new Screenshot(mockRequest as Request), mockOptions)
+
+			expect(mockPage.screenshot).toHaveBeenCalledWith({'encoding': 'base64', 'path': undefined, 'quality': undefined, 'type': 'jpeg'})
+		})
+
+		it('configures pdf screen shot correctly', async() => {
+			const mockOptions: ShotOptions = {
+				output: 'pdf'
+			}
+
+			await makeScreenshot(mockBrowser as unknown as Browser, new Screenshot(mockRequest as Request, mockOptions))
+
+			expect(mockPage.pdf).toHaveBeenCalledWith({'encoding': 'base64', 'path': undefined, 'quality': undefined, 'type': undefined})
+		})
+
+		it('configures jpg (2) screen shot correctly', async() => {
+			const mockOptions: ShotOptions = {
+				output: 'jpg'
+			}
+
+			await makeScreenshot(mockBrowser as unknown as Browser, new Screenshot(mockRequest as Request, mockOptions))
+
+			expect(mockPage.screenshot).toHaveBeenCalledWith({'encoding': 'base64', 'path': undefined, 'quality': undefined, 'type': 'jpeg'})
+		})
+
+		it('configures png screen shot correctly', async() => {
+			const mockOptions: ShotOptions = {
+				output: 'png'
+			}
+
+			await makeScreenshot(mockBrowser as unknown as Browser, new Screenshot(mockRequest as Request, mockOptions))
+
+			expect(mockPage.screenshot).toHaveBeenCalledWith({'encoding': 'base64', 'path': undefined, 'quality': undefined, 'type': 'png'})
+		})
+
+	})
+
+	it('configures screen shot quality correctly', async() => {
+		const mockOptions: ScreenshotOptions = {
+			quality: 59
+		}
+
+		await makeScreenshot(mockBrowser as unknown as Browser, new Screenshot(mockRequest as Request), mockOptions)
+
+		expect(mockPage.screenshot).toHaveBeenCalledWith({'encoding': 'base64', 'path': undefined, 'quality': 59, 'type': 'png'})
 	})
 
 })
