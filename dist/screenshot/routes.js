@@ -31,81 +31,87 @@ const makeOriginURL = (req, options) => {
         : ''}`
         : req.protocol + '://' + req.get('host') + req.originalUrl;
 };
-exports.getScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void 0, function* () {
-    const image = new Screenshot_1.Screenshot(req, options);
-    const browser = yield browser_1.launchBrowser(res);
-    const response = yield browser_1.makeScreenshot(browser, image, options === null || options === void 0 ? void 0 : options.screenshot);
-    if (options === null || options === void 0 ? void 0 : options.callback)
-        options.callback(response);
-    switch (response.output) {
-        case 'bin':
-            break;
-        case 'jpg':
-            res.type('jpg');
-            break;
-        case 'pdf':
-            res.type('pdf');
-            break;
-        case 'png':
-            res.type('png');
-            break;
-        default:
-            res.type('json');
-            break;
-    }
-    const originalUrl = makeOriginURL(req, options);
-    response.output === 'json'
-        ? res.status(200).send(JSON.stringify({ response, originalUrl }))
-        : response.output === 'bin'
-            ? res.status(200).send(response.src)
-            : res.status(200).send(Buffer.from(response.src, 'base64'));
-    utils_1.logToConsole('closing browser...');
-    yield browser.close();
-    return;
-});
-exports.postScreenshotRoute = (req, res, options) => __awaiter(void 0, void 0, void 0, function* () {
+function getScreenshotRoute(req, res, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const image = new Screenshot_1.Screenshot(req, options);
+        const browser = yield browser_1.launchBrowser(res);
+        const response = yield browser_1.makeScreenshot(browser, image, options === null || options === void 0 ? void 0 : options.screenshot);
+        if (options === null || options === void 0 ? void 0 : options.callback)
+            options.callback(response);
+        switch (response.output) {
+            case 'bin':
+                break;
+            case 'jpg':
+                res.type('jpg');
+                break;
+            case 'pdf':
+                res.type('pdf');
+                break;
+            case 'png':
+                res.type('png');
+                break;
+            default:
+                res.type('json');
+                break;
+        }
+        const originalUrl = makeOriginURL(req, options);
+        response.output === 'json'
+            ? res.status(200).send(JSON.stringify({ response, originalUrl }))
+            : response.output === 'bin'
+                ? res.status(200).send(response.src)
+                : res.status(200).send(Buffer.from(response.src, 'base64'));
+        utils_1.logToConsole('closing browser...');
+        yield browser.close();
+        return;
+    });
+}
+exports.getScreenshotRoute = getScreenshotRoute;
+function postScreenshotRoute(req, res, options) {
     var e_1, _a;
-    res.type('json');
-    const { cached, needed } = req.body.cached && req.body.needed
-        ? req.body
-        : {
-            cached: [],
-            needed: req.body
-        };
-    const browser = yield browser_1.launchBrowser(res);
-    const returns = [];
-    const errors = [];
-    try {
-        for (var needed_1 = __asyncValues(needed), needed_1_1; needed_1_1 = yield needed_1.next(), !needed_1_1.done;) {
-            const query = needed_1_1.value;
-            const img = new Screenshot_1.Screenshot({ query, path: req.path }, options);
-            try {
-                const response = yield browser_1.makeScreenshot(browser, img, options === null || options === void 0 ? void 0 : options.screenshot);
-                if (response.src)
-                    returns.push(response);
-                else
-                    errors.push(response);
-            }
-            catch (error) {
-                img.errors.push(error);
-                utils_1.logErrorToConsole(error);
-                errors.push(img);
-            }
-        }
-    }
-    catch (e_1_1) { e_1 = { error: e_1_1 }; }
-    finally {
+    return __awaiter(this, void 0, void 0, function* () {
+        res.type('json');
+        const { cached, needed } = req.body.cached && req.body.needed
+            ? req.body
+            : {
+                cached: [],
+                needed: req.body
+            };
+        const browser = yield browser_1.launchBrowser(res);
+        const returns = [];
+        const errors = [];
         try {
-            if (needed_1_1 && !needed_1_1.done && (_a = needed_1.return)) yield _a.call(needed_1);
+            for (var needed_1 = __asyncValues(needed), needed_1_1; needed_1_1 = yield needed_1.next(), !needed_1_1.done;) {
+                const query = needed_1_1.value;
+                const img = new Screenshot_1.Screenshot({ query, path: req.path }, options);
+                try {
+                    const response = yield browser_1.makeScreenshot(browser, img, options === null || options === void 0 ? void 0 : options.screenshot);
+                    if (response.src)
+                        returns.push(response);
+                    else
+                        errors.push(response);
+                }
+                catch (error) {
+                    img.errors.push(error);
+                    utils_1.logErrorToConsole(error);
+                    errors.push(img);
+                }
+            }
         }
-        finally { if (e_1) throw e_1.error; }
-    }
-    const originalUrl = makeOriginURL(req, options);
-    const conditionalErrors = errors.length ? { errors } : {};
-    if (options === null || options === void 0 ? void 0 : options.callback)
-        options.callback(returns);
-    res.status(200).send(JSON.stringify(Object.assign(Object.assign({}, conditionalErrors), { originalUrl, response: [...cached, ...returns] })));
-    utils_1.logToConsole('closing browser...');
-    browser.close().catch((e) => void e);
-});
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (needed_1_1 && !needed_1_1.done && (_a = needed_1.return)) yield _a.call(needed_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        const originalUrl = makeOriginURL(req, options);
+        const conditionalErrors = errors.length ? { errors } : {};
+        if (options === null || options === void 0 ? void 0 : options.callback)
+            options.callback(returns);
+        res.status(200).send(JSON.stringify(Object.assign(Object.assign({}, conditionalErrors), { originalUrl, response: [...cached, ...returns] })));
+        utils_1.logToConsole('closing browser...');
+        browser.close().catch((e) => void e);
+    });
+}
+exports.postScreenshotRoute = postScreenshotRoute;
 //# sourceMappingURL=routes.js.map

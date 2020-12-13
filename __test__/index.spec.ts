@@ -1,18 +1,18 @@
 import { Request, Response } from 'express'
-import screenshotR from '../src'
-import { getScreenshotRoute } from '../src/screenshot/routes'
-const mockScreenshotR = async (_req: Request, _res: Response) => await Promise.resolve()
+import screenshotR, { getScreenshot, postScreenshot } from '../src'
+
+jest.mock('../src/screenshot/routes', () => ({
+	getScreenshotRoute: jest.fn(() => new Promise(resolve => resolve('GET'))),
+	postScreenshotRoute: jest.fn(() => new Promise(resolve => resolve('POST'))),
+}))
 
 describe('screenshotR', () => {
-	it('works', () => {
-		// expect(screenshotR()).toEqual(async (_req: Request, _res: Response) => await Promise.resolve())
-		expect(screenshotR()).toBeTruthy()
-		expect(screenshotR('get')).toBeTruthy()
-		expect(screenshotR({ method: 'post' })).toBeTruthy()
-		// expect(screenshotR(undefined)).toBeTruthy()
-		// expect(screenshotR({method: 'get'})).toBeTruthy()
-		// expect(screenshotR({method: 'post'})).toBeTruthy()
+	it('works', async() => {
+		expect(await screenshotR()({} as Request, {} as Response)).toEqual('GET')
+		expect(await screenshotR('post')({} as Request, {} as Response)).toEqual('POST')
+		expect(await screenshotR({ method: 'post' })({} as Request, {} as Response)).toEqual('POST')
+
+		expect(await getScreenshot({} as Request, {} as Response)).toEqual('GET')
+		expect(await postScreenshot({} as Request, {} as Response)).toEqual('POST')
 	})
-	// + mockGetRouteScreenshot
-	// + mockPostRouteScreenshot
 })

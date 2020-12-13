@@ -13,7 +13,7 @@ const makeOriginURL = (req: Request, options?: ShotOptions) => options?.return_u
 	}`
 	: req.protocol + '://' + req.get('host') + req.originalUrl
 
-export const getScreenshotRoute = async (req: Request, res: Response, options?: ShotOptions): Promise<void> => {
+export async function getScreenshotRoute(req: Request, res: Response, options?: ShotOptions): Promise<void> {
 		
 	const image = new Screenshot(req, options)
 	
@@ -53,7 +53,7 @@ export const getScreenshotRoute = async (req: Request, res: Response, options?: 
 	return
 }
 
-export const postScreenshotRoute = async (req: Request, res: Response, options?: ShotOptions): Promise<void> => {
+export async function postScreenshotRoute(req: Request, res: Response, options?: ShotOptions): Promise<void> {
 
 	res.type('json')
 

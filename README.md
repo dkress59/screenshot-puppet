@@ -129,5 +129,4 @@ ___
 - [X] improve ShotQuery (query/body)
 - [X] rename ShotQuery, ShotOptions, …
 - [ ] README.md
-- [ ] custom matcher for [index.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/index.ts) tests
 - [ ] implement [puppet.connect()](https://pptr.dev/#?product=Puppeteer&version=v5.5.0&show=api-puppeteerconnectoptions)
