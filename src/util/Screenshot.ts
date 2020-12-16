@@ -1,5 +1,5 @@
 import queryString from 'query-string'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 import { ShotOptions } from '../types'
 
 interface ShotQuery {
@@ -46,6 +46,16 @@ const mergeData = (options: ShotOptions | undefined, data: string | undefined): 
 		return JSON.parse(user) as Record<string, unknown>
 }
 
+export const parseShotQuery = (query: Record<string, string>): ShotQuery => {
+	return queryString.parse(
+		queryString.stringify(query as Record<string, string>), {
+			arrayFormat: 'comma',
+			parseBooleans: true,
+			parseNumbers: true,
+		}
+	)
+}
+
 export class Screenshot {
 
 	public w = 1024
@@ -62,13 +72,7 @@ export class Screenshot {
 	constructor({ params, query }: Request, options?: ShotOptions) {
 
 		const formats = ['bin', 'jpg', 'json', 'pdf', 'png']
-		const { w, h, url, data, dark, remove, output }: ShotQuery = queryString.parse(
-			queryString.stringify(query as Record<string, string>), {
-				arrayFormat: 'comma',
-				parseBooleans: true,
-				parseNumbers: true,
-			}
-		)
+		const { w, h, url, data, dark, remove, output } = parseShotQuery(query as Record<string, string>)
 
 
 		if (url) // always true

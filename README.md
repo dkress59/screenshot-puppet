@@ -129,6 +129,7 @@ ___
   - [ ] improve return_url
 - [X] improve ShotQuery (query/body)
 - [X] rename ShotQuery, ShotOptions, …
+- [X] export parseShotQuery(req:Express.Request)
 - [ ] README.md
 - [ ] merge branch
 - [ ] implement [puppet.connect()](https://pptr.dev/#?product=Puppeteer&version=v5.5.0&show=api-puppeteerconnectoptions)
