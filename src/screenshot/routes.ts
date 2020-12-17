@@ -14,9 +14,9 @@ const makeOriginURL = (req: Request, options?: ShotOptions) => options?.return_u
 	}`
 	: req.protocol + '://' + req.get('host') + req.originalUrl
 
-export async function getScreenshotRoute(req: Request, res: Response, options?: ShotOptions): Promise<void> {
+export const getScreenshotRoute = async(req: Request, res: Response, options?: ShotOptions): Promise<void> => {
 
-	const cacheSuccess = options?.middleware && await options.middleware(req, res)
+	const cacheSuccess = options?.middleware ? await options.middleware(req, res) : null
 	if (cacheSuccess === false) return
 
 	const image = new Screenshot(req, options)
@@ -62,7 +62,7 @@ export async function getScreenshotRoute(req: Request, res: Response, options?: 
 	return
 }
 
-export async function postScreenshotRoute(req: Request, res: Response, options?: ShotOptions): Promise<void> {
+export const postScreenshotRoute = async(req: Request, res: Response, options?: ShotOptions): Promise<void> => {
 
 	res.type('json')
 
