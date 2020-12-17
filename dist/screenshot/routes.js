@@ -65,12 +65,12 @@ function getScreenshotRoute(req, res, options) {
             : response.output === 'bin'
                 ? res.status(200).send(response.src)
                 : res.status(200).send(Buffer.from(response.src, 'base64'));
-        if (browser) {
-            browser.close().catch((e) => void e);
-            utils_1.logToConsole(`
+        if (cacheSuccess)
+            return undefined;
+        browser.close().catch((e) => void e);
+        utils_1.logToConsole(`
 			browser closed.
 		`);
-        }
         return;
     });
 }
@@ -117,12 +117,12 @@ function postScreenshotRoute(req, res, options) {
         if (options === null || options === void 0 ? void 0 : options.callback)
             options.callback(returns);
         res.status(200).send(JSON.stringify(Object.assign(Object.assign({}, conditionalErrors), { originalUrl, response: [...cached, ...returns] })));
-        if (browser) {
-            browser.close().catch((e) => void e);
-            utils_1.logToConsole(`
-			browser closed.
-		`);
-        }
+        if (!needed.length)
+            return undefined;
+        browser.close().catch((e) => void e);
+        utils_1.logToConsole(`
+		browser closed.
+	`);
     });
 }
 exports.postScreenshotRoute = postScreenshotRoute;
