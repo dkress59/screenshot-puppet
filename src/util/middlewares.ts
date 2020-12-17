@@ -21,7 +21,7 @@ export const headers = (_req: Request, res: Response, next: NextFunction): void 
 	next()
 }
 
-export const cache = async (req: Request, res: Response, next: NextFunction): Promise<Response<unknown> | undefined> => {
+export const cache = async (req: Request, res: Response): Promise<string | false | null> => {
 	const needed: Screenshot[] = []
 	const cached: Screenshot[] = []
 	
@@ -32,40 +32,40 @@ export const cache = async (req: Request, res: Response, next: NextFunction): Pr
 	switch (req.method) {
 
 		default:
-			next()
-			break
+			return null
 
 
 		case 'GET': {
 			const image = req.query
-			if (!image || !('url' in image))
-				return res.status(400).send({ error: 'Required param(s) missing.' })
+			if (!image || !('url' in image)) {
+				res.status(400).send({ error: 'Required param(s) missing.' })
+				return false
+			}
 	
 			// Your cache retreival method here!
-			const cache = null
-			if (!cache)
-				next()
-	
-			break
+			const cache = await 'cached img.src'
+			if (cache)
+				return cache
+			
+			return null
 		}
 
 
 		case 'POST':
-			if (!req.body || req.body === {})
-				return res
+			if (!req.body || req.body === {}) {
+				res
 					.status(402)
 					.send({ error: 'Nothing passed in the request body.' })
+				return false
+			}
 
 			// Your cache retreival method here!
 			for await (const image of req.body) {
-				needed.push(image)
+				await needed.push(image)
 			}
-			/* if (!needed || !needed.length || cached.length === req.body.length)
-				return res.send(JSON.stringify(cached) as string) */
 
 			req.body = { cached, needed }
-			next()
-			break
+			return null
 
 	}
 }

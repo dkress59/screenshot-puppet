@@ -4,6 +4,7 @@ import { launchBrowser, makeScreenshot } from './browser'
 import { Screenshot } from '../util/Screenshot'
 import { ShotOptions } from '../types'
 import queryString from 'query-string'
+import { Browser } from 'puppeteer'
 
 const makeOriginURL = (req: Request, options?: ShotOptions) => options?.return_url
 	? `${options.return_url}${req.path}${req.params?.filename ?? ''}${
@@ -14,12 +15,16 @@ const makeOriginURL = (req: Request, options?: ShotOptions) => options?.return_u
 	: req.protocol + '://' + req.get('host') + req.originalUrl
 
 export async function getScreenshotRoute(req: Request, res: Response, options?: ShotOptions): Promise<void> {
-		
+
+	const cacheSuccess = options?.middleware && await options.middleware(req, res)
+	if (cacheSuccess === false) return
+
 	const image = new Screenshot(req, options)
+	if (cacheSuccess) image.src = cacheSuccess
+
+	const browser = cacheSuccess ? {} as Browser : await launchBrowser(res)
 	
-	const browser = await launchBrowser(res)
-	
-	const response = await makeScreenshot(browser, image, options?.screenshot)
+	const response = cacheSuccess ? image : await makeScreenshot(browser, image, options?.screenshot)
 	
 	if (options?.callback) options.callback(response)
 	
@@ -48,8 +53,12 @@ export async function getScreenshotRoute(req: Request, res: Response, options?: 
 			? res.status(200).send(response.src)
 			: res.status(200).send(Buffer.from(response.src as string, 'base64'))
 	
-	logToConsole('closing browser...')
-	await browser.close()
+	if (browser) {
+		browser.close().catch((e: Error) => void e)
+		logToConsole(`
+			browser closed.
+		`)
+	}
 	return
 }
 
@@ -57,13 +66,15 @@ export async function postScreenshotRoute(req: Request, res: Response, options?:
 
 	res.type('json')
 
+	if (options?.middleware) await options.middleware(req, res)
+
 	const { cached, needed } = req.body.cached && req.body.needed
 		? req.body
 		: {
 			cached: [],
 			needed: req.body
 		}
-	const browser = await launchBrowser(res)
+	const browser = needed.length ? await launchBrowser(res) : {} as Browser
 
 	const returns = []
 	const errors = []
@@ -92,7 +103,11 @@ export async function postScreenshotRoute(req: Request, res: Response, options?:
 		originalUrl,
 		response: [...cached, ...returns],
 	}))
-			
-	logToConsole('closing browser...')
-	browser.close().catch((e: Error) => void e)
+
+	if (browser) {
+		browser.close().catch((e: Error) => void e)
+		logToConsole(`
+			browser closed.
+		`)
+	}
 }

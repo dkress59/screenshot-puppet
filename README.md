@@ -20,10 +20,10 @@ Then you can install screenshotR:
 
 ### Basic Example ([src/server.ts](https://github.com/dkress59/screenshot-puppet/blob/module/src/server.ts))
 
-```ts
+```typescript
 import express from 'express'
 import bodyParser from 'body-parser'
-import { cache, headers, fallback } from './util/middlewares'
+import { cache, fallback, headers } from './util/middlewares'
 import screenshotR from 'screenshotr'
 
 const PORT = process.env.PORT ?? 6000
@@ -31,21 +31,19 @@ const app = express()
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+app.use(headers)
 
-app.use('/', headers) // Check out the example middleware!
-app.use('/', cache) // Check out the example middleware!
+/**********************************************/
 
-/***********************************/
-
-const getShot = screenshotR()
-const postShot = screenshotR('post')
+const getShot = screenshotR({ middleware: cache }) // check out the example middleware!
+const postShot = screenshotR({ method: 'post', middleware: cache })
 
 app.get('/', getShot)
 app.get('/:filename', getShot)
 
 app.post('/', postShot)
 
-/***********************************/
+/**********************************************/
 
 app.use(fallback)
 
@@ -130,6 +128,7 @@ ___
 - [X] improve ShotQuery (query/body)
 - [X] rename ShotQuery, ShotOptions, …
 - [X] export parseShotQuery(req:Express.Request)
+- [ ] fix middleware
 - [ ] README.md
 - [ ] merge branch
 - [ ] implement [puppet.connect()](https://pptr.dev/#?product=Puppeteer&version=v5.5.0&show=api-puppeteerconnectoptions)

@@ -6,7 +6,7 @@ export interface ShotOptions {
 	return_url?: string
 	method?: 'get' | 'post'
 	callback?: CallableFunction
-	middleware?: (req: Request, res: Response, next: NextFunction) => void // ??
+	middleware?: (req: Request, res: Response) => Promise<string | false | null>
 	
 	/**
 	 * 'bin':
