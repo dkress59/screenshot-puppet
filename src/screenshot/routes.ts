@@ -53,7 +53,7 @@ export async function getScreenshotRoute(req: Request, res: Response, options?: 
 			? res.status(200).send(response.src)
 			: res.status(200).send(Buffer.from(response.src as string, 'base64'))
 	
-	if (browser) {
+	if (!cacheSuccess) {
 		browser.close().catch((e: Error) => void e)
 		logToConsole(`
 			browser closed.
@@ -104,7 +104,7 @@ export async function postScreenshotRoute(req: Request, res: Response, options?:
 		response: [...cached, ...returns],
 	}))
 
-	if (browser) {
+	if (needed.length) {
 		browser.close().catch((e: Error) => void e)
 		logToConsole(`
 			browser closed.
