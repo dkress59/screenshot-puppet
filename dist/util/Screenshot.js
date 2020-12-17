@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Screenshot = void 0;
+exports.Screenshot = exports.parseShotQuery = void 0;
 const query_string_1 = __importDefault(require("query-string"));
 const isOverridable = (name, options) => {
     if (!options
@@ -25,8 +25,13 @@ const mergeData = (options, data) => {
         return Object.assign(Object.assign({}, settings), JSON.parse(user));
     if (user)
         return JSON.parse(user);
-    if (settings)
-        return settings;
+};
+exports.parseShotQuery = (query) => {
+    return query_string_1.default.parse(query_string_1.default.stringify(query), {
+        arrayFormat: 'comma',
+        parseBooleans: true,
+        parseNumbers: true,
+    });
 };
 class Screenshot {
     constructor({ params, query }, options) {
@@ -38,11 +43,7 @@ class Screenshot {
         this.errors = [];
         this.output = 'json';
         const formats = ['bin', 'jpg', 'json', 'pdf', 'png'];
-        const { w, h, url, data, dark, remove, output } = query_string_1.default.parse(query_string_1.default.stringify(query), {
-            arrayFormat: 'comma',
-            parseBooleans: true,
-            parseNumbers: true,
-        });
+        const { w, h, url, data, dark, remove, output } = exports.parseShotQuery(query);
         if (url) // always true
             this.url = url.substring(0, 5) === 'http:'
                 ? url

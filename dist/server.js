@@ -13,11 +13,10 @@ const PORT = (_a = process.env.PORT) !== null && _a !== void 0 ? _a : 6000;
 const app = express_1.default();
 app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use(body_parser_1.default.json());
-app.use('/', middlewares_1.headers); // Check out the example middleware!
-app.use('/', middlewares_1.cache); // Check out the example middleware!
+app.use(middlewares_1.headers);
 /**********************************************/
-const getShot = _1.default();
-const postShot = _1.default({ method: 'post' });
+const getShot = _1.default({ middleware: middlewares_1.cache }); // check out the example middleware!
+const postShot = _1.default({ method: 'post', middleware: middlewares_1.cache });
 app.get('/', getShot);
 app.get('/:filename', getShot);
 app.post('/', postShot);

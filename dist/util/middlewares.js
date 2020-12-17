@@ -33,7 +33,7 @@ exports.headers = (_req, res, next) => {
     res.header('Cache-Control', 'private, max-age=1');
     next();
 };
-exports.cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.cache = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var e_1, _a;
     const needed = [];
     const cached = [];
@@ -43,28 +43,31 @@ exports.cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     else */
     switch (req.method) {
         default:
-            next();
-            break;
+            return null;
         case 'GET': {
             const image = req.query;
-            if (!image || !('url' in image))
-                return res.status(400).send({ error: 'Required param(s) missing.' });
+            if (!image || !('url' in image)) {
+                res.status(400).send({ error: 'Required param(s) missing.' });
+                return false;
+            }
             // Your cache retreival method here!
-            const cache = null;
-            if (!cache)
-                next();
-            break;
+            const cache = yield 'cached img.src';
+            if (cache)
+                return cache;
+            return null;
         }
         case 'POST':
-            if (!req.body || req.body === {})
-                return res
+            if (!req.body || req.body === {}) {
+                res
                     .status(402)
                     .send({ error: 'Nothing passed in the request body.' });
+                return false;
+            }
             try {
                 // Your cache retreival method here!
                 for (var _b = __asyncValues(req.body), _c; _c = yield _b.next(), !_c.done;) {
                     const image = _c.value;
-                    needed.push(image);
+                    yield needed.push(image);
                 }
             }
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -74,11 +77,8 @@ exports.cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-            /* if (!needed || !needed.length || cached.length === req.body.length)
-                return res.send(JSON.stringify(cached) as string) */
             req.body = { cached, needed };
-            next();
-            break;
+            return null;
     }
 });
 //# sourceMappingURL=middlewares.js.map

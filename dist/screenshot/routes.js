@@ -33,9 +33,14 @@ const makeOriginURL = (req, options) => {
 };
 function getScreenshotRoute(req, res, options) {
     return __awaiter(this, void 0, void 0, function* () {
+        const cacheSuccess = (options === null || options === void 0 ? void 0 : options.middleware) && (yield options.middleware(req, res));
+        if (cacheSuccess === false)
+            return;
         const image = new Screenshot_1.Screenshot(req, options);
-        const browser = yield browser_1.launchBrowser(res);
-        const response = yield browser_1.makeScreenshot(browser, image, options === null || options === void 0 ? void 0 : options.screenshot);
+        if (cacheSuccess)
+            image.src = cacheSuccess;
+        const browser = cacheSuccess ? {} : yield browser_1.launchBrowser(res);
+        const response = cacheSuccess ? image : yield browser_1.makeScreenshot(browser, image, options === null || options === void 0 ? void 0 : options.screenshot);
         if (options === null || options === void 0 ? void 0 : options.callback)
             options.callback(response);
         switch (response.output) {
@@ -60,8 +65,12 @@ function getScreenshotRoute(req, res, options) {
             : response.output === 'bin'
                 ? res.status(200).send(response.src)
                 : res.status(200).send(Buffer.from(response.src, 'base64'));
-        utils_1.logToConsole('closing browser...');
-        yield browser.close();
+        if (browser) {
+            browser.close().catch((e) => void e);
+            utils_1.logToConsole(`
+			browser closed.
+		`);
+        }
         return;
     });
 }
@@ -70,13 +79,15 @@ function postScreenshotRoute(req, res, options) {
     var e_1, _a;
     return __awaiter(this, void 0, void 0, function* () {
         res.type('json');
+        if (options === null || options === void 0 ? void 0 : options.middleware)
+            yield options.middleware(req, res);
         const { cached, needed } = req.body.cached && req.body.needed
             ? req.body
             : {
                 cached: [],
                 needed: req.body
             };
-        const browser = yield browser_1.launchBrowser(res);
+        const browser = needed.length ? yield browser_1.launchBrowser(res) : {};
         const returns = [];
         const errors = [];
         try {
@@ -85,10 +96,7 @@ function postScreenshotRoute(req, res, options) {
                 const img = new Screenshot_1.Screenshot({ query, path: req.path }, options);
                 try {
                     const response = yield browser_1.makeScreenshot(browser, img, options === null || options === void 0 ? void 0 : options.screenshot);
-                    if (response.src)
-                        returns.push(response);
-                    else
-                        errors.push(response);
+                    returns.push(response);
                 }
                 catch (error) {
                     img.errors.push(error);
@@ -109,8 +117,12 @@ function postScreenshotRoute(req, res, options) {
         if (options === null || options === void 0 ? void 0 : options.callback)
             options.callback(returns);
         res.status(200).send(JSON.stringify(Object.assign(Object.assign({}, conditionalErrors), { originalUrl, response: [...cached, ...returns] })));
-        utils_1.logToConsole('closing browser...');
-        browser.close().catch((e) => void e);
+        if (browser) {
+            browser.close().catch((e) => void e);
+            utils_1.logToConsole(`
+			browser closed.
+		`);
+        }
     });
 }
 exports.postScreenshotRoute = postScreenshotRoute;
