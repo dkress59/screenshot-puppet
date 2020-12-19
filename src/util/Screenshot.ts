@@ -1,5 +1,5 @@
 import queryString from 'query-string'
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import { ShotOptions } from '../types'
 
 interface ShotQuery {

@@ -301,15 +301,14 @@ export const makeScreenshot = async (browser: Browser, image: Screenshot, option
 					image.errors.push(error)
 					logErrorToConsole(error)
 				}
+				//page.waitForTimeout(20)
 			}
-
-		//page.waitForTimeout(20)
 
 		const screenshot = (output === 'pdf')
 			? await page.pdf(safeOptions)
 			: await page.screenshot(safeOptions)
 
-		image.src = screenshot // ToDo: test b64/bin + pdf / return string
+		image.src = screenshot
 
 	} catch (error) {
 

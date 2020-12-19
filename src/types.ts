@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
 export { LaunchOptions, PDFOptions, ScreenshotOptions } from 'puppeteer'
 

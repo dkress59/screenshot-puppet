@@ -6,6 +6,22 @@ A nifty [Express](https://expressjs.com) tool for [Node.js](https://nodejs.org/)
 
 With screenshotR you can… _ToDo_
 
+___
+
+## ToDo
+
+- [ ] rename: screenshooter <–> screenshotRoute <–> screenshotR
+- [X] make options individually overridable
+  - [ ] improve return_url
+- [X] improve ShotQuery (query/body)
+- [X] rename ShotQuery, ShotOptions, …
+- [X] export parseShotQuery(req:Express.Request)
+- [X] fix middleware
+- [ ] README.md
+- [ ] merge branch
+- [ ] publish
+- [ ] implement [puppet.connect()](https://pptr.dev/#?product=Puppeteer&version=v5.5.0&show=api-puppeteerconnectoptions)
+
 ## How to use
 
 ### Installation
@@ -117,18 +133,3 @@ _ToDo_
 #### Cacheing
 
 _ToDo_
-
-___
-
-## ToDo
-
-- [ ] rename: screenshooter <–> screenshotRoute
-- [X] make options individually overridable
-  - [ ] improve return_url
-- [X] improve ShotQuery (query/body)
-- [X] rename ShotQuery, ShotOptions, …
-- [X] export parseShotQuery(req:Express.Request)
-- [ ] fix middleware
-- [ ] README.md
-- [ ] merge branch
-- [ ] implement [puppet.connect()](https://pptr.dev/#?product=Puppeteer&version=v5.5.0&show=api-puppeteerconnectoptions)
