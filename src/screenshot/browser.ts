@@ -218,7 +218,7 @@ export const launchBrowser = async (res?: Response, options?: LaunchOptions): Pr
 			timeout: 6666,
 			defaultViewport: null,
 			ignoreHTTPSErrors: true,
-			args: ['--no-sandbox', '--disable-setuid-sandbox'], // ToDo: neccessary?
+			args: ['--no-sandbox', '--disable-setuid-sandbox'],
 			...options,
 			headless: true,
 		})
@@ -228,7 +228,7 @@ export const launchBrowser = async (res?: Response, options?: LaunchOptions): Pr
 					.status(500)
 					.send({
 						message: 'error launching puppeteer',
-						error: e,
+						error: JSON.stringify(e),
 					})
 
 			throw new Error('error launching puppeteer: ' + JSON.stringify(e)) // breaks jest
